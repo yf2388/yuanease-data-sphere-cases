@@ -1,0 +1,36 @@
+﻿供应商编号,供应商名称,地址,城市,州省,国家,邮编,联系人,联系邮箱,联系电话,供应商类型,业务线,是否优选,付款条件
+9001,Aerospace Materials Corp,1200 Aviation Blvd,Seattle,WA,USA,98101,Sarah Johnson,sarah.johnson@aeromat.com,206-555-0101,Raw Materials,AEROSPACE,是,Net 30
+9002,Titanium Alloys International,4500 Industrial Way,Phoenix,AZ,USA,85001,Michael Chen,m.chen@titaniumalloys.com,602-555-0102,Raw Materials,AEROSPACE,是,Net 45
+9003,Carbon Fiber Solutions,800 Composite Dr,Wichita,KS,USA,67201,Jennifer Davis,j.davis@carbonfibersol.com,316-555-0103,Raw Materials,AEROSPACE,否,Net 60
+9004,Precision Electronics Ltd,2100 Circuit Ave,Austin,TX,USA,78701,Robert Kim,r.kim@precisionelec.com,512-555-0104,Components,AEROSPACE,是,Net 30
+9005,Avionics Systems Inc,3300 Flight Control Rd,Fort Worth,TX,USA,76155,Lisa Wang,l.wang@avionicsys.com,817-555-0105,Components,AEROSPACE,是,Net 30
+9006,Hydraulic Components Co,1750 Pressure Ln,San Diego,CA,USA,92101,David Miller,d.miller@hydrauliccomp.com,619-555-0106,Components,AEROSPACE,否,Net 45
+9007,Steel Works Industries,5000 Foundry St,Pittsburgh,PA,USA,15201,Amanda Rodriguez,a.rodriguez@steelworks.com,412-555-0107,Raw Materials,INDUSTRIAL,是,Net 30
+9008,Advanced Polymers LLC,2800 Chemical Blvd,Houston,TX,USA,77001,Thomas Anderson,t.anderson@advpolymers.com,713-555-0108,Raw Materials,INDUSTRIAL,是,Net 45
+9009,Copper Wire Specialists,900 Conductor Ave,Detroit,MI,USA,48201,Rachel Green,r.green@copperwire.com,313-555-0109,Raw Materials,INDUSTRIAL,否,Net 30
+9010,Industrial Electronics Corp,4200 Automation Dr,Milwaukee,WI,USA,53201,Kevin Brown,k.brown@indelec.com,414-555-0110,Components,INDUSTRIAL,是,Net 30
+9011,Motor Technologies Inc,1600 Drive Systems Way,Cleveland,OH,USA,44101,Maria Garcia,m.garcia@motortech.com,216-555-0111,Components,INDUSTRIAL,是,Net 45
+9012,Sensor Solutions Ltd,3100 Measurement Rd,Chicago,IL,USA,60601,James Wilson,j.wilson@sensorsol.com,312-555-0112,Components,INDUSTRIAL,否,Net 60
+9013,Control Systems Pro,2500 Logic Ln,Atlanta,GA,USA,30301,Susan Taylor,s.taylor@controlsys.com,404-555-0113,Components,INDUSTRIAL,是,Net 30
+9014,Smart Building Materials,1800 Construction Ave,Denver,CO,USA,80201,Mark Thompson,m.thompson@smartbuild.com,303-555-0114,Raw Materials,BUILDINGS,是,Net 30
+9015,HVAC Components Direct,3600 Climate Dr,Nashville,TN,USA,37201,Nicole Martinez,n.martinez@hvaccomp.com,615-555-0115,Components,BUILDINGS,是,Net 45
+9016,Security Systems Supply,1200 Safety Blvd,Las Vegas,NV,USA,89101,Christopher Lee,c.lee@securitysys.com,702-555-0116,Components,BUILDINGS,否,Net 30
+9017,LED Lighting Solutions,2900 Illumination St,Portland,OR,USA,97201,Ashley Davis,a.davis@ledlighting.com,503-555-0117,Components,BUILDINGS,是,Net 30
+9018,Access Control Tech,4100 Entry Way,Boston,MA,USA,02101,Daniel Johnson,d.johnson@accesscontrol.com,617-555-0118,Components,BUILDINGS,是,Net 45
+9019,Fire Safety Systems,1500 Protection Ave,Phoenix,AZ,USA,85002,Laura Wilson,l.wilson@firesafety.com,602-555-0119,Components,BUILDINGS,否,Net 60
+9020,Building Automation Parts,3400 Integration Rd,Miami,FL,USA,33101,Ryan Martinez,r.martinez@buildauto.com,305-555-0120,Components,BUILDINGS,是,Net 30
+9021,Solar Panel Materials,2200 Renewable Dr,San Francisco,CA,USA,94101,Jessica Chen,j.chen@solarmaterials.com,415-555-0121,Raw Materials,ENERGY,是,Net 30
+9022,Battery Technologies Corp,1900 Energy Storage Way,Austin,TX,USA,78702,Andrew Kim,a.kim@batterytech.com,512-555-0122,Components,ENERGY,是,Net 45
+9023,Wind Turbine Components,5200 Turbine Blvd,Kansas City,MO,USA,64101,Melissa Rodriguez,m.rodriguez@windcomp.com,816-555-0123,Components,ENERGY,否,Net 30
+9024,Energy Storage Materials,3800 Grid Ave,Seattle,WA,USA,98102,Jonathan Brown,j.brown@energystorage.com,206-555-0124,Raw Materials,ENERGY,是,Net 30
+9025,Power Electronics Ltd,1400 Inverter Ln,San Jose,CA,USA,95101,Stephanie Taylor,s.taylor@powerelec.com,408-555-0125,Components,ENERGY,是,Net 45
+9026,Renewable Systems Supply,2600 Green Energy St,Portland,OR,USA,97202,Brian Anderson,b.anderson@renewablesys.com,503-555-0126,Components,ENERGY,否,Net 60
+9027,Lithium Materials Inc,4300 Battery Raw Dr,Reno,NV,USA,89501,Christina Davis,c.davis@lithiummaterials.com,775-555-0127,Raw Materials,ENERGY,是,Net 30
+9028,Smart Grid Components,1100 Distribution Way,Denver,CO,USA,80202,Matthew Wilson,m.wilson@smartgrid.com,303-555-0128,Components,ENERGY,是,Net 45
+9029,Energy Efficiency Parts,3500 Conservation Rd,Minneapolis,MN,USA,55401,Amanda Johnson,a.johnson@energyeff.com,612-555-0129,Components,ENERGY,否,Net 30
+9030,Sustainable Tech Supply,2000 Clean Energy Ave,Salt Lake City,UT,USA,84101,Tyler Martinez,t.martinez@sustaintech.com,801-555-0130,Components,ENERGY,是,Net 30
+9031,Precision Machining Works,1700 Manufacturing Dr,Grand Rapids,MI,USA,49501,Emily Thompson,e.thompson@precisionmach.com,616-555-0131,Raw Materials,INDUSTRIAL,是,Net 30
+9032,Aerospace Fasteners Pro,2300 Assembly Ln,Long Beach,CA,USA,90801,Jacob Garcia,j.garcia@aerofasteners.com,562-555-0132,Components,AEROSPACE,是,Net 45
+9033,Industrial Coatings Corp,4600 Surface Treatment St,Cincinnati,OH,USA,45201,Sarah Miller,s.miller@indcoatings.com,513-555-0133,Raw Materials,INDUSTRIAL,否,Net 30
+9034,Building Systems Integration,1300 Facility Ave,Tampa,FL,USA,33601,Michael Davis,m.davis@buildsysint.com,813-555-0134,Components,BUILDINGS,是,Net 30
+9035,Energy Management Solutions,3700 Efficiency Blvd,Charlotte,NC,USA,28201,Jennifer Wilson,j.wilson@energymgmt.com,704-555-0135,Components,ENERGY,是,Net 45

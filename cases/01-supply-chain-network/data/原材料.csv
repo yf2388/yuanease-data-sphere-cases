@@ -1,0 +1,41 @@
+﻿原材料编号,原材料名称,原材料说明,供应商编号,采购单价,厂间运输基准成本,业务线
+101,Aluminum Alloy 6061-T6,High-strength aluminum alloy suitable for aerospace and automotive applications,9001,8.50,2.15,AEROSPACE
+102,Carbon Fiber Composite,Lightweight high-strength carbon fiber reinforced polymer sheets,9003,45.75,8.25,AEROSPACE
+103,Titanium Grade 5 Alloy,Aerospace-grade titanium alloy with excellent strength-to-weight ratio,9002,125.00,18.50,AEROSPACE
+104,Inconel 718,High-temperature nickel-chromium superalloy for jet engine components,9001,85.25,12.75,AEROSPACE
+105,Aluminum 7075-T6,Ultra-high strength aluminum alloy for aerospace structural applications,9001,12.80,3.20,AEROSPACE
+106,Kevlar Aramid Fiber,High-strength aramid fiber for ballistic and structural applications,9003,38.90,7.50,AEROSPACE
+107,Magnesium AZ91D,Lightweight magnesium alloy for aerospace and automotive components,9002,22.45,5.85,AEROSPACE
+108,Stainless Steel 15-5 PH,Precipitation-hardening stainless steel for aerospace applications,9001,18.60,4.25,AEROSPACE
+109,Ceramic Matrix Composite,Advanced ceramic matrix composite for high-temperature applications,9003,95.30,15.40,AEROSPACE
+110,Titanium 6Al-4V Wire,Titanium alloy wire for additive manufacturing and welding applications,9002,145.75,22.80,AEROSPACE
+111,Carbon Steel A36,General purpose structural carbon steel for industrial applications,9007,3.25,1.80,INDUSTRIAL
+112,Stainless Steel 304,Austenitic stainless steel for industrial equipment and piping,9007,8.75,2.95,INDUSTRIAL
+113,Copper C101,High-conductivity oxygen-free copper for electrical applications,9009,12.40,3.60,INDUSTRIAL
+114,Aluminum 6063-T5,Extruded aluminum alloy for industrial framing and structures,9007,6.85,2.40,INDUSTRIAL
+115,Brass C360,Free-machining brass for industrial fittings and components,9009,9.95,3.15,INDUSTRIAL
+116,PVC Plastic Resin,Polyvinyl chloride resin for industrial pipe and fitting applications,9008,2.85,1.25,INDUSTRIAL
+117,Nylon 6/6 Plastic,High-strength nylon polymer for industrial gears and bearings,9008,7.40,2.60,INDUSTRIAL
+118,Polyurethane Elastomer,Flexible polyurethane for industrial seals and gaskets,9008,11.25,3.80,INDUSTRIAL
+119,Silicon Steel,Electrical silicon steel for transformer and motor cores,9007,5.65,2.10,INDUSTRIAL
+120,Tool Steel D2,High-carbon high-chromium tool steel for industrial cutting tools,9007,15.80,4.45,INDUSTRIAL
+121,ABS Plastic Resin,Acrylonitrile butadiene styrene plastic for building components,9014,4.20,1.90,BUILDINGS
+122,Polycarbonate Sheet,Clear polycarbonate sheet for building glazing and safety applications,9014,8.95,3.25,BUILDINGS
+123,Fiberglass Insulation,Thermal insulation fiberglass for building envelope applications,9014,1.85,0.95,BUILDINGS
+124,Vinyl Siding Material,PVC vinyl siding material for exterior building cladding,9014,3.60,1.65,BUILDINGS
+125,Gypsum Wallboard,Gypsum-based wallboard for interior building construction,9014,2.15,1.20,BUILDINGS
+126,Ceramic Tile Material,Porcelain ceramic tile material for building flooring applications,9014,6.75,2.85,BUILDINGS
+127,LED Semiconductor,High-efficiency LED semiconductor chips for lighting applications,9017,12.50,4.20,BUILDINGS
+128,Copper Wire 12 AWG,Solid copper electrical wire for building wiring systems,9009,4.85,2.05,BUILDINGS
+129,Steel Reinforcement Bar,Carbon steel rebar for concrete reinforcement in buildings,9014,2.95,1.45,BUILDINGS
+130,Glass Fiber Mesh,Alkali-resistant glass fiber mesh for building facade systems,9014,3.40,1.75,BUILDINGS
+131,Lithium Iron Phosphate,LiFePO4 cathode material for energy storage battery applications,9027,28.50,6.75,ENERGY
+132,Silicon Solar Cell,High-efficiency monocrystalline silicon solar cell material,9021,15.80,4.95,ENERGY
+133,Neodymium Magnet,Rare earth permanent magnet for wind turbine generators,9023,45.25,8.60,ENERGY
+134,Electrolyte Solution,Lithium salt electrolyte solution for battery manufacturing,9027,22.90,5.40,ENERGY
+135,Graphite Anode Material,Synthetic graphite anode material for lithium-ion batteries,9027,18.75,4.25,ENERGY
+136,Silver Paste,Conductive silver paste for solar cell metallization,9021,85.60,12.30,ENERGY
+137,Copper Foil,High-purity copper foil for battery current collectors,9024,24.40,5.85,ENERGY
+138,Separator Film,Polyethylene separator film for lithium-ion battery cells,9027,16.25,3.90,ENERGY
+139,Aluminum Frame,Extruded aluminum frame for solar panel mounting systems,9024,8.95,2.75,ENERGY
+140,Tempered Glass,Low-iron tempered glass for solar panel front covers,9021,12.60,3.45,ENERGY

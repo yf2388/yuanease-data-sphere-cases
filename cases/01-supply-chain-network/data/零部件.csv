@@ -1,0 +1,53 @@
+﻿零部件编号,零部件名称,零部件说明,关联物料清单,业务线
+1001,Flight Control PCB,Primary flight control printed circuit board with redundant processing units for commercial aircraft,5001,AEROSPACE
+1002,Turbine Blade Assembly,High-temperature resistant turbine blade assembly for jet engines with ceramic coating,5002,AEROSPACE
+1003,Navigation Sensor Module,Integrated GPS/INS navigation sensor module for aircraft positioning and guidance,5003,AEROSPACE
+1004,Engine Control Unit,Full authority digital engine control (FADEC) unit for turbofan engines,5004,AEROSPACE
+1005,Hydraulic Actuator,Primary hydraulic flight surface actuator with integrated position feedback,5005,AEROSPACE
+1006,Avionics Display Unit,High-resolution cockpit display unit with touch interface and redundant processing,5006,AEROSPACE
+1007,Radar Antenna Module,Weather radar antenna module with electronic beam steering capability,5007,AEROSPACE
+1008,Landing Gear Actuator,Electro-hydraulic landing gear retraction actuator with position sensors,5008,AEROSPACE
+1009,Oxygen System Controller,Aircraft oxygen system controller with pressure regulation and monitoring,5009,AEROSPACE
+1010,Communications Radio Module,VHF communications radio module with digital signal processing,5010,AEROSPACE
+2001,PLC I/O Module,Industrial programmable logic controller input/output expansion module,6001,INDUSTRIAL
+2002,Variable Frequency Drive,Three-phase variable frequency drive for industrial motor speed control,6002,INDUSTRIAL
+2003,HMI Touch Panel,10-inch industrial human-machine interface touchscreen panel with Ethernet connectivity,6003,INDUSTRIAL
+2004,Servo Motor,High-precision servo motor with integrated encoder for industrial automation,6004,INDUSTRIAL
+2005,Safety Relay Module,Dual-channel safety relay module for emergency stop and safety interlock systems,6005,INDUSTRIAL
+2006,Flow Sensor,Ultrasonic flow sensor for liquid measurement in industrial process control,6006,INDUSTRIAL
+2007,Pressure Transmitter,4-20mA pressure transmitter for industrial process monitoring,6007,INDUSTRIAL
+2008,Temperature Controller,PID temperature controller with thermocouple input for process control,6008,INDUSTRIAL
+2009,Proximity Sensor,Inductive proximity sensor for metal object detection in automation,6009,INDUSTRIAL
+2010,Pneumatic Valve,Solenoid-operated pneumatic valve with manual override capability,6010,INDUSTRIAL
+2011,Encoder Module,High-resolution rotary encoder for position feedback in servo systems,6011,INDUSTRIAL
+2012,Vision System Camera,Industrial vision system camera with integrated image processing,6012,INDUSTRIAL
+2013,Robotic Gripper,Pneumatic robotic gripper with force feedback and position control,6013,INDUSTRIAL
+2014,Conveyor Motor Drive,Heavy-duty motor drive system for industrial conveyor applications,6014,INDUSTRIAL
+3001,Smart Thermostat,WiFi-enabled smart thermostat with learning algorithms and mobile app control,7001,BUILDINGS
+3002,Access Control Reader,RFID card reader for building access control and security systems,7002,BUILDINGS
+3003,Fire Alarm Panel,Addressable fire alarm control panel with network communication capabilities,7003,BUILDINGS
+3004,LED Lighting Controller,Intelligent LED lighting controller with dimming and color temperature adjustment,7004,BUILDINGS
+3005,Security Camera Module,IP security camera module with night vision and motion detection,7005,BUILDINGS
+3006,Building Automation Gateway,BACnet/IP gateway for building automation system integration,7006,BUILDINGS
+3007,HVAC Damper Actuator,Electric actuator for HVAC damper control with position feedback,7007,BUILDINGS
+3008,Occupancy Sensor,PIR occupancy sensor for automatic lighting and HVAC control,7008,BUILDINGS
+3009,Air Quality Monitor,Multi-sensor air quality monitor for CO2 temperature and humidity,7009,BUILDINGS
+3010,Smart Lock Module,Electronic door lock with keypad biometric and mobile app access,7010,BUILDINGS
+3011,Emergency Lighting Unit,Battery backup LED emergency lighting with self-testing capability,7011,BUILDINGS
+3012,Elevator Control Panel,Microprocessor-based elevator control panel with safety interlocks,7012,BUILDINGS
+3013,Fire Suppression Controller,Intelligent fire suppression system controller with zone control,7013,BUILDINGS
+3014,Intercom System Module,IP-based intercom system module with video calling capability,7014,BUILDINGS
+4001,Battery Management PCB,Lithium-ion battery management system PCB with cell balancing and monitoring,8001,ENERGY
+4002,Solar Inverter Module,Grid-tie solar inverter power module with MPPT control,8002,ENERGY
+4003,Energy Storage Controller,Intelligent energy storage system controller with grid integration capabilities,8003,ENERGY
+4004,DC-DC Converter,High-efficiency isolated DC-DC converter for energy storage applications,8004,ENERGY
+4005,Grid Protection Relay,Microprocessor-based grid protection relay with communication interface,8005,ENERGY
+4006,Power Meter Module,Smart power metering module with demand response capabilities,8006,ENERGY
+4007,Wind Turbine Controller,Wind turbine pitch control system with weather monitoring,8007,ENERGY
+4008,Microgrid Controller,Intelligent microgrid controller for distributed energy resource management,8008,ENERGY
+4009,Solar Panel Optimizer,Power optimizer for individual solar panels with maximum power point tracking,8009,ENERGY
+4010,Energy Management Gateway,Smart grid energy management gateway with demand response capability,8010,ENERGY
+4011,Electric Vehicle Charger,Level 2 electric vehicle charging station with smart grid integration,8011,ENERGY
+4012,Fuel Cell Controller,Hydrogen fuel cell system controller with safety monitoring,8012,ENERGY
+4013,Battery Thermal Manager,Thermal management system for large-scale battery energy storage,8013,ENERGY
+4014,Grid Synchronization Unit,Power electronics unit for renewable energy grid synchronization,8014,ENERGY

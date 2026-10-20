@@ -1,0 +1,55 @@
+gold_version: case05-purchasing-v1
+status: frozen
+protocol: entity-model-score-v1
+weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
+weights_rationale: 沿用协议默认权重。
+derivation: >-
+  实体、唯一标识列与关系取自 instawdb.sql 的主键与外键约束：本案例 9 张表之间的外键共 9 条，全部列为必需（采购单的采购员工号指向本案例不含的员工表，不计）。
+  采购明细的主键是采购单号+明细行号，数据里明细行号单独也唯一，列为等价标识。
+  指标依据建库脚本的列说明：LineTotal「Per product subtotal」、ReceivedQty「Quantity actually received from the vendor」、
+  RejectedQty「Quantity rejected during inspection」、TotalDue「Total due to vendor」；拒收率 = 拒收数量合计 / 收货数量合计。
+entities:
+  - {table: 供应商, kind: object, label: 供应商, identifier: [[供应商编号], [供应商账号]]}
+  - {table: 产品供货, kind: object, label: 产品供货, identifier: [[产品编号, 供应商编号]]}
+  - {table: 采购单, kind: event, label: 采购单, identifier: [[采购单号]]}
+  - {table: 采购明细, kind: event, label: 采购明细, identifier: [[采购单号, 明细行号], [明细行号]]}
+  - {table: 运输方式, kind: object, label: 运输方式, identifier: [[运输方式编号]]}
+  - {table: 产品, kind: object, label: 产品, identifier: [[产品编号], [产品代码]]}
+  - {table: 产品子类, kind: object, label: 产品子类, identifier: [[产品子类编号]]}
+  - {table: 产品大类, kind: object, label: 产品大类, identifier: [[产品大类编号]]}
+  - {table: 计量单位, kind: object, label: 计量单位, identifier: [[计量单位代码]]}
+relations:
+  - {from: 产品供货, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 产品供货, to: 计量单位, on: [[计量单位代码, 计量单位代码]], relationship: many_to_one}
+  - {from: 产品供货, to: 供应商, on: [[供应商编号, 供应商编号]], relationship: many_to_one}
+  - {from: 采购明细, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 采购明细, to: 采购单, on: [[采购单号, 采购单号]], relationship: many_to_one}
+  - {from: 采购单, to: 供应商, on: [[供应商编号, 供应商编号]], relationship: many_to_one}
+  - {from: 采购单, to: 运输方式, on: [[运输方式编号, 运输方式编号]], relationship: many_to_one}
+  - {from: 产品, to: 产品子类, on: [[产品子类编号, 产品子类编号]], relationship: many_to_one}
+  - {from: 产品子类, to: 产品大类, on: [[产品大类编号, 产品大类编号]], relationship: many_to_one}
+metrics:
+  - {table: 采购明细, label: 采购金额, aggregate: sum, column: 行金额, filters: []}
+  - {table: 采购明细, label: 收货数量, aggregate: sum, column: 收货数量, filters: []}
+  - {table: 采购明细, label: 拒收数量, aggregate: sum, column: 拒收数量, filters: []}
+  - table: 采购明细
+    label: 拒收率
+    aggregate: ratio
+    numerator: {aggregate: sum, column: 拒收数量, filters: []}
+    denominator: {aggregate: sum, column: 收货数量, filters: []}
+  - {table: 采购单, label: 应付总额, aggregate: sum, column: 应付总额, filters: []}
+  - {table: 采购单, label: 采购单数, aggregate: count, column: null, filters: []}
+  - {table: 采购单, label: 运费, aggregate: sum, column: 运费, filters: [], required: false}
+  - {table: 采购单, label: 税额, aggregate: sum, column: 税额, filters: [], required: false}
+  - {table: 采购单, label: 小计, aggregate: sum, column: 小计, filters: [], required: false}
+  - {table: 采购单, label: 已完成采购单数, aggregate: count, column: null, filters: [{column: 状态, op: eq, value: 已完成}], required: false}
+  - {table: 采购单, label: 已完成采购单金额, aggregate: sum, column: 应付总额, filters: [{column: 状态, op: eq, value: 已完成}], required: false}
+  - {table: 采购单, label: 待审批采购单数, aggregate: count, column: null, filters: [{column: 状态, op: eq, value: 待审批}], required: false}
+  - {table: 采购明细, label: 订购数量, aggregate: sum, column: 订购数量, filters: [], required: false}
+  - {table: 采购明细, label: 入库数量, aggregate: sum, column: 入库数量, filters: [], required: false}
+  - {table: 采购明细, label: 采购明细行数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 产品供货, label: 平均交期, aggregate: avg, column: 平均交期_天, filters: [], required: false}
+  - {table: 供应商, label: 供应商数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 供应商, label: 优选供应商数, aggregate: count, column: null, filters: [{column: 是否优选, op: eq, value: 是}], required: false}
+format_gaps:
+  - {area: metric, description: 按时到货率（收货日期不晚于要求到货日期）缺少实际收货日期列；准时率无法表达, tables: [采购明细]}

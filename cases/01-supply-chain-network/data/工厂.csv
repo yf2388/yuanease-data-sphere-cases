@@ -1,0 +1,25 @@
+﻿工厂编号,工厂名称,地址,城市,州省,国家,邮编,纬度,经度,厂长联系人编号,面积_平方英尺,员工人数,是否在产,业务线
+1001,Phoenix Aerospace Manufacturing,1200 Aviation Blvd,Phoenix,AZ,USA,85001,33.4484,-112.0740,10001,450000.00,850,是,AEROSPACE
+1002,Seattle Aircraft Components,4500 Boeing Way,Seattle,WA,USA,98101,47.6062,-122.3321,10002,380000.00,625,是,AEROSPACE
+1003,Wichita Aviation Systems,800 Aerospace Dr,Wichita,KS,USA,67201,37.6922,-97.3375,10003,520000.00,945,是,AEROSPACE
+1004,Fort Worth Defense Systems,1500 Military Ave,Fort Worth,TX,USA,76108,32.7555,-97.3308,10004,675000.00,1245,是,AEROSPACE
+1005,Long Beach Aircraft Assembly,2800 Lakewood Blvd,Long Beach,CA,USA,90806,33.7701,-118.1937,10005,890000.00,1850,是,AEROSPACE
+1006,Cincinnati Engine Components,3200 Jet Engine Dr,Cincinnati,OH,USA,45215,39.1031,-84.5120,10006,425000.00,765,是,AEROSPACE
+1007,Atlanta Industrial Automation,2100 Technology Pkwy,Atlanta,GA,USA,30309,33.7490,-84.3880,10007,485000.00,925,是,INDUSTRIAL
+1008,Milwaukee Process Control,1800 Industrial Blvd,Milwaukee,WI,USA,53204,43.0389,-87.9065,10008,365000.00,685,是,INDUSTRIAL
+1009,Houston Petrochemical Systems,4200 Refinery Rd,Houston,TX,USA,77001,29.7604,-95.3698,10009,750000.00,1450,是,INDUSTRIAL
+1010,Detroit Automotive Systems,1600 Motor City Dr,Detroit,MI,USA,48201,42.3314,-83.0458,10010,620000.00,1125,是,INDUSTRIAL
+1011,Chicago Manufacturing Control,3500 Industrial Way,Chicago,IL,USA,60601,41.8781,-87.6298,10011,445000.00,825,是,INDUSTRIAL
+1012,St. Louis Material Handling,2400 Assembly Ave,St. Louis,MO,USA,63101,38.6270,-90.1994,10012,535000.00,975,是,INDUSTRIAL
+1013,Denver Building Automation,1900 Smart Building Dr,Denver,CO,USA,80202,39.7392,-104.9903,10013,325000.00,485,是,BUILDINGS
+1014,Nashville HVAC Systems,2600 Climate Control Ln,Nashville,TN,USA,37201,36.1627,-86.7816,10014,395000.00,625,是,BUILDINGS
+1015,Tampa Security Systems,1400 Safety Blvd,Tampa,FL,USA,33601,27.9506,-82.4572,10015,285000.00,425,是,BUILDINGS
+1016,Phoenix Smart Lighting,3100 LED Technology Dr,Phoenix,AZ,USA,85003,33.4734,-112.0880,10016,245000.00,365,是,BUILDINGS
+1017,Portland Building Controls,2200 Automation Ave,Portland,OR,USA,97201,45.5152,-122.6784,10017,335000.00,515,是,BUILDINGS
+1018,Miami Facility Management,1800 Property Control Way,Miami,FL,USA,33101,25.7617,-80.1918,10018,275000.00,385,是,BUILDINGS
+1019,Austin Energy Storage,3400 Battery Park Dr,Austin,TX,USA,78701,30.2672,-97.7431,10019,685000.00,1285,是,ENERGY
+1020,San Francisco Solar Systems,2800 Renewable Energy Blvd,San Francisco,CA,USA,94103,37.7749,-122.4194,10020,425000.00,745,是,ENERGY
+1021,Portland Wind Power,1600 Turbine Manufacturing Way,Portland,OR,USA,97202,45.5051,-122.6750,10021,595000.00,1085,是,ENERGY
+1022,Phoenix Grid Solutions,4100 Smart Grid Ave,Phoenix,AZ,USA,85004,33.4484,-112.0640,10022,365000.00,625,是,ENERGY
+1023,Denver Microgrid Systems,2300 Distributed Energy Dr,Denver,CO,USA,80203,39.7317,-104.9542,10023,445000.00,785,是,ENERGY
+1024,San Jose EV Charging,1700 Electric Vehicle Way,San Jose,CA,USA,95101,37.3382,-121.8863,10024,315000.00,485,是,ENERGY

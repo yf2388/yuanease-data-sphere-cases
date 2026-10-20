@@ -1,0 +1,63 @@
+gold_version: case01-supply-chain-v1
+status: frozen
+protocol: entity-model-score-v1
+weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
+weights_rationale: 沿用协议默认权重。
+derivation: >-
+  实体与唯一标识列取自 setup.sql 的建表语句（PRIMARY KEY）与语义模型 SUPPLY_CHAIN_ASSISTANT_MODEL.yaml 的 primary_key；
+  工厂表建表语句没有写主键，语义模型写为 MFG_PLANT_ID。工厂库存在语义模型里的主键（原材料、零部件、产品三列）在数据里不唯一（173 行只有 124 组），
+  按数据改为四列组合（加工厂编号），已用 tools/casekit.py gold 核验。关系取自语义模型 relationships 的全部 16 条；物料清单的父项列与数据不一致，处理见各条 waive。
+  指标取自语义模型 verified_queries 中能用单表指标表达的口径；用到列与列比较或相对日期的口径列在 format_gaps。
+entities:
+  - {table: 供应商, kind: object, label: 供应商, identifier: [[供应商编号]]}
+  - {table: 原材料, kind: object, label: 原材料, identifier: [[原材料编号]]}
+  - {table: 零部件, kind: object, label: 零部件, identifier: [[零部件编号]]}
+  - {table: 产品, kind: object, label: 产品, identifier: [[产品编号]]}
+  - {table: 工厂, kind: object, label: 工厂, identifier: [[工厂编号]]}
+  - {table: 客户, kind: object, label: 客户, identifier: [[客户编号]]}
+  - {table: 物料清单, kind: object, label: 物料清单, identifier: [[物料清单编号]]}
+  - {table: 工厂库存, kind: object, label: 工厂库存, identifier: [[工厂编号, 原材料编号, 零部件编号, 产品编号]]}
+  - {table: 订单, kind: event, label: 订单, identifier: [[订单编号]]}
+  - {table: 发货, kind: event, label: 发货, identifier: [[发货单号]]}
+  - {table: 厂间运输附加费, kind: object, label: 厂间运输附加费, identifier: [[调出工厂编号, 调入工厂编号]]}
+relations:
+  - {from: 工厂库存, to: 工厂, on: [[工厂编号, 工厂编号]], relationship: many_to_one}
+  - {from: 工厂库存, to: 原材料, on: [[原材料编号, 原材料编号]], relationship: many_to_one}
+  - {from: 工厂库存, to: 零部件, on: [[零部件编号, 零部件编号]], relationship: many_to_one}
+  - {from: 工厂库存, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 订单, to: 客户, on: [[客户编号, 客户编号]], relationship: many_to_one}
+  - {from: 订单, to: 工厂, on: [[工厂编号, 工厂编号]], relationship: many_to_one}
+  - {from: 订单, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 发货, to: 工厂, on: [[发货工厂编号, 工厂编号]], relationship: many_to_one}
+  - {from: 发货, to: 客户, on: [[收货客户编号, 客户编号]], relationship: many_to_one}
+  - {from: 厂间运输附加费, to: 工厂, on: [[调出工厂编号, 工厂编号]], relationship: many_to_one}
+  - {from: 厂间运输附加费, to: 工厂, on: [[调入工厂编号, 工厂编号]], relationship: many_to_one}
+  - {from: 原材料, to: 供应商, on: [[供应商编号, 供应商编号]], relationship: many_to_one}
+  - {from: 物料清单, to: 产品, on: [[父产品编号, 产品编号]], relationship: many_to_one, waive: 源数据把子装配的父零部件编号也写在父产品编号里（123 行中 54 行是零部件编号，编号段 1001–4014 与产品 5001–8010 不相交），落在产品表的 69 行全部命中}
+  - {from: 物料清单, to: 零部件, on: [[父产品编号, 零部件编号]], relationship: many_to_one, required: false, waive: 同上，父产品编号中 54 行落在零部件表；语义模型没写这条，数据里成立，列为可选}
+  - {from: 物料清单, to: 零部件, on: [[父零部件编号, 零部件编号]], relationship: many_to_one, required: false, waive: 语义模型写了这条，但父零部件编号在数据里全空，只凭数据无法发现，列为可选}
+  - {from: 物料清单, to: 原材料, on: [[子原材料编号, 原材料编号]], relationship: many_to_one}
+  - {from: 物料清单, to: 零部件, on: [[子零部件编号, 零部件编号]], relationship: many_to_one}
+metrics:
+  - {table: 工厂, label: 在产工厂数, aggregate: count, column: null, filters: [{column: 是否在产, op: eq, value: 是}], basis: 'verified query「How many active MFG plants」'}
+  - {table: 工厂库存, label: 成品在库数量, aggregate: sum, column: 在库数量, filters: [{column: 产品编号, op: is_null, value: false}], basis: 'verified query「total quantity of finished goods」'}
+  - {table: 订单, label: 订单数, aggregate: count, column: null, filters: [], basis: 'verified queries「AEROSPACE Business Line Orders」「Recent Orders」'}
+  - {table: 订单, label: 订单金额, aggregate: sum, column: 订单金额, filters: [], basis: 'verified query「Top Customers by Revenue」'}
+  - {table: 工厂库存, label: 在库数量, aggregate: sum, column: 在库数量, filters: [], required: false}
+  - {table: 工厂库存, label: 原材料在库数量, aggregate: sum, column: 在库数量, filters: [{column: 原材料编号, op: is_null, value: false}], required: false}
+  - {table: 工厂库存, label: 零部件在库数量, aggregate: sum, column: 在库数量, filters: [{column: 零部件编号, op: is_null, value: false}], required: false}
+  - {table: 工厂库存, label: 在途数量, aggregate: sum, column: 在途数量, filters: [], required: false}
+  - {table: 订单, label: 订购数量, aggregate: sum, column: 数量, filters: [], required: false}
+  - {table: 发货, label: 发货单数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 发货, label: 运费, aggregate: sum, column: 运费, filters: [], required: false}
+  - {table: 工厂, label: 工厂数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 工厂, label: 员工人数, aggregate: sum, column: 员工人数, filters: [], required: false}
+  - {table: 供应商, label: 供应商数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 客户, label: 客户数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 产品, label: 产品数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 原材料, label: 原材料数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 零部件, label: 零部件数, aggregate: count, column: null, filters: [], required: false}
+format_gaps:
+  - {area: metric, description: 低库存（在库数量 < 安全库存 且 可支撑天数 ≤ 采购提前期 + 提前期波动）与过剩库存需要列与列比较, tables: [工厂库存]}
+  - {area: metric, description: 晚到货（实际到货日期 > 预计到货日期）需要列与列比较, tables: [发货]}
+  - {area: metric, description: 近 30 天订单需要相对当前日期的时间窗, tables: [订单]}

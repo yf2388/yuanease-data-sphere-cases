@@ -1,0 +1,121 @@
+case: 01-supply-chain-network
+note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则：must_include 的每一项都出现在回答里（缺省为期望结果的全部取值；数字允许 0.5% 相对误差，列表项写成 [a, b] 表示任一即可）。
+questions:
+- id: q01
+  question: 目前有多少家在产的工厂？
+  sql: SELECT COUNT(*) FROM 工厂 WHERE 是否在产 = '是'
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 24
+- id: q02
+  question: 航空航天（AEROSPACE）业务线的产品一共有多少笔订单？
+  sql: SELECT COUNT(*) FROM 订单 o JOIN 产品 p ON o.产品编号 = p.产品编号 WHERE p.业务线 = 'AEROSPACE'
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 13
+- id: q03
+  question: 各工厂合计的成品（产品）在库数量是多少？
+  sql: SELECT SUM(在库数量) FROM 工厂库存 WHERE 产品编号 IS NOT NULL
+  expected:
+    columns:
+    - SUM(在库数量)
+    rows:
+    - - 4020
+- id: q04
+  question: 按订单金额合计，排名前 5 的客户是哪几家？各自的订单金额是多少？
+  sql: SELECT c.客户名称, SUM(o.订单金额) AS 金额 FROM 订单 o JOIN 客户 c ON o.客户编号 = c.客户编号 GROUP BY c.客户名称 ORDER BY 金额 DESC LIMIT 5
+  expected:
+    columns:
+    - 客户名称
+    - 金额
+    rows:
+    - - First Solar
+      - 1220000.0
+    - - ExxonMobil
+      - 1115000.0
+    - - BYD America
+      - 850000.0
+    - - NextEra Energy
+      - 570000.0
+    - - Tesla Energy
+      - 450000.0
+- id: q05
+  question: 2024 年 12 月一共收到多少笔订单？
+  sql: SELECT COUNT(*) FROM 订单 WHERE 下单时间 >= '2024-12-01' AND 下单时间 < '2025-01-01'
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 38
+- id: q06
+  question: 按「在库数量低于安全库存，且可支撑天数不超过采购提前期加提前期波动」判定原材料库存偏低，一共有多少条偏低的库存记录？Phoenix Aerospace Manufacturing 工厂有哪几种原材料偏低？
+  sql: SELECT COUNT(*), (SELECT GROUP_CONCAT(n, '、') FROM (SELECT m.原材料名称 AS n FROM 工厂库存 k JOIN 工厂 g ON k.工厂编号 = g.工厂编号 JOIN 原材料 m ON k.原材料编号 = m.原材料编号 WHERE g.工厂名称 = 'Phoenix Aerospace Manufacturing' AND k.在库数量 < k.安全库存 AND k.可支撑天数 <= k.采购提前期_天 + k.提前期波动_天 ORDER BY 1)) FROM 工厂库存 k WHERE k.原材料编号 IS NOT NULL AND k.在库数量 < k.安全库存 AND k.可支撑天数 <= k.采购提前期_天 + k.提前期波动_天
+  must_include:
+  - 26
+  - Aluminum Alloy 6061-T6
+  - Carbon Fiber Composite
+  - Titanium Grade 5 Alloy
+  expected:
+    columns:
+    - COUNT(*)
+    - (SELECT GROUP_CONCAT(n, '、') FROM (SELECT m.原材料名称 AS n FROM 工厂库存 k JOIN 工厂 g ON k.工厂编号 = g.工厂编号 JOIN 原材料 m ON k.原材料编号 = m.原材料编号 WHERE g.工厂名称 = 'Phoenix Aerospace Manufacturing' AND k.在库数量 < k.安全库存 AND k.可支撑天数 <= k.采购提前期_天 + k.提前期波动_天 ORDER BY 1))
+    rows:
+    - - 26
+      - Aluminum Alloy 6061-T6、Carbon Fiber Composite、Titanium Grade 5 Alloy
+- id: q07
+  question: 2024 年第四季度发出的货物中，有多少单实际到货晚于预计到货日期？
+  sql: SELECT COUNT(*) FROM 发货 WHERE 实际到货日期 > 预计到货日期 AND 发货日期 >= '2024-10-01' AND 发货日期 < '2025-01-01'
+  must_include:
+  - - 0
+    - 没有
+    - 零
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 0
+- id: q08
+  question: 名称里含有 steel 或 copper 的原材料有几种？分别叫什么？
+  sql: SELECT COUNT(*), GROUP_CONCAT(原材料名称, '、') FROM (SELECT 原材料名称 FROM 原材料 WHERE LOWER(原材料名称) LIKE '%steel%' OR LOWER(原材料名称) LIKE '%copper%' ORDER BY 1)
+  must_include:
+  - 9
+  - Carbon Steel A36
+  - Copper C101
+  - Copper Foil
+  - Copper Wire 12 AWG
+  - Silicon Steel
+  - Stainless Steel 15-5 PH
+  - Stainless Steel 304
+  - Steel Reinforcement Bar
+  - Tool Steel D2
+  expected:
+    columns:
+    - COUNT(*)
+    - GROUP_CONCAT(原材料名称, '、')
+    rows:
+    - - 9
+      - Carbon Steel A36、Copper C101、Copper Foil、Copper Wire 12 AWG、Silicon Steel、Stainless Steel 15-5 PH、Stainless Steel 304、Steel Reinforcement Bar、Tool Steel D2
+- id: q09
+  question: 哪个供应商供应的原材料种类最多？供应几种？
+  sql: SELECT s.供应商名称, COUNT(*) AS n FROM 原材料 m JOIN 供应商 s ON m.供应商编号 = s.供应商编号 GROUP BY s.供应商名称 ORDER BY n DESC LIMIT 1
+  expected:
+    columns:
+    - 供应商名称
+    - n
+    rows:
+    - - Smart Building Materials
+      - 8
+- id: q10
+  question: 订单金额合计最高的工厂是哪家？金额是多少？
+  sql: SELECT g.工厂名称, SUM(o.订单金额) AS 金额 FROM 订单 o JOIN 工厂 g ON o.工厂编号 = g.工厂编号 GROUP BY g.工厂名称 ORDER BY 金额 DESC LIMIT 1
+  expected:
+    columns:
+    - 工厂名称
+    - 金额
+    rows:
+    - - Portland Wind Power
+      - 1300000.0

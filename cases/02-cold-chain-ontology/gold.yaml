@@ -1,0 +1,58 @@
+gold_version: case02-cold-chain-v1
+status: frozen
+protocol: entity-model-score-v1
+weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
+weights_rationale: 沿用协议默认权重。
+derivation: >-
+  实体取自 Fabric IQ 本体教程第 1 部分的实体类型表（Store 与 Distribution Center 都绑定 dimlocations，Frozen/Perishable Product 都绑定 dimproducts，
+  本产品一张表对应一个实体，所以合并为「地点」「产品」；Sale 绑定 Power BI 语义模型，本复现不含）。唯一标识列取各表的编号列；库存是单次快照，
+  门店编号+产品编号唯一（也接受加上快照时间）。关系取自教程第 1 部分关系类型表中不涉及 Sale 的 8 条。
+  指标取自教程第 2 部分 Inventory 的附加元数据（On-Shelf Availability % = 货架可售数量合计 / 货架容量合计）与 InventoryStatus 的取值说明（0 = AT_RISK）。
+  教程第 2 部分的三条业务规则（冷链异常、库存风险、补货晚到）需要列与列比较或持续时长，列在 format_gaps。
+entities:
+  - {table: 地点, kind: object, label: 地点, identifier: [[地点编号]]}
+  - {table: 产品, kind: object, label: 产品, identifier: [[产品编号]]}
+  - {table: 供应商, kind: object, label: 供应商, identifier: [[供应商编号]]}
+  - {table: 冷柜, kind: object, label: 冷柜, identifier: [[冷柜编号]]}
+  - {table: 库存, kind: object, label: 库存, identifier: [[门店编号, 产品编号], [门店编号, 产品编号, 快照时间]]}
+  - {table: 货运, kind: event, label: 货运, identifier: [[货运单号]]}
+  - {table: 冷柜遥测, kind: event, label: 冷柜遥测, identifier: [[遥测编号]]}
+relations:
+  - {from: 冷柜, to: 地点, on: [[门店编号, 地点编号]], relationship: many_to_one, basis: operates}
+  - {from: 货运, to: 地点, on: [[目的门店编号, 地点编号]], relationship: many_to_one, basis: deliversTo}
+  - {from: 库存, to: 地点, on: [[门店编号, 地点编号]], relationship: many_to_one, basis: stockedAt（Inventory → Store）}
+  - {from: 货运, to: 地点, on: [[发出地点编号, 地点编号]], relationship: many_to_one, basis: originatesAt}
+  - {from: 库存, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one, basis: stockedAt（Product → Inventory）}
+  - {from: 产品, to: 供应商, on: [[供应商编号, 供应商编号]], relationship: many_to_one, basis: suppliedBy}
+  - {from: 货运, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one, basis: contains}
+  - {from: 冷柜遥测, to: 冷柜, on: [[冷柜编号, 冷柜编号]], relationship: many_to_one, basis: hasTelemetryReading}
+metrics:
+  - {table: 库存, label: 货架可售数量, aggregate: sum, column: 货架可售数量, filters: [], basis: On-Shelf Availability % 的分子}
+  - {table: 库存, label: 货架容量, aggregate: sum, column: 货架容量, filters: [], basis: On-Shelf Availability % 的分母}
+  - table: 库存
+    label: 货架可得率
+    aggregate: ratio
+    numerator: {aggregate: sum, column: 货架可售数量, filters: []}
+    denominator: {aggregate: sum, column: 货架容量, filters: []}
+    basis: On-Shelf Availability %
+  - {table: 库存, label: 风险库存记录数, aggregate: count, column: null, filters: [{column: 库存状态, op: eq, value: 0}], basis: InventoryStatus 0 = AT_RISK}
+  - {table: 库存, label: 在库数量, aggregate: sum, column: 在库数量, filters: [], required: false}
+  - {table: 库存, label: 在途数量, aggregate: sum, column: 在途数量, filters: [], required: false}
+  - {table: 库存, label: 安全库存, aggregate: sum, column: 安全库存, filters: [], required: false}
+  - {table: 库存, label: 健康库存记录数, aggregate: count, column: null, filters: [{column: 库存状态, op: eq, value: 1}], required: false}
+  - {table: 库存, label: 库存记录数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 货运, label: 货运单数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 货运, label: 货运数量, aggregate: sum, column: 数量, filters: [], required: false}
+  - {table: 冷柜遥测, label: 遥测读数条数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 冷柜遥测, label: 平均温度, aggregate: avg, column: 温度_摄氏度, filters: [], required: false}
+  - {table: 冷柜遥测, label: 最高温度, aggregate: max, column: 温度_摄氏度, filters: [], required: false}
+  - {table: 冷柜遥测, label: 开门读数条数, aggregate: count, column: null, filters: [{column: 门是否打开, op: eq, value: 是}], required: false}
+  - {table: 冷柜, label: 冷柜数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 地点, label: 门店数, aggregate: count, column: null, filters: [{column: 地点类型, op: eq, value: STORE}], required: false}
+  - {table: 产品, label: 产品数, aggregate: count, column: null, filters: [], required: false}
+format_gaps:
+  - {area: metric, description: 冷链异常：冷柜温度高于产品最高储存温度且持续超过 20 分钟（跨表列比较 + 持续时长）, tables: [冷柜遥测, 冷柜, 产品]}
+  - {area: metric, description: 库存风险：下次到货前预计在库数量低于安全库存（列与列比较）, tables: [库存]}
+  - {area: metric, description: 补货晚到：预计到达时间晚于计划到达时间 4 小时以上（列与列比较）, tables: [货运]}
+  - {area: metric, description: 货架可得率低于 95% 的门店（对比率指标设阈值）, tables: [库存]}
+  - {area: entity, description: 原教程的实体继承（地点 → 门店/配送中心，产品 → 冷冻品/易腐品）本产品用「地点类型」「储存类别」列表达，不单独建子类型实体, tables: [地点, 产品]}

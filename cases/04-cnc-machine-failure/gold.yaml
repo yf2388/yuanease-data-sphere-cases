@@ -1,0 +1,40 @@
+gold_version: case04-cnc-failure-v1
+status: frozen
+protocol: entity-model-score-v1
+weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
+weights_rationale: 沿用协议默认权重。
+derivation: >-
+  本案例的表结构由 prepare/build_data.py 生成，主键与外键由生成规则决定（每张表的编号列唯一；加工记录的设备编号、班组编号，
+  设备台账的产线编号，故障事件的记录编号、设备编号、失效模式代码都取自对应主数据表），金标直接按生成规则写出，并用 tools/casekit.py gold 核验。
+  指标依据 AI4I 数据集文档的目标变量「Machine failure」与五个失效模式标志：故障率 = 故障加工记录数 / 加工记录数。
+entities:
+  - {table: 产线, kind: object, label: 产线, identifier: [[产线编号]]}
+  - {table: 设备台账, kind: object, label: 设备, identifier: [[设备编号]]}
+  - {table: 班组, kind: object, label: 班组, identifier: [[班组编号]]}
+  - {table: 失效模式, kind: object, label: 失效模式, identifier: [[失效模式代码]]}
+  - {table: 加工记录, kind: event, label: 加工记录, identifier: [[记录编号]]}
+  - {table: 故障事件, kind: event, label: 故障事件, identifier: [[故障编号]]}
+relations:
+  - {from: 设备台账, to: 产线, on: [[产线编号, 产线编号]], relationship: many_to_one}
+  - {from: 加工记录, to: 设备台账, on: [[设备编号, 设备编号]], relationship: many_to_one}
+  - {from: 加工记录, to: 班组, on: [[班组编号, 班组编号]], relationship: many_to_one}
+  - {from: 故障事件, to: 加工记录, on: [[记录编号, 记录编号]], relationship: many_to_one}
+  - {from: 故障事件, to: 设备台账, on: [[设备编号, 设备编号]], relationship: many_to_one}
+  - {from: 故障事件, to: 失效模式, on: [[失效模式代码, 失效模式代码]], relationship: many_to_one}
+metrics:
+  - {table: 加工记录, label: 加工次数, aggregate: count, column: null, filters: []}
+  - {table: 加工记录, label: 故障次数, aggregate: count, column: null, filters: [{column: 是否故障, op: eq, value: 是}]}
+  - table: 加工记录
+    label: 故障率
+    aggregate: ratio
+    numerator: {aggregate: count, filters: [{column: 是否故障, op: eq, value: 是}]}
+    denominator: {aggregate: count, filters: []}
+  - {table: 故障事件, label: 故障事件数, aggregate: count, column: null, filters: []}
+  - {table: 加工记录, label: 平均刀具磨损, aggregate: avg, column: 刀具磨损_分钟, filters: [], required: false}
+  - {table: 加工记录, label: 平均扭矩, aggregate: avg, column: 扭矩_Nm, filters: [], required: false}
+  - {table: 加工记录, label: 平均主轴转速, aggregate: avg, column: 主轴转速_rpm, filters: [], required: false}
+  - {table: 加工记录, label: 平均加工温度, aggregate: avg, column: 加工温度_K, filters: [], required: false}
+  - {table: 加工记录, label: 最大刀具磨损, aggregate: max, column: 刀具磨损_分钟, filters: [], required: false}
+  - {table: 设备台账, label: 设备数, aggregate: count, column: null, filters: [], required: false}
+format_gaps:
+  - {area: metric, description: 散热失效等判定条件需要列与列运算（加工温度 − 环境温度、扭矩 × 转速），只能作为说明，不能写成指标筛选, tables: [加工记录]}

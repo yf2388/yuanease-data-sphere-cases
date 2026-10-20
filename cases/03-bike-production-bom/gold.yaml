@@ -1,0 +1,64 @@
+gold_version: case03-bike-production-v1
+status: frozen
+protocol: entity-model-score-v1
+weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
+weights_rationale: 沿用协议默认权重。
+derivation: >-
+  实体、唯一标识列与关系全部取自 instawdb.sql 的主键（PRIMARY KEY）与外键（FOREIGN KEY）约束：本案例 11 张表之间的外键共 14 条，全部列为必需；
+  产品代码有唯一索引 AK_Product_ProductNumber，列为产品的等价标识；工单工序的主键是工单编号+产品编号+工序号，数据里工单编号+工序号同样唯一，列为等价标识。
+  工单工序的产品编号在数据里全部落在产品表，但源库没有这条外键，列为可选。
+  指标依据建库脚本的列说明（MS_Description）：OrderQty「Product quantity to build」、ScrappedQty「Quantity that failed inspection」、
+  ScrapReason「Manufacturing failure reasons lookup table」、ProductInventory.Quantity「Product quantity in inventory」、
+  WorkOrderRouting.ActualResourceHrs / ActualCost。报废率 = 报废数量合计 / 计划数量合计。
+entities:
+  - {table: 产品, kind: object, label: 产品, identifier: [[产品编号], [产品代码]]}
+  - {table: 产品大类, kind: object, label: 产品大类, identifier: [[产品大类编号]]}
+  - {table: 产品子类, kind: object, label: 产品子类, identifier: [[产品子类编号]]}
+  - {table: 产品型号, kind: object, label: 产品型号, identifier: [[产品型号编号]]}
+  - {table: 物料清单, kind: object, label: 物料清单, identifier: [[物料清单编号]]}
+  - {table: 工位, kind: object, label: 工位, identifier: [[工位编号]]}
+  - {table: 产品库存, kind: object, label: 产品库存, identifier: [[产品编号, 工位编号]]}
+  - {table: 报废原因, kind: object, label: 报废原因, identifier: [[报废原因编号]]}
+  - {table: 计量单位, kind: object, label: 计量单位, identifier: [[计量单位代码]]}
+  - {table: 工单, kind: event, label: 工单, identifier: [[工单编号]]}
+  - {table: 工单工序, kind: event, label: 工单工序, identifier: [[工单编号, 产品编号, 工序号], [工单编号, 工序号]]}
+relations:
+  - {from: 物料清单, to: 产品, on: [[装配件产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 物料清单, to: 产品, on: [[组件产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 物料清单, to: 计量单位, on: [[计量单位代码, 计量单位代码]], relationship: many_to_one}
+  - {from: 产品, to: 计量单位, on: [[尺寸单位代码, 计量单位代码]], relationship: many_to_one}
+  - {from: 产品, to: 计量单位, on: [[重量单位代码, 计量单位代码]], relationship: many_to_one}
+  - {from: 产品, to: 产品型号, on: [[产品型号编号, 产品型号编号]], relationship: many_to_one}
+  - {from: 产品, to: 产品子类, on: [[产品子类编号, 产品子类编号]], relationship: many_to_one}
+  - {from: 产品库存, to: 工位, on: [[工位编号, 工位编号]], relationship: many_to_one}
+  - {from: 产品库存, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 产品子类, to: 产品大类, on: [[产品大类编号, 产品大类编号]], relationship: many_to_one}
+  - {from: 工单, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one}
+  - {from: 工单, to: 报废原因, on: [[报废原因编号, 报废原因编号]], relationship: many_to_one}
+  - {from: 工单工序, to: 工位, on: [[工位编号, 工位编号]], relationship: many_to_one}
+  - {from: 工单工序, to: 工单, on: [[工单编号, 工单编号]], relationship: many_to_one}
+  - {from: 工单工序, to: 产品, on: [[产品编号, 产品编号]], relationship: many_to_one, required: false}
+metrics:
+  - {table: 工单, label: 计划数量, aggregate: sum, column: 计划数量, filters: []}
+  - {table: 工单, label: 报废数量, aggregate: sum, column: 报废数量, filters: []}
+  - table: 工单
+    label: 报废率
+    aggregate: ratio
+    numerator: {aggregate: sum, column: 报废数量, filters: []}
+    denominator: {aggregate: sum, column: 计划数量, filters: []}
+  - {table: 产品库存, label: 库存数量, aggregate: sum, column: 数量, filters: []}
+  - {table: 工单工序, label: 实际工时, aggregate: sum, column: 实际工时, filters: []}
+  - {table: 工单工序, label: 实际成本, aggregate: sum, column: 实际成本, filters: []}
+  - {table: 工单, label: 入库数量, aggregate: sum, column: 入库数量, filters: [], required: false}
+  - {table: 工单, label: 工单数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 工单, label: 有报废的工单数, aggregate: count, column: null, filters: [{column: 报废数量, op: gt, value: 0}], required: false}
+  - {table: 工单, label: 有报废原因的工单数, aggregate: count, column: null, filters: [{column: 报废原因编号, op: is_null, value: false}], required: false}
+  - {table: 工单工序, label: 计划成本, aggregate: sum, column: 计划成本, filters: [], required: false}
+  - {table: 工单工序, label: 工序数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 物料清单, label: 物料清单行数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 产品, label: 产品数, aggregate: count, column: null, filters: [], required: false}
+  - {table: 产品, label: 成品数, aggregate: count, column: null, filters: [{column: 是否成品, op: eq, value: 是}], required: false}
+  - {table: 产品, label: 自制产品数, aggregate: count, column: null, filters: [{column: 是否自制, op: eq, value: 是}], required: false}
+format_gaps:
+  - {area: metric, description: 延期完工工单（完工日期 > 交期）需要列与列比较, tables: [工单]}
+  - {area: metric, description: 当前有效的物料清单行（失效日期为空且生效日期不晚于今天）需要相对日期, tables: [物料清单]}

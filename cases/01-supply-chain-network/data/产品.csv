@@ -1,0 +1,41 @@
+﻿产品编号,产品名称,产品说明,产品类别,单价,业务线
+5001,Flight Management System,Complete flight management system for commercial aircraft with navigation and autopilot capabilities,Avionics,125000.00,AEROSPACE
+5002,Engine Monitoring System,Real-time engine health monitoring system with predictive maintenance capabilities,Engine Systems,85000.00,AEROSPACE
+5003,Weather Radar System,Advanced weather detection radar system for aircraft with turbulence prediction,Safety Systems,95000.00,AEROSPACE
+5004,Fuel Management System,Automated fuel management and distribution system for large commercial aircraft,Aircraft Systems,72000.00,AEROSPACE
+5005,Landing Gear Controller,Electronic landing gear control system with position monitoring and safety interlocks,Aircraft Control,58000.00,AEROSPACE
+5006,Navigation System,Inertial navigation system with GPS integration for commercial aircraft,Navigation,89000.00,AEROSPACE
+5007,Communication System,Integrated aircraft communication system with satellite and ground connectivity,Communication,145000.00,AEROSPACE
+5008,Cabin Pressure System,Aircraft cabin pressurization and environmental control system,Environmental Systems,67000.00,AEROSPACE
+5009,Emergency Systems,Aircraft emergency systems including oxygen masks and evacuation equipment,Emergency Systems,78000.00,AEROSPACE
+5010,Avionics Display System,Primary flight display and multifunction display system for cockpit,Display Systems,95000.00,AEROSPACE
+6001,SCADA System,Supervisory control and data acquisition system for industrial process monitoring,Process Control,145000.00,INDUSTRIAL
+6002,DCS Control System,Distributed control system for large-scale industrial process automation,Process Control,185000.00,INDUSTRIAL
+6003,Safety Instrumented System,SIL-rated safety system for critical industrial process protection,Safety Systems,95000.00,INDUSTRIAL
+6004,MES Production System,Manufacturing execution system for production planning and tracking,Manufacturing Software,78000.00,INDUSTRIAL
+6005,Quality Control System,Automated quality inspection and control system with machine vision,Quality Systems,65000.00,INDUSTRIAL
+6006,Asset Management System,Industrial asset monitoring and predictive maintenance system,Asset Management,52000.00,INDUSTRIAL
+6007,Robotic Control System,Advanced robotic control system with vision and motion planning capabilities,Robotics,125000.00,INDUSTRIAL
+6008,Motor Drive System,Variable frequency drive system for industrial motor control and energy efficiency,Drive Systems,165000.00,INDUSTRIAL
+6009,Process Monitoring System,Real-time process monitoring and control system for industrial applications,Monitoring Systems,115000.00,INDUSTRIAL
+6010,Material Handling System,Automated material handling system with conveyor and sorting capabilities,Material Handling,195000.00,INDUSTRIAL
+7001,Building Management System,Integrated building automation system for HVAC climate and energy control,Building Automation,89000.00,BUILDINGS
+7002,Security System,Complete building security system with access control and surveillance,Security Systems,125000.00,BUILDINGS
+7003,Fire Safety System,Comprehensive fire detection alarm and suppression system,Safety Systems,95000.00,BUILDINGS
+7004,Smart Lighting System,Intelligent LED lighting system with occupancy sensing and daylight harvesting,Lighting Systems,35000.00,BUILDINGS
+7005,HVAC Control System,Advanced HVAC control system with energy optimization and zone control,Climate Control,78000.00,BUILDINGS
+7006,Energy Management System,Building energy monitoring and optimization system with demand response,Energy Management,85000.00,BUILDINGS
+7007,Access Control System,Advanced access control system with biometric and card-based authentication,Access Control,145000.00,BUILDINGS
+7008,Elevator Control System,Modern elevator control system with destination dispatch and energy recovery,Elevator Systems,185000.00,BUILDINGS
+7009,Parking Management System,Automated parking management system with license plate recognition,Parking Systems,95000.00,BUILDINGS
+7010,Emergency Communication System,Building-wide emergency communication and notification system,Emergency Systems,65000.00,BUILDINGS
+8001,Battery Energy Storage System,Large-scale lithium-ion battery energy storage system for grid applications,Energy Storage,450000.00,ENERGY
+8002,Solar Power System,Complete photovoltaic solar power generation system with inverters and monitoring,Solar Energy,285000.00,ENERGY
+8003,Wind Power System,Wind turbine power generation system with grid synchronization controls,Wind Energy,650000.00,ENERGY
+8004,Microgrid Controller,Intelligent microgrid management system for distributed energy resources,Grid Control,125000.00,ENERGY
+8005,Grid-Scale Inverter,High-power grid-tie inverter for utility-scale renewable energy integration,Power Electronics,85000.00,ENERGY
+8006,Energy Management Platform,Cloud-based energy management and optimization platform for smart grids,Energy Software,95000.00,ENERGY
+8007,Electric Vehicle Charging System,Level 3 DC fast charging system for electric vehicles with smart grid integration,EV Charging,185000.00,ENERGY
+8008,Fuel Cell Power System,Hydrogen fuel cell power generation system for stationary applications,Fuel Cell Systems,425000.00,ENERGY
+8009,Grid Stabilization System,Power electronics system for grid frequency and voltage stabilization,Grid Systems,375000.00,ENERGY
+8010,Energy Analytics Platform,Advanced energy analytics platform with AI-powered optimization,Analytics Systems,155000.00,ENERGY

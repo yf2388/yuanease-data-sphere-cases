@@ -1,0 +1,113 @@
+case: 03-bike-production-bom
+note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。本案例的工单是 2025 年 5 月开工的全部工单。
+questions:
+- id: q01
+  question: 一共有多少张工单？计划生产数量合计是多少？
+  sql: SELECT COUNT(*), SUM(计划数量) FROM 工单
+  expected:
+    columns:
+    - COUNT(*)
+    - SUM(计划数量)
+    rows:
+    - - 3432
+      - 216968
+- id: q02
+  question: 工单的报废数量合计是多少？报废率（报废数量 ÷ 计划数量）是多少？
+  sql: SELECT SUM(报废数量), ROUND(1.0 * SUM(报废数量) / SUM(计划数量), 4) FROM 工单
+  must_include:
+  - 318
+  - - 0.0015
+    - 0.15
+    - 0.147
+    - 0.1466
+  expected:
+    columns:
+    - SUM(报废数量)
+    - ROUND(1.0 * SUM(报废数量) / SUM(计划数量), 4)
+    rows:
+    - - 318
+      - 0.0015
+- id: q03
+  question: 报废数量最多的三个报废原因是什么？各报废多少件？
+  sql: SELECT r.报废原因, SUM(w.报废数量) AS n FROM 工单 w JOIN 报废原因 r ON w.报废原因编号 = r.报废原因编号 GROUP BY r.报废原因 ORDER BY n DESC LIMIT 3
+  expected:
+    columns:
+    - 报废原因
+    - n
+    rows:
+    - - 修边长度过短
+      - 110
+    - - 热成型温度过高
+      - 67
+    - - 车轮偏位
+      - 43
+- id: q04
+  question: 有多少张工单的完工日期晚于交期？
+  sql: SELECT COUNT(*) FROM 工单 WHERE 完工日期 > 交期
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 1153
+- id: q05
+  question: 按工单工序的实际工时合计，哪个工位最忙？实际工时合计多少小时？
+  sql: SELECT g.工位名称, ROUND(SUM(o.实际工时), 2) AS h FROM 工单工序 o JOIN 工位 g ON o.工位编号 = g.工位编号 GROUP BY g.工位名称 ORDER BY h DESC LIMIT 1
+  expected:
+    columns:
+    - 工位名称
+    - h
+    rows:
+    - - 总装
+      - 4640.0
+- id: q06
+  question: 「车架成型」工位上工单工序的实际成本合计是多少？
+  sql: SELECT ROUND(SUM(o.实际成本), 2) FROM 工单工序 o JOIN 工位 g ON o.工位编号 = g.工位编号 WHERE g.工位名称 = '车架成型'
+  expected:
+    columns:
+    - ROUND(SUM(o.实际成本), 2)
+    rows:
+    - - 40221.0
+- id: q07
+  question: 产品库存的数量合计是多少？库存数量最多的是哪个工位？
+  sql: SELECT (SELECT SUM(数量) FROM 产品库存), g.工位名称 FROM 产品库存 k JOIN 工位 g ON k.工位编号 = g.工位编号 GROUP BY g.工位名称 ORDER BY SUM(k.数量) DESC LIMIT 1
+  expected:
+    columns:
+    - (SELECT SUM(数量) FROM 产品库存)
+    - 工位名称
+    rows:
+    - - 335974
+      - 部件装配
+- id: q08
+  question: 产品「Mountain-100 Black, 42」当前有效的物料清单（失效日期为空）直接包含多少个组件？
+  sql: SELECT COUNT(*) FROM 物料清单 b JOIN 产品 p ON b.装配件产品编号 = p.产品编号 WHERE p.产品名称 = 'Mountain-100 Black, 42' AND b.失效日期 IS NULL
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 14
+- id: q09
+  question: 每个产品大类下各有多少个产品？
+  sql: SELECT c.大类名称, COUNT(*) FROM 产品 p JOIN 产品子类 s ON p.产品子类编号 = s.产品子类编号 JOIN 产品大类 c ON s.产品大类编号 = c.产品大类编号 GROUP BY c.大类名称 ORDER BY 2 DESC
+  expected:
+    columns:
+    - 大类名称
+    - COUNT(*)
+    rows:
+    - - 零部件
+      - 134
+    - - 整车
+      - 97
+    - - 服装
+      - 35
+    - - 配件
+      - 29
+- id: q10
+  question: 哪个产品的工单报废数量最多？报废了多少件？
+  sql: SELECT p.产品名称, SUM(w.报废数量) AS n FROM 工单 w JOIN 产品 p ON w.产品编号 = p.产品编号 GROUP BY p.产品名称 ORDER BY n DESC LIMIT 1
+  expected:
+    columns:
+    - 产品名称
+    - n
+    rows:
+    - - Head Tube
+      - 110

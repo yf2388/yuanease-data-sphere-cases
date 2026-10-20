@@ -1,0 +1,41 @@
+﻿客户编号,客户名称,地址,城市,州省,国家,邮编,联系人编号,行业,业务线
+3001,American Airlines,1 Skyview Dr,Fort Worth,TX,USA,76155,30001,Commercial Aviation,AEROSPACE
+3002,Delta Air Lines,1050 Delta Blvd,Atlanta,GA,USA,30354,30002,Commercial Aviation,AEROSPACE
+3003,Boeing Commercial Airplanes,100 N Riverside Plaza,Seattle,WA,USA,98101,30003,Aircraft Manufacturing,AEROSPACE
+3004,United Airlines,233 S Wacker Dr,Chicago,IL,USA,60606,30004,Commercial Aviation,AEROSPACE
+3005,Southwest Airlines,2702 Love Field Dr,Dallas,TX,USA,75235,30005,Commercial Aviation,AEROSPACE
+3006,Airbus Americas,2551 Riva Rd,Annapolis,MD,USA,21401,30006,Aircraft Manufacturing,AEROSPACE
+3007,Lockheed Martin Aeronautics,1 Lockheed Blvd,Fort Worth,TX,USA,76108,30007,Defense Aerospace,AEROSPACE
+3008,Northrop Grumman,2980 Fairview Park Dr,Falls Church,VA,USA,22042,30008,Defense Aerospace,AEROSPACE
+3009,Raytheon Technologies,870 Winter St,Waltham,MA,USA,02451,30009,Defense Aerospace,AEROSPACE
+3010,JetBlue Airways,27-01 Queens Plaza N,Long Island City,NY,USA,11101,30010,Commercial Aviation,AEROSPACE
+4001,General Electric,1 River Rd,Schenectady,NY,USA,12345,40001,Industrial Manufacturing,INDUSTRIAL
+4002,Siemens USA,300 New Jersey Ave NW,Washington,DC,USA,20001,40002,Industrial Automation,INDUSTRIAL
+4003,Rockwell Automation,1201 S 2nd St,Milwaukee,WI,USA,53204,40003,Industrial Automation,INDUSTRIAL
+4004,ABB Inc,3450 Harvester Rd,Burlington,ON,Canada,L7N3W5,40004,Industrial Automation,INDUSTRIAL
+4005,Schneider Electric,800 Federal St,Andover,MA,USA,01810,40005,Industrial Automation,INDUSTRIAL
+4006,Emerson Electric,8000 W Florissant Ave,St. Louis,MO,USA,63136,40006,Industrial Automation,INDUSTRIAL
+4007,Caterpillar Inc,510 Lake Cook Rd,Deerfield,IL,USA,60015,40007,Heavy Machinery,INDUSTRIAL
+4008,Ford Motor Company,1 American Rd,Dearborn,MI,USA,48126,40008,Automotive Manufacturing,INDUSTRIAL
+4009,General Motors,300 Renaissance Center,Detroit,MI,USA,48265,40009,Automotive Manufacturing,INDUSTRIAL
+4010,3M Company,3M Center,St. Paul,MN,USA,55144,40010,Industrial Manufacturing,INDUSTRIAL
+5001,Johnson Controls,5757 N Green Bay Ave,Milwaukee,WI,USA,53209,50001,Building Technologies,BUILDINGS
+5002,Honeywell Building Technologies,715 Peachtree St NE,Atlanta,GA,USA,30308,50002,Building Automation,BUILDINGS
+5003,Carrier Global,13995 Pasteur Blvd,Palm Beach Gardens,FL,USA,33418,50003,HVAC Systems,BUILDINGS
+5004,Trane Technologies,170 Scott Rd,Piscataway,NJ,USA,08854,50004,Climate Solutions,BUILDINGS
+5005,Otis Elevator Company,1 Carrier Pl,Farmington,CT,USA,06032,50005,Elevator Systems,BUILDINGS
+5006,Tyco International,9 Roszel Rd,Princeton,NJ,USA,08540,50006,Security Systems,BUILDINGS
+5007,Allegion,11819 N Pennsylvania St,Carmel,IN,USA,46032,50007,Security Products,BUILDINGS
+5008,ASSA ABLOY,110 110th Ave NE,Bellevue,WA,USA,98004,50008,Access Solutions,BUILDINGS
+5009,Philips Lighting,200 Franklin Square Dr,Somerset,NJ,USA,08873,50009,Lighting Solutions,BUILDINGS
+5010,Acuity Brands,1170 Peachtree St NE,Atlanta,GA,USA,30309,50010,Lighting Systems,BUILDINGS
+6001,Tesla Energy,3500 Deer Creek Rd,Palo Alto,CA,USA,94304,60001,Energy Storage,ENERGY
+6002,NextEra Energy,700 Universe Blvd,Juno Beach,FL,USA,33408,60002,Renewable Energy,ENERGY
+6003,First Solar,350 W Washington St,Tempe,AZ,USA,85281,60003,Solar Energy,ENERGY
+6004,General Electric Renewable Energy,1 River Rd,Schenectady,NY,USA,12345,60004,Wind Energy,ENERGY
+6005,Vestas Wind Systems,1417 NW Everett St,Portland,OR,USA,97209,60005,Wind Turbines,ENERGY
+6006,SolarEdge Technologies,47300 Kato Rd,Fremont,CA,USA,94538,60006,Solar Inverters,ENERGY
+6007,Enphase Energy,47281 Bayside Pkwy,Fremont,CA,USA,94538,60007,Solar Microinverters,ENERGY
+6008,BYD America,1800 S Figueroa St,Los Angeles,CA,USA,90015,60008,Energy Storage,ENERGY
+6009,Fluence Energy,4300 Wilson Blvd,Arlington,VA,USA,22203,60009,Energy Storage,ENERGY
+6010,ExxonMobil,5959 Las Colinas Blvd,Irving,TX,USA,75039,60010,Energy Infrastructure,ENERGY

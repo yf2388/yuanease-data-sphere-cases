@@ -1,0 +1,505 @@
+﻿产品编号,产品名称,产品代码,是否自制,颜色,标准成本,标价,产品子类编号
+1,Adjustable Race,AR-5381,否,,0.0000,0.0000,
+2,Bearing Ball,BA-8327,否,,0.0000,0.0000,
+3,BB Ball Bearing,BE-2349,是,,0.0000,0.0000,
+4,Headset Ball Bearings,BE-2908,否,,0.0000,0.0000,
+316,Blade,BL-2036,是,,0.0000,0.0000,
+317,LL Crankarm,CA-5965,否,Black,0.0000,0.0000,
+318,ML Crankarm,CA-6738,否,Black,0.0000,0.0000,
+319,HL Crankarm,CA-7457,否,Black,0.0000,0.0000,
+320,Chainring Bolts,CB-2903,否,Silver,0.0000,0.0000,
+321,Chainring Nut,CN-6137,否,Silver,0.0000,0.0000,
+322,Chainring,CR-7833,否,Black,0.0000,0.0000,
+323,Crown Race,CR-9981,否,,0.0000,0.0000,
+324,Chain Stays,CS-2812,是,,0.0000,0.0000,
+325,Decal 1,DC-8732,否,,0.0000,0.0000,
+326,Decal 2,DC-9824,否,,0.0000,0.0000,
+327,Down Tube,DT-2377,是,,0.0000,0.0000,
+328,Mountain End Caps,EC-M092,是,,0.0000,0.0000,
+329,Road End Caps,EC-R098,是,,0.0000,0.0000,
+330,Touring End Caps,EC-T209,是,,0.0000,0.0000,
+331,Fork End,FE-3760,是,,0.0000,0.0000,
+332,Freewheel,FH-2981,否,Silver,0.0000,0.0000,
+341,Flat Washer 1,FW-1000,否,,0.0000,0.0000,
+342,Flat Washer 6,FW-1200,否,,0.0000,0.0000,
+343,Flat Washer 2,FW-1400,否,,0.0000,0.0000,
+344,Flat Washer 9,FW-3400,否,,0.0000,0.0000,
+345,Flat Washer 4,FW-3800,否,,0.0000,0.0000,
+346,Flat Washer 3,FW-5160,否,,0.0000,0.0000,
+347,Flat Washer 8,FW-5800,否,,0.0000,0.0000,
+348,Flat Washer 5,FW-7160,否,,0.0000,0.0000,
+349,Flat Washer 7,FW-9160,否,,0.0000,0.0000,
+350,Fork Crown,FC-3654,是,,0.0000,0.0000,
+351,Front Derailleur Cage,FC-3982,否,Silver,0.0000,0.0000,
+352,Front Derailleur Linkage,FL-2301,否,Silver,0.0000,0.0000,
+355,Guide Pulley,GP-0982,否,,0.0000,0.0000,
+356,LL Grip Tape,GT-0820,否,,0.0000,0.0000,
+357,ML Grip Tape,GT-1209,否,,0.0000,0.0000,
+358,HL Grip Tape,GT-2908,否,,0.0000,0.0000,
+359,Thin-Jam Hex Nut 9,HJ-1213,否,,0.0000,0.0000,
+360,Thin-Jam Hex Nut 10,HJ-1220,否,,0.0000,0.0000,
+361,Thin-Jam Hex Nut 1,HJ-1420,否,,0.0000,0.0000,
+362,Thin-Jam Hex Nut 2,HJ-1428,否,,0.0000,0.0000,
+363,Thin-Jam Hex Nut 15,HJ-3410,否,,0.0000,0.0000,
+364,Thin-Jam Hex Nut 16,HJ-3416,否,,0.0000,0.0000,
+365,Thin-Jam Hex Nut 5,HJ-3816,否,,0.0000,0.0000,
+366,Thin-Jam Hex Nut 6,HJ-3824,否,,0.0000,0.0000,
+367,Thin-Jam Hex Nut 3,HJ-5161,否,,0.0000,0.0000,
+368,Thin-Jam Hex Nut 4,HJ-5162,否,,0.0000,0.0000,
+369,Thin-Jam Hex Nut 13,HJ-5811,否,,0.0000,0.0000,
+370,Thin-Jam Hex Nut 14,HJ-5818,否,,0.0000,0.0000,
+371,Thin-Jam Hex Nut 7,HJ-7161,否,,0.0000,0.0000,
+372,Thin-Jam Hex Nut 8,HJ-7162,否,,0.0000,0.0000,
+373,Thin-Jam Hex Nut 12,HJ-9080,否,,0.0000,0.0000,
+374,Thin-Jam Hex Nut 11,HJ-9161,否,,0.0000,0.0000,
+375,Hex Nut 5,HN-1024,否,,0.0000,0.0000,
+376,Hex Nut 6,HN-1032,否,,0.0000,0.0000,
+377,Hex Nut 16,HN-1213,否,,0.0000,0.0000,
+378,Hex Nut 17,HN-1220,否,,0.0000,0.0000,
+379,Hex Nut 7,HN-1224,否,,0.0000,0.0000,
+380,Hex Nut 8,HN-1420,否,,0.0000,0.0000,
+381,Hex Nut 9,HN-1428,否,,0.0000,0.0000,
+382,Hex Nut 22,HN-3410,否,,0.0000,0.0000,
+383,Hex Nut 23,HN-3416,否,,0.0000,0.0000,
+384,Hex Nut 12,HN-3816,否,,0.0000,0.0000,
+385,Hex Nut 13,HN-3824,否,,0.0000,0.0000,
+386,Hex Nut 1,HN-4402,否,,0.0000,0.0000,
+387,Hex Nut 10,HN-5161,否,,0.0000,0.0000,
+388,Hex Nut 11,HN-5162,否,,0.0000,0.0000,
+389,Hex Nut 2,HN-5400,否,,0.0000,0.0000,
+390,Hex Nut 20,HN-5811,否,,0.0000,0.0000,
+391,Hex Nut 21,HN-5818,否,,0.0000,0.0000,
+392,Hex Nut 3,HN-6320,否,,0.0000,0.0000,
+393,Hex Nut 14,HN-7161,否,,0.0000,0.0000,
+394,Hex Nut 15,HN-7162,否,,0.0000,0.0000,
+395,Hex Nut 4,HN-8320,否,,0.0000,0.0000,
+396,Hex Nut 18,HN-9161,否,,0.0000,0.0000,
+397,Hex Nut 19,HN-9168,否,,0.0000,0.0000,
+398,Handlebar Tube,HT-2981,是,,0.0000,0.0000,
+399,Head Tube,HT-8019,是,,0.0000,0.0000,
+400,LL Hub,HU-6280,是,,0.0000,0.0000,
+401,HL Hub,HU-8998,是,,0.0000,0.0000,
+402,Keyed Washer,KW-4091,否,,0.0000,0.0000,
+403,External Lock Washer 3,LE-1000,否,,0.0000,0.0000,
+404,External Lock Washer 4,LE-1200,否,,0.0000,0.0000,
+405,External Lock Washer 9,LE-1201,否,,0.0000,0.0000,
+406,External Lock Washer 5,LE-1400,否,,0.0000,0.0000,
+407,External Lock Washer 7,LE-3800,否,,0.0000,0.0000,
+408,External Lock Washer 6,LE-5160,否,,0.0000,0.0000,
+409,External Lock Washer 1,LE-6000,否,,0.0000,0.0000,
+410,External Lock Washer 8,LE-7160,否,,0.0000,0.0000,
+411,External Lock Washer 2,LE-8000,否,,0.0000,0.0000,
+412,Internal Lock Washer 3,LI-1000,否,,0.0000,0.0000,
+413,Internal Lock Washer 4,LI-1200,否,,0.0000,0.0000,
+414,Internal Lock Washer 9,LI-1201,否,,0.0000,0.0000,
+415,Internal Lock Washer 5,LI-1400,否,,0.0000,0.0000,
+416,Internal Lock Washer 7,LI-3800,否,,0.0000,0.0000,
+417,Internal Lock Washer 6,LI-5160,否,,0.0000,0.0000,
+418,Internal Lock Washer 10,LI-5800,否,,0.0000,0.0000,
+419,Internal Lock Washer 1,LI-6000,否,,0.0000,0.0000,
+420,Internal Lock Washer 8,LI-7160,否,,0.0000,0.0000,
+421,Internal Lock Washer 2,LI-8000,否,,0.0000,0.0000,
+422,Thin-Jam Lock Nut 9,LJ-1213,否,,0.0000,0.0000,
+423,Thin-Jam Lock Nut 10,LJ-1220,否,,0.0000,0.0000,
+424,Thin-Jam Lock Nut 1,LJ-1420,否,,0.0000,0.0000,
+425,Thin-Jam Lock Nut 2,LJ-1428,否,,0.0000,0.0000,
+426,Thin-Jam Lock Nut 15,LJ-3410,否,,0.0000,0.0000,
+427,Thin-Jam Lock Nut 16,LJ-3416,否,,0.0000,0.0000,
+428,Thin-Jam Lock Nut 5,LJ-3816,否,,0.0000,0.0000,
+429,Thin-Jam Lock Nut 6,LJ-3824,否,,0.0000,0.0000,
+430,Thin-Jam Lock Nut 3,LJ-5161,否,,0.0000,0.0000,
+431,Thin-Jam Lock Nut 4,LJ-5162,否,,0.0000,0.0000,
+432,Thin-Jam Lock Nut 13,LJ-5811,否,,0.0000,0.0000,
+433,Thin-Jam Lock Nut 14,LJ-5818,否,,0.0000,0.0000,
+434,Thin-Jam Lock Nut 7,LJ-7161,否,,0.0000,0.0000,
+435,Thin-Jam Lock Nut 8,LJ-7162,否,,0.0000,0.0000,
+436,Thin-Jam Lock Nut 12,LJ-9080,否,,0.0000,0.0000,
+437,Thin-Jam Lock Nut 11,LJ-9161,否,,0.0000,0.0000,
+438,Lock Nut 5,LN-1024,否,,0.0000,0.0000,
+439,Lock Nut 6,LN-1032,否,,0.0000,0.0000,
+440,Lock Nut 16,LN-1213,否,,0.0000,0.0000,
+441,Lock Nut 17,LN-1220,否,,0.0000,0.0000,
+442,Lock Nut 7,LN-1224,否,,0.0000,0.0000,
+443,Lock Nut 8,LN-1420,否,,0.0000,0.0000,
+444,Lock Nut 9,LN-1428,否,,0.0000,0.0000,
+445,Lock Nut 22,LN-3410,否,,0.0000,0.0000,
+446,Lock Nut 23,LN-3416,否,,0.0000,0.0000,
+447,Lock Nut 12,LN-3816,否,,0.0000,0.0000,
+448,Lock Nut 13,LN-3824,否,,0.0000,0.0000,
+449,Lock Nut 1,LN-4400,否,,0.0000,0.0000,
+450,Lock Nut 10,LN-5161,否,,0.0000,0.0000,
+451,Lock Nut 11,LN-5162,否,,0.0000,0.0000,
+452,Lock Nut 2,LN-5400,否,,0.0000,0.0000,
+453,Lock Nut 20,LN-5811,否,,0.0000,0.0000,
+454,Lock Nut 21,LN-5818,否,,0.0000,0.0000,
+455,Lock Nut 3,LN-6320,否,,0.0000,0.0000,
+456,Lock Nut 14,LN-7161,否,,0.0000,0.0000,
+457,Lock Nut 15,LN-7162,否,,0.0000,0.0000,
+458,Lock Nut 4,LN-8320,否,,0.0000,0.0000,
+459,Lock Nut 19,LN-9080,否,,0.0000,0.0000,
+460,Lock Nut 18,LN-9161,否,,0.0000,0.0000,
+461,Lock Ring,LR-2398,否,Silver,0.0000,0.0000,
+462,Lower Head Race,LR-8520,否,,0.0000,0.0000,
+463,Lock Washer 4,LW-1000,否,,0.0000,0.0000,
+464,Lock Washer 5,LW-1200,否,,0.0000,0.0000,
+465,Lock Washer 10,LW-1201,否,,0.0000,0.0000,
+466,Lock Washer 6,LW-1400,否,,0.0000,0.0000,
+467,Lock Washer 13,LW-3400,否,,0.0000,0.0000,
+468,Lock Washer 8,LW-3800,否,,0.0000,0.0000,
+469,Lock Washer 1,LW-4000,否,,0.0000,0.0000,
+470,Lock Washer 7,LW-5160,否,,0.0000,0.0000,
+471,Lock Washer 12,LW-5800,否,,0.0000,0.0000,
+472,Lock Washer 2,LW-6000,否,,0.0000,0.0000,
+473,Lock Washer 9,LW-7160,否,,0.0000,0.0000,
+474,Lock Washer 3,LW-8000,否,,0.0000,0.0000,
+475,Lock Washer 11,LW-9160,否,,0.0000,0.0000,
+476,Metal Angle,MA-7075,否,,0.0000,0.0000,
+477,Metal Bar 1,MB-2024,否,,0.0000,0.0000,
+478,Metal Bar 2,MB-6061,否,,0.0000,0.0000,
+479,Metal Plate 2,MP-2066,否,,0.0000,0.0000,
+480,Metal Plate 1,MP-2503,否,,0.0000,0.0000,
+481,Metal Plate 3,MP-4960,否,,0.0000,0.0000,
+482,Metal Sheet 2,MS-0253,否,,0.0000,0.0000,
+483,Metal Sheet 3,MS-1256,否,,0.0000,0.0000,
+484,Metal Sheet 7,MS-1981,否,,0.0000,0.0000,
+485,Metal Sheet 4,MS-2259,否,,0.0000,0.0000,
+486,Metal Sheet 5,MS-2341,否,,0.0000,0.0000,
+487,Metal Sheet 6,MS-2348,否,,0.0000,0.0000,
+488,Metal Sheet 1,MS-6061,否,,0.0000,0.0000,
+489,Metal Tread Plate,MT-1000,否,,0.0000,0.0000,
+490,LL Nipple,NI-4127,否,,0.0000,0.0000,
+491,HL Nipple,NI-9522,否,,0.0000,0.0000,
+492,Paint - Black,PA-187B,否,,0.0000,0.0000,
+493,Paint - Red,PA-361R,否,,0.0000,0.0000,
+494,Paint - Silver,PA-529S,否,,0.0000,0.0000,
+495,Paint - Blue,PA-632U,否,,0.0000,0.0000,
+496,Paint - Yellow,PA-823Y,否,,0.0000,0.0000,
+497,Pinch Bolt,PB-6109,否,,0.0000,0.0000,
+504,Cup-Shaped Race,RA-2345,否,,0.0000,0.0000,
+505,Cone-Shaped Race,RA-7490,否,,0.0000,0.0000,
+506,Reflector,RF-9198,否,,0.0000,0.0000,
+507,LL Mountain Rim,RM-M464,否,,0.0000,0.0000,
+508,ML Mountain Rim,RM-M692,否,,0.0000,0.0000,
+509,HL Mountain Rim,RM-M823,否,,0.0000,0.0000,
+510,LL Road Rim,RM-R436,否,,0.0000,0.0000,
+511,ML Road Rim,RM-R600,否,,0.0000,0.0000,
+512,HL Road Rim,RM-R800,否,,0.0000,0.0000,
+513,Touring Rim,RM-T801,否,,0.0000,0.0000,
+514,LL Mountain Seat Assembly,SA-M198,是,,98.7700,133.3400,
+515,ML Mountain Seat Assembly,SA-M237,是,,108.9900,147.1400,
+516,HL Mountain Seat Assembly,SA-M687,是,,145.8700,196.9200,
+517,LL Road Seat Assembly,SA-R127,是,,98.7700,133.3400,
+518,ML Road Seat Assembly,SA-R430,是,,108.9900,147.1400,
+519,HL Road Seat Assembly,SA-R522,是,,145.8700,196.9200,
+520,LL Touring Seat Assembly,SA-T467,是,,98.7700,133.3400,
+521,ML Touring Seat Assembly,SA-T612,是,,108.9900,147.1400,
+522,HL Touring Seat Assembly,SA-T872,是,,145.8700,196.9200,
+523,LL Spindle/Axle,SD-2342,否,,0.0000,0.0000,
+524,HL Spindle/Axle,SD-9872,否,,0.0000,0.0000,
+525,LL Shell,SH-4562,否,,0.0000,0.0000,
+526,HL Shell,SH-9312,否,,0.0000,0.0000,
+527,Spokes,SK-9283,否,,0.0000,0.0000,
+528,Seat Lug,SL-0931,否,,0.0000,0.0000,
+529,Stem,SM-9087,是,,0.0000,0.0000,
+530,Seat Post,SP-2981,否,,0.0000,0.0000,
+531,Steerer,SR-2098,是,,0.0000,0.0000,
+532,Seat Stays,SS-2985,是,,0.0000,0.0000,
+533,Seat Tube,ST-9828,是,,0.0000,0.0000,
+534,Top Tube,TO-2301,是,,0.0000,0.0000,
+535,Tension Pulley,TP-0923,否,,0.0000,0.0000,
+679,Rear Derailleur Cage,RC-0291,否,Silver,0.0000,0.0000,
+680,"HL Road Frame - Black, 58",FR-R92B-58,是,Black,1059.3100,1431.5000,14
+706,"HL Road Frame - Red, 58",FR-R92R-58,是,Red,1059.3100,1431.5000,14
+707,"Sport-100 Helmet, Red",HL-U509-R,否,Red,13.0863,34.9900,31
+708,"Sport-100 Helmet, Black",HL-U509,否,Black,13.0863,34.9900,31
+709,"Mountain Bike Socks, M",SO-B909-M,否,White,3.3963,9.5000,23
+710,"Mountain Bike Socks, L",SO-B909-L,否,White,3.3963,9.5000,23
+711,"Sport-100 Helmet, Blue",HL-U509-B,否,Blue,13.0863,34.9900,31
+712,AWC Logo Cap,CA-1098,否,Multi,6.9223,8.9900,19
+713,"Long-Sleeve Logo Jersey, S",LJ-0192-S,否,Multi,38.4923,49.9900,21
+714,"Long-Sleeve Logo Jersey, M",LJ-0192-M,否,Multi,38.4923,49.9900,21
+715,"Long-Sleeve Logo Jersey, L",LJ-0192-L,否,Multi,38.4923,49.9900,21
+716,"Long-Sleeve Logo Jersey, XL",LJ-0192-X,否,Multi,38.4923,49.9900,21
+717,"HL Road Frame - Red, 62",FR-R92R-62,是,Red,868.6342,1431.5000,14
+718,"HL Road Frame - Red, 44",FR-R92R-44,是,Red,868.6342,1431.5000,14
+719,"HL Road Frame - Red, 48",FR-R92R-48,是,Red,868.6342,1431.5000,14
+720,"HL Road Frame - Red, 52",FR-R92R-52,是,Red,868.6342,1431.5000,14
+721,"HL Road Frame - Red, 56",FR-R92R-56,是,Red,868.6342,1431.5000,14
+722,"LL Road Frame - Black, 58",FR-R38B-58,是,Black,204.6251,337.2200,14
+723,"LL Road Frame - Black, 60",FR-R38B-60,是,Black,204.6251,337.2200,14
+724,"LL Road Frame - Black, 62",FR-R38B-62,是,Black,204.6251,337.2200,14
+725,"LL Road Frame - Red, 44",FR-R38R-44,是,Red,187.1571,337.2200,14
+726,"LL Road Frame - Red, 48",FR-R38R-48,是,Red,187.1571,337.2200,14
+727,"LL Road Frame - Red, 52",FR-R38R-52,是,Red,187.1571,337.2200,14
+728,"LL Road Frame - Red, 58",FR-R38R-58,是,Red,187.1571,337.2200,14
+729,"LL Road Frame - Red, 60",FR-R38R-60,是,Red,187.1571,337.2200,14
+730,"LL Road Frame - Red, 62",FR-R38R-62,是,Red,187.1571,337.2200,14
+731,"ML Road Frame - Red, 44",FR-R72R-44,是,Red,352.1394,594.8300,14
+732,"ML Road Frame - Red, 48",FR-R72R-48,是,Red,352.1394,594.8300,14
+733,"ML Road Frame - Red, 52",FR-R72R-52,是,Red,352.1394,594.8300,14
+734,"ML Road Frame - Red, 58",FR-R72R-58,是,Red,352.1394,594.8300,14
+735,"ML Road Frame - Red, 60",FR-R72R-60,是,Red,352.1394,594.8300,14
+736,"LL Road Frame - Black, 44",FR-R38B-44,是,Black,204.6251,337.2200,14
+737,"LL Road Frame - Black, 48",FR-R38B-48,是,Black,204.6251,337.2200,14
+738,"LL Road Frame - Black, 52",FR-R38B-52,是,Black,204.6251,337.2200,14
+739,"HL Mountain Frame - Silver, 42",FR-M94S-42,是,Silver,747.2002,1364.5000,12
+740,"HL Mountain Frame - Silver, 44",FR-M94S-44,是,Silver,706.8110,1364.5000,12
+741,"HL Mountain Frame - Silver, 48",FR-M94S-52,是,Silver,706.8110,1364.5000,12
+742,"HL Mountain Frame - Silver, 46",FR-M94S-46,是,Silver,747.2002,1364.5000,12
+743,"HL Mountain Frame - Black, 42",FR-M94B-42,是,Black,739.0410,1349.6000,12
+744,"HL Mountain Frame - Black, 44",FR-M94B-44,是,Black,699.0928,1349.6000,12
+745,"HL Mountain Frame - Black, 48",FR-M94B-48,是,Black,699.0928,1349.6000,12
+746,"HL Mountain Frame - Black, 46",FR-M94B-46,是,Black,739.0410,1349.6000,12
+747,"HL Mountain Frame - Black, 38",FR-M94B-38,是,Black,739.0410,1349.6000,12
+748,"HL Mountain Frame - Silver, 38",FR-M94S-38,是,Silver,747.2002,1364.5000,12
+749,"Road-150 Red, 62",BK-R93R-62,是,Red,2171.2942,3578.2700,2
+750,"Road-150 Red, 44",BK-R93R-44,是,Red,2171.2942,3578.2700,2
+751,"Road-150 Red, 48",BK-R93R-48,是,Red,2171.2942,3578.2700,2
+752,"Road-150 Red, 52",BK-R93R-52,是,Red,2171.2942,3578.2700,2
+753,"Road-150 Red, 56",BK-R93R-56,是,Red,2171.2942,3578.2700,2
+754,"Road-450 Red, 58",BK-R68R-58,是,Red,884.7083,1457.9900,2
+755,"Road-450 Red, 60",BK-R68R-60,是,Red,884.7083,1457.9900,2
+756,"Road-450 Red, 44",BK-R68R-44,是,Red,884.7083,1457.9900,2
+757,"Road-450 Red, 48",BK-R68R-48,是,Red,884.7083,1457.9900,2
+758,"Road-450 Red, 52",BK-R68R-52,是,Red,884.7083,1457.9900,2
+759,"Road-650 Red, 58",BK-R50R-58,是,Red,486.7066,782.9900,2
+760,"Road-650 Red, 60",BK-R50R-60,是,Red,486.7066,782.9900,2
+761,"Road-650 Red, 62",BK-R50R-62,是,Red,486.7066,782.9900,2
+762,"Road-650 Red, 44",BK-R50R-44,是,Red,486.7066,782.9900,2
+763,"Road-650 Red, 48",BK-R50R-48,是,Red,486.7066,782.9900,2
+764,"Road-650 Red, 52",BK-R50R-52,是,Red,486.7066,782.9900,2
+765,"Road-650 Black, 58",BK-R50B-58,是,Black,486.7066,782.9900,2
+766,"Road-650 Black, 60",BK-R50B-60,是,Black,486.7066,782.9900,2
+767,"Road-650 Black, 62",BK-R50B-62,是,Black,486.7066,782.9900,2
+768,"Road-650 Black, 44",BK-R50B-44,是,Black,486.7066,782.9900,2
+769,"Road-650 Black, 48",BK-R50B-48,是,Black,486.7066,782.9900,2
+770,"Road-650 Black, 52",BK-R50B-52,是,Black,486.7066,782.9900,2
+771,"Mountain-100 Silver, 38",BK-M82S-38,是,Silver,1912.1544,3399.9900,1
+772,"Mountain-100 Silver, 42",BK-M82S-42,是,Silver,1912.1544,3399.9900,1
+773,"Mountain-100 Silver, 44",BK-M82S-44,是,Silver,1912.1544,3399.9900,1
+774,"Mountain-100 Silver, 48",BK-M82S-48,是,Silver,1912.1544,3399.9900,1
+775,"Mountain-100 Black, 38",BK-M82B-38,是,Black,1898.0944,3374.9900,1
+776,"Mountain-100 Black, 42",BK-M82B-42,是,Black,1898.0944,3374.9900,1
+777,"Mountain-100 Black, 44",BK-M82B-44,是,Black,1898.0944,3374.9900,1
+778,"Mountain-100 Black, 48",BK-M82B-48,是,Black,1898.0944,3374.9900,1
+779,"Mountain-200 Silver, 38",BK-M68S-38,是,Silver,1265.6195,2319.9900,1
+780,"Mountain-200 Silver, 42",BK-M68S-42,是,Silver,1265.6195,2319.9900,1
+781,"Mountain-200 Silver, 46",BK-M68S-46,是,Silver,1265.6195,2319.9900,1
+782,"Mountain-200 Black, 38",BK-M68B-38,是,Black,1251.9813,2294.9900,1
+783,"Mountain-200 Black, 42",BK-M68B-42,是,Black,1251.9813,2294.9900,1
+784,"Mountain-200 Black, 46",BK-M68B-46,是,Black,1251.9813,2294.9900,1
+785,"Mountain-300 Black, 38",BK-M47B-38,是,Black,598.4354,1079.9900,1
+786,"Mountain-300 Black, 40",BK-M47B-40,是,Black,598.4354,1079.9900,1
+787,"Mountain-300 Black, 44",BK-M47B-44,是,Black,598.4354,1079.9900,1
+788,"Mountain-300 Black, 48",BK-M47B-48,是,Black,598.4354,1079.9900,1
+789,"Road-250 Red, 44",BK-R89R-44,是,Red,1518.7864,2443.3500,2
+790,"Road-250 Red, 48",BK-R89R-48,是,Red,1518.7864,2443.3500,2
+791,"Road-250 Red, 52",BK-R89R-52,是,Red,1518.7864,2443.3500,2
+792,"Road-250 Red, 58",BK-R89R-58,是,Red,1554.9479,2443.3500,2
+793,"Road-250 Black, 44",BK-R89B-44,是,Black,1554.9479,2443.3500,2
+794,"Road-250 Black, 48",BK-R89B-48,是,Black,1554.9479,2443.3500,2
+795,"Road-250 Black, 52",BK-R89B-52,是,Black,1554.9479,2443.3500,2
+796,"Road-250 Black, 58",BK-R89B-58,是,Black,1554.9479,2443.3500,2
+797,"Road-550-W Yellow, 38",BK-R64Y-38,是,Yellow,713.0798,1120.4900,2
+798,"Road-550-W Yellow, 40",BK-R64Y-40,是,Yellow,713.0798,1120.4900,2
+799,"Road-550-W Yellow, 42",BK-R64Y-42,是,Yellow,713.0798,1120.4900,2
+800,"Road-550-W Yellow, 44",BK-R64Y-44,是,Yellow,713.0798,1120.4900,2
+801,"Road-550-W Yellow, 48",BK-R64Y-48,是,Yellow,713.0798,1120.4900,2
+802,LL Fork,FK-1639,是,,65.8097,148.2200,10
+803,ML Fork,FK-5136,是,,77.9176,175.4900,10
+804,HL Fork,FK-9939,是,,101.8936,229.4900,10
+805,LL Headset,HS-0296,是,,15.1848,34.2000,11
+806,ML Headset,HS-2451,是,,45.4168,102.2900,11
+807,HL Headset,HS-3479,是,,55.3801,124.7300,11
+808,LL Mountain Handlebars,HB-M243,是,,19.7758,44.5400,4
+809,ML Mountain Handlebars,HB-M763,是,,27.4925,61.9200,4
+810,HL Mountain Handlebars,HB-M918,是,,53.3999,120.2700,4
+811,LL Road Handlebars,HB-R504,是,,19.7758,44.5400,4
+812,ML Road Handlebars,HB-R720,是,,27.4925,61.9200,4
+813,HL Road Handlebars,HB-R956,是,,53.3999,120.2700,4
+814,"ML Mountain Frame - Black, 38",FR-M63B-38,是,Black,185.8193,348.7600,12
+815,LL Mountain Front Wheel,FW-M423,是,Black,26.9708,60.7450,17
+816,ML Mountain Front Wheel,FW-M762,是,Black,92.8071,209.0250,17
+817,HL Mountain Front Wheel,FW-M928,是,Black,133.2955,300.2150,17
+818,LL Road Front Wheel,FW-R623,是,Black,37.9909,85.5650,17
+819,ML Road Front Wheel,FW-R762,是,Black,110.2829,248.3850,17
+820,HL Road Front Wheel,FW-R820,是,Black,146.5466,330.0600,17
+821,Touring Front Wheel,FW-T905,是,Black,96.7964,218.0100,17
+822,"ML Road Frame-W - Yellow, 38",FR-R72Y-38,是,Yellow,360.9428,594.8300,14
+823,LL Mountain Rear Wheel,RW-M423,是,Black,38.9588,87.7450,17
+824,ML Mountain Rear Wheel,RW-M762,是,Black,104.7951,236.0250,17
+825,HL Mountain Rear Wheel,RW-M928,是,Black,145.2835,327.2150,17
+826,LL Road Rear Wheel,RW-R623,是,Black,49.9789,112.5650,17
+827,ML Road Rear Wheel,RW-R762,是,Black,122.2709,275.3850,17
+828,HL Road Rear Wheel,RW-R820,是,Black,158.5346,357.0600,17
+829,Touring Rear Wheel,RW-T905,是,Black,108.7844,245.0100,17
+830,"ML Mountain Frame - Black, 40",FR-M63B-40,是,Black,185.8193,348.7600,12
+831,"ML Mountain Frame - Black, 44",FR-M63B-44,是,Black,185.8193,348.7600,12
+832,"ML Mountain Frame - Black, 48",FR-M63B-48,是,Black,185.8193,348.7600,12
+833,"ML Road Frame-W - Yellow, 40",FR-R72Y-40,是,Yellow,360.9428,594.8300,14
+834,"ML Road Frame-W - Yellow, 42",FR-R72Y-42,是,Yellow,360.9428,594.8300,14
+835,"ML Road Frame-W - Yellow, 44",FR-R72Y-44,是,Yellow,360.9428,594.8300,14
+836,"ML Road Frame-W - Yellow, 48",FR-R72Y-48,是,Yellow,360.9428,594.8300,14
+837,"HL Road Frame - Black, 62",FR-R92B-62,是,Black,868.6342,1431.5000,14
+838,"HL Road Frame - Black, 44",FR-R92B-44,是,Black,868.6342,1431.5000,14
+839,"HL Road Frame - Black, 48",FR-R92B-48,是,Black,868.6342,1431.5000,14
+840,"HL Road Frame - Black, 52",FR-R92B-52,是,Black,868.6342,1431.5000,14
+841,"Men's Sports Shorts, S",SH-M897-S,否,Black,24.7459,59.9900,22
+842,"Touring-Panniers, Large",PA-T100,否,Grey,51.5625,125.0000,35
+843,Cable Lock,LO-C100,否,,10.3125,25.0000,34
+844,Minipump,PU-0452,否,,8.2459,19.9900,36
+845,Mountain Pump,PU-M044,否,,10.3084,24.9900,36
+846,Taillights - Battery-Powered,LT-T990,否,,5.7709,13.9900,33
+847,Headlights - Dual-Beam,LT-H902,否,,14.4334,34.9900,33
+848,Headlights - Weatherproof,LT-H903,否,,18.5584,44.9900,33
+849,"Men's Sports Shorts, M",SH-M897-M,否,Black,24.7459,59.9900,22
+850,"Men's Sports Shorts, L",SH-M897-L,否,Black,24.7459,59.9900,22
+851,"Men's Sports Shorts, XL",SH-M897-X,否,Black,24.7459,59.9900,22
+852,"Women's Tights, S",TG-W091-S,否,Black,30.9334,74.9900,24
+853,"Women's Tights, M",TG-W091-M,否,Black,30.9334,74.9900,24
+854,"Women's Tights, L",TG-W091-L,否,Black,30.9334,74.9900,24
+855,"Men's Bib-Shorts, S",SB-M891-S,否,Multi,37.1209,89.9900,18
+856,"Men's Bib-Shorts, M",SB-M891-M,否,Multi,37.1209,89.9900,18
+857,"Men's Bib-Shorts, L",SB-M891-L,否,Multi,37.1209,89.9900,18
+858,"Half-Finger Gloves, S",GL-H102-S,否,Black,9.1593,24.4900,20
+859,"Half-Finger Gloves, M",GL-H102-M,否,Black,9.1593,24.4900,20
+860,"Half-Finger Gloves, L",GL-H102-L,否,Black,9.1593,24.4900,20
+861,"Full-Finger Gloves, S",GL-F110-S,否,Black,15.6709,37.9900,20
+862,"Full-Finger Gloves, M",GL-F110-M,否,Black,15.6709,37.9900,20
+863,"Full-Finger Gloves, L",GL-F110-L,否,Black,15.6709,37.9900,20
+864,"Classic Vest, S",VE-C304-S,否,Blue,23.7490,63.5000,25
+865,"Classic Vest, M",VE-C304-M,否,Blue,23.7490,63.5000,25
+866,"Classic Vest, L",VE-C304-L,否,Blue,23.7490,63.5000,25
+867,"Women's Mountain Shorts, S",SH-W890-S,否,Black,26.1763,69.9900,22
+868,"Women's Mountain Shorts, M",SH-W890-M,否,Black,26.1763,69.9900,22
+869,"Women's Mountain Shorts, L",SH-W890-L,否,Black,26.1763,69.9900,22
+870,Water Bottle - 30 oz.,WB-H098,否,,1.8663,4.9900,28
+871,Mountain Bottle Cage,BC-M005,否,,3.7363,9.9900,28
+872,Road Bottle Cage,BC-R205,否,,3.3623,8.9900,28
+873,Patch Kit/8 Patches,PK-7098,否,,0.8565,2.2900,37
+874,"Racing Socks, M",SO-R809-M,否,White,3.3623,8.9900,23
+875,"Racing Socks, L",SO-R809-L,否,White,3.3623,8.9900,23
+876,Hitch Rack - 4-Bike,RA-H123,否,,44.8800,120.0000,26
+877,Bike Wash - Dissolver,CL-9009,否,,2.9733,7.9500,29
+878,Fender Set - Mountain,FE-6654,否,,8.2205,21.9800,30
+879,All-Purpose Bike Stand,ST-1401,否,,59.4660,159.0000,27
+880,Hydration Pack - 70 oz.,HY-1023-70,否,Silver,20.5663,54.9900,32
+881,"Short-Sleeve Classic Jersey, S",SJ-0194-S,否,Yellow,41.5723,53.9900,21
+882,"Short-Sleeve Classic Jersey, M",SJ-0194-M,否,Yellow,41.5723,53.9900,21
+883,"Short-Sleeve Classic Jersey, L",SJ-0194-L,否,Yellow,41.5723,53.9900,21
+884,"Short-Sleeve Classic Jersey, XL",SJ-0194-X,否,Yellow,41.5723,53.9900,21
+885,"HL Touring Frame - Yellow, 60",FR-T98Y-60,是,Yellow,601.7437,1003.9100,16
+886,"LL Touring Frame - Yellow, 62",FR-T67Y-62,是,Yellow,199.8519,333.4200,16
+887,"HL Touring Frame - Yellow, 46",FR-T98Y-46,是,Yellow,601.7437,1003.9100,16
+888,"HL Touring Frame - Yellow, 50",FR-T98Y-50,是,Yellow,601.7437,1003.9100,16
+889,"HL Touring Frame - Yellow, 54",FR-T98Y-54,是,Yellow,601.7437,1003.9100,16
+890,"HL Touring Frame - Blue, 46",FR-T98U-46,是,Blue,601.7437,1003.9100,16
+891,"HL Touring Frame - Blue, 50",FR-T98U-50,是,Blue,601.7437,1003.9100,16
+892,"HL Touring Frame - Blue, 54",FR-T98U-54,是,Blue,601.7437,1003.9100,16
+893,"HL Touring Frame - Blue, 60",FR-T98U-60,是,Blue,601.7437,1003.9100,16
+894,Rear Derailleur,RD-2308,是,Silver,53.9282,121.4600,9
+895,"LL Touring Frame - Blue, 50",FR-T67U-50,是,Blue,199.8519,333.4200,16
+896,"LL Touring Frame - Blue, 54",FR-T67U-54,是,Blue,199.8519,333.4200,16
+897,"LL Touring Frame - Blue, 58",FR-T67U-58,是,Blue,199.8519,333.4200,16
+898,"LL Touring Frame - Blue, 62",FR-T67U-62,是,Blue,199.8519,333.4200,16
+899,"LL Touring Frame - Yellow, 44",FR-T67Y-44,是,Yellow,199.8519,333.4200,16
+900,"LL Touring Frame - Yellow, 50",FR-T67Y-50,是,Yellow,199.8519,333.4200,16
+901,"LL Touring Frame - Yellow, 54",FR-T67Y-54,是,Yellow,199.8519,333.4200,16
+902,"LL Touring Frame - Yellow, 58",FR-T67Y-58,是,Yellow,199.8519,333.4200,16
+903,"LL Touring Frame - Blue, 44",FR-T67U-44,是,Blue,199.8519,333.4200,16
+904,"ML Mountain Frame-W - Silver, 40",FR-M63S-40,是,Silver,199.3757,364.0900,12
+905,"ML Mountain Frame-W - Silver, 42",FR-M63S-42,是,Silver,199.3757,364.0900,12
+906,"ML Mountain Frame-W - Silver, 46",FR-M63S-46,是,Silver,199.3757,364.0900,12
+907,Rear Brakes,RB-9231,否,Silver,47.2860,106.5000,6
+908,LL Mountain Seat/Saddle,SE-M236,否,,12.0413,27.1200,15
+909,ML Mountain Seat/Saddle,SE-M798,否,,17.3782,39.1400,15
+910,HL Mountain Seat/Saddle,SE-M940,否,,23.3722,52.6400,15
+911,LL Road Seat/Saddle,SE-R581,否,,12.0413,27.1200,15
+912,ML Road Seat/Saddle,SE-R908,否,,17.3782,39.1400,15
+913,HL Road Seat/Saddle,SE-R995,否,,23.3722,52.6400,15
+914,LL Touring Seat/Saddle,SE-T312,否,,12.0413,27.1200,15
+915,ML Touring Seat/Saddle,SE-T762,否,,17.3782,39.1400,15
+916,HL Touring Seat/Saddle,SE-T924,否,,23.3722,52.6400,15
+917,"LL Mountain Frame - Silver, 42",FR-M21S-42,是,Silver,144.5938,264.0500,12
+918,"LL Mountain Frame - Silver, 44",FR-M21S-44,是,Silver,144.5938,264.0500,12
+919,"LL Mountain Frame - Silver, 48",FR-M21S-48,是,Silver,144.5938,264.0500,12
+920,"LL Mountain Frame - Silver, 52",FR-M21S-52,是,Silver,144.5938,264.0500,12
+921,Mountain Tire Tube,TT-M928,否,,1.8663,4.9900,37
+922,Road Tire Tube,TT-R982,否,,1.4923,3.9900,37
+923,Touring Tire Tube,TT-T092,否,,1.8663,4.9900,37
+924,"LL Mountain Frame - Black, 42",FR-M21B-42,是,Black,136.7850,249.7900,12
+925,"LL Mountain Frame - Black, 44",FR-M21B-44,是,Black,136.7850,249.7900,12
+926,"LL Mountain Frame - Black, 48",FR-M21B-48,是,Black,136.7850,249.7900,12
+927,"LL Mountain Frame - Black, 52",FR-M21B-52,是,Black,136.7850,249.7900,12
+928,LL Mountain Tire,TI-M267,否,,9.3463,24.9900,37
+929,ML Mountain Tire,TI-M602,否,,11.2163,29.9900,37
+930,HL Mountain Tire,TI-M823,否,,13.0900,35.0000,37
+931,LL Road Tire,TI-R092,否,,8.0373,21.4900,37
+932,ML Road Tire,TI-R628,否,,9.3463,24.9900,37
+933,HL Road Tire,TI-R982,否,,12.1924,32.6000,37
+934,Touring Tire,TI-T723,否,,10.8423,28.9900,37
+935,LL Mountain Pedal,PD-M282,否,Silver/Black,17.9776,40.4900,13
+936,ML Mountain Pedal,PD-M340,否,Silver/Black,27.5680,62.0900,13
+937,HL Mountain Pedal,PD-M562,否,Silver/Black,35.9596,80.9900,13
+938,LL Road Pedal,PD-R347,否,Silver/Black,17.9776,40.4900,13
+939,ML Road Pedal,PD-R563,否,Silver/Black,27.5680,62.0900,13
+940,HL Road Pedal,PD-R853,否,Silver/Black,35.9596,80.9900,13
+941,Touring Pedal,PD-T852,否,Silver/Black,35.9596,80.9900,13
+942,"ML Mountain Frame-W - Silver, 38",FR-M63S-38,是,Silver,199.3757,364.0900,12
+943,"LL Mountain Frame - Black, 40",FR-M21B-40,是,Black,136.7850,249.7900,12
+944,"LL Mountain Frame - Silver, 40",FR-M21S-40,是,Silver,144.5938,264.0500,12
+945,Front Derailleur,FD-2342,是,Silver,40.6216,91.4900,9
+946,LL Touring Handlebars,HB-T721,是,,20.4640,46.0900,4
+947,HL Touring Handlebars,HB-T928,是,,40.6571,91.5700,4
+948,Front Brakes,FB-9873,否,Silver,47.2860,106.5000,6
+949,LL Crankset,CS-4759,是,Black,77.9176,175.4900,8
+950,ML Crankset,CS-6583,是,Black,113.8816,256.4900,8
+951,HL Crankset,CS-9183,是,Black,179.8156,404.9900,8
+952,Chain,CH-0234,否,Silver,8.9866,20.2400,7
+953,"Touring-2000 Blue, 60",BK-T44U-60,是,Blue,755.1508,1214.8500,3
+954,"Touring-1000 Yellow, 46",BK-T79Y-46,是,Yellow,1481.9379,2384.0700,3
+955,"Touring-1000 Yellow, 50",BK-T79Y-50,是,Yellow,1481.9379,2384.0700,3
+956,"Touring-1000 Yellow, 54",BK-T79Y-54,是,Yellow,1481.9379,2384.0700,3
+957,"Touring-1000 Yellow, 60",BK-T79Y-60,是,Yellow,1481.9379,2384.0700,3
+958,"Touring-3000 Blue, 54",BK-T18U-54,是,Blue,461.4448,742.3500,3
+959,"Touring-3000 Blue, 58",BK-T18U-58,是,Blue,461.4448,742.3500,3
+960,"Touring-3000 Blue, 62",BK-T18U-62,是,Blue,461.4448,742.3500,3
+961,"Touring-3000 Yellow, 44",BK-T18Y-44,是,Yellow,461.4448,742.3500,3
+962,"Touring-3000 Yellow, 50",BK-T18Y-50,是,Yellow,461.4448,742.3500,3
+963,"Touring-3000 Yellow, 54",BK-T18Y-54,是,Yellow,461.4448,742.3500,3
+964,"Touring-3000 Yellow, 58",BK-T18Y-58,是,Yellow,461.4448,742.3500,3
+965,"Touring-3000 Yellow, 62",BK-T18Y-62,是,Yellow,461.4448,742.3500,3
+966,"Touring-1000 Blue, 46",BK-T79U-46,是,Blue,1481.9379,2384.0700,3
+967,"Touring-1000 Blue, 50",BK-T79U-50,是,Blue,1481.9379,2384.0700,3
+968,"Touring-1000 Blue, 54",BK-T79U-54,是,Blue,1481.9379,2384.0700,3
+969,"Touring-1000 Blue, 60",BK-T79U-60,是,Blue,1481.9379,2384.0700,3
+970,"Touring-2000 Blue, 46",BK-T44U-46,是,Blue,755.1508,1214.8500,3
+971,"Touring-2000 Blue, 50",BK-T44U-50,是,Blue,755.1508,1214.8500,3
+972,"Touring-2000 Blue, 54",BK-T44U-54,是,Blue,755.1508,1214.8500,3
+973,"Road-350-W Yellow, 40",BK-R79Y-40,是,Yellow,1082.5100,1700.9900,2
+974,"Road-350-W Yellow, 42",BK-R79Y-42,是,Yellow,1082.5100,1700.9900,2
+975,"Road-350-W Yellow, 44",BK-R79Y-44,是,Yellow,1082.5100,1700.9900,2
+976,"Road-350-W Yellow, 48",BK-R79Y-48,是,Yellow,1082.5100,1700.9900,2
+977,"Road-750 Black, 58",BK-R19B-58,是,Black,343.6496,539.9900,2
+978,"Touring-3000 Blue, 44",BK-T18U-44,是,Blue,461.4448,742.3500,3
+979,"Touring-3000 Blue, 50",BK-T18U-50,是,Blue,461.4448,742.3500,3
+980,"Mountain-400-W Silver, 38",BK-M38S-38,是,Silver,419.7784,769.4900,1
+981,"Mountain-400-W Silver, 40",BK-M38S-40,是,Silver,419.7784,769.4900,1
+982,"Mountain-400-W Silver, 42",BK-M38S-42,是,Silver,419.7784,769.4900,1
+983,"Mountain-400-W Silver, 46",BK-M38S-46,是,Silver,419.7784,769.4900,1
+984,"Mountain-500 Silver, 40",BK-M18S-40,是,Silver,308.2179,564.9900,1
+985,"Mountain-500 Silver, 42",BK-M18S-42,是,Silver,308.2179,564.9900,1
+986,"Mountain-500 Silver, 44",BK-M18S-44,是,Silver,308.2179,564.9900,1
+987,"Mountain-500 Silver, 48",BK-M18S-48,是,Silver,308.2179,564.9900,1
+988,"Mountain-500 Silver, 52",BK-M18S-52,是,Silver,308.2179,564.9900,1
+989,"Mountain-500 Black, 40",BK-M18B-40,是,Black,294.5797,539.9900,1
+990,"Mountain-500 Black, 42",BK-M18B-42,是,Black,294.5797,539.9900,1
+991,"Mountain-500 Black, 44",BK-M18B-44,是,Black,294.5797,539.9900,1
+992,"Mountain-500 Black, 48",BK-M18B-48,是,Black,294.5797,539.9900,1
+993,"Mountain-500 Black, 52",BK-M18B-52,是,Black,294.5797,539.9900,1
+994,LL Bottom Bracket,BB-7421,是,,23.9716,53.9900,5
+995,ML Bottom Bracket,BB-8107,是,,44.9506,101.2400,5
+996,HL Bottom Bracket,BB-9108,是,,53.9416,121.4900,5
+997,"Road-750 Black, 44",BK-R19B-44,是,Black,343.6496,539.9900,2
+998,"Road-750 Black, 48",BK-R19B-48,是,Black,343.6496,539.9900,2
+999,"Road-750 Black, 52",BK-R19B-52,是,Black,343.6496,539.9900,2
