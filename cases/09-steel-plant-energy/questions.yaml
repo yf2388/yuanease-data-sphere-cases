@@ -1,0 +1,170 @@
+case: 09-steel-plant-energy
+note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。数据为 2018 年 1–3 月，每行一个 15 分钟区间。
+questions:
+- id: q01
+  question: 2018 年第一季度总用电量是多少 kWh？
+  sql: SELECT ROUND(SUM(用电量_kWh), 2) FROM 用电记录
+  must_include:
+  - - 297966.04
+    - 29.8万
+    - 29.80万
+    - 297966
+  expected:
+    columns:
+    - ROUND(SUM(用电量_kWh), 2)
+    rows:
+    - - 297966.04
+- id: q02
+  question: 1 月、2 月、3 月各用电多少 kWh？
+  sql: SELECT SUBSTR(日期, 1, 7), ROUND(SUM(用电量_kWh), 2) FROM 用电记录 GROUP BY 1 ORDER BY 1
+  must_include:
+  - - 126238.29
+    - 126238.3
+    - 12.62万
+  - - 91497.34
+    - 91497.3
+    - 9.15万
+  - - 80230.41
+    - 80230.4
+    - 8.02万
+  expected:
+    columns:
+    - SUBSTR(日期, 1, 7)
+    - ROUND(SUM(用电量_kWh), 2)
+    rows:
+    - - 2018-01
+      - 126238.29
+    - - 2018-02
+      - 91497.34
+    - - 2018-03
+      - 80230.41
+- id: q03
+  question: 用电量最高的 15 分钟区间是哪个时刻？用了多少 kWh？
+  sql: SELECT 记录时间, 用电量_kWh FROM 用电记录 ORDER BY 用电量_kWh DESC LIMIT 1
+  must_include:
+  - - 2018-01-15 13:45
+    - 1月15日 13:45
+    - 825
+  - 153.14
+  expected:
+    columns:
+    - 记录时间
+    - 用电量_kWh
+    rows:
+    - - 2018-01-15 13:45
+      - 153.14
+- id: q04
+  question: 轻载、中载、重载三类负荷各用了多少电？各占总用电量的百分之几？
+  sql: SELECT t.负荷类型名称, ROUND(SUM(r.用电量_kWh), 2), ROUND(100 * SUM(r.用电量_kWh) / (SELECT SUM(用电量_kWh) FROM 用电记录), 2) FROM 用电记录 r JOIN 负荷类型 t ON r.负荷类型代码 = t.负荷类型代码 GROUP BY t.负荷类型名称 ORDER BY 2 DESC
+  must_include:
+  - 中载
+  - 重载
+  - 轻载
+  - - 41.24
+    - 41.2
+  - - 38.81
+    - 38.8
+  - - 19.95
+    - 20.0
+    - 19.9
+  expected:
+    columns:
+    - 负荷类型名称
+    - ROUND(SUM(r.用电量_kWh), 2)
+    - ROUND(100 * SUM(r.用电量_kWh) / (SELECT SUM(用电量_kWh) FROM 用电记录), 2)
+    rows:
+    - - 中载
+      - 122878.78
+      - 41.24
+    - - 重载
+      - 115653.56
+      - 38.81
+    - - 轻载
+      - 59433.7
+      - 19.95
+- id: q05
+  question: 工作日和周末的日均用电量分别是多少 kWh？
+  sql: SELECT c.是否周末, ROUND(SUM(r.用电量_kWh) / COUNT(DISTINCT r.日期), 2) FROM 用电记录 r JOIN 日历 c ON r.日期 = c.日期 GROUP BY c.是否周末 ORDER BY 1
+  must_include:
+  - - 4055.9
+    - 4056
+  - - 1373.3
+    - 1373
+  expected:
+    columns:
+    - 是否周末
+    - ROUND(SUM(r.用电量_kWh) / COUNT(DISTINCT r.日期), 2)
+    rows:
+    - - 否
+      - 4055.9
+    - - 是
+      - 1373.3
+- id: q06
+  question: 第一季度二氧化碳排放合计多少吨？
+  sql: SELECT ROUND(SUM(二氧化碳_tCO2), 2) FROM 用电记录
+  expected:
+    columns:
+    - ROUND(SUM(二氧化碳_tCO2), 2)
+    rows:
+    - - 126.87
+- id: q07
+  question: 第一季度滞后功率因数的平均值是多少？
+  sql: SELECT ROUND(AVG(滞后功率因数), 2) FROM 用电记录
+  expected:
+    columns:
+    - ROUND(AVG(滞后功率因数), 2)
+    rows:
+    - - 85.38
+- id: q08
+  question: 滞后功率因数低于 90 的记录占全部记录的比例是多少？
+  sql: SELECT ROUND(1.0 * SUM(滞后功率因数 < 90) / COUNT(*), 4) FROM 用电记录
+  must_include:
+  - - 0.4862
+    - 48.62
+    - 48.6
+  expected:
+    columns:
+    - ROUND(1.0 * SUM(滞后功率因数 < 90) / COUNT(*), 4)
+    rows:
+    - - 0.4862
+- id: q09
+  question: 早班、中班、夜班各用了多少电？哪个班次最多？
+  sql: SELECT b.班次名称, ROUND(SUM(r.用电量_kWh), 2) FROM 用电记录 r JOIN 班次 b ON r.班次代码 = b.班次代码 GROUP BY b.班次名称 ORDER BY 2 DESC
+  must_include:
+  - 早班
+  - - 158946.46
+    - 158946.5
+    - 15.89万
+  - - 110804.71
+    - 110804.7
+    - 11.08万
+  - - 28214.87
+    - 28214.9
+    - 2.82万
+  expected:
+    columns:
+    - 班次名称
+    - ROUND(SUM(r.用电量_kWh), 2)
+    rows:
+    - - 早班
+      - 158946.46
+    - - 中班
+      - 110804.71
+    - - 夜班
+      - 28214.87
+- id: q10
+  question: 用电量最高的一天是哪天？当天用了多少 kWh？
+  sql: SELECT 日期, ROUND(SUM(用电量_kWh), 2) AS s FROM 用电记录 GROUP BY 日期 ORDER BY s DESC LIMIT 1
+  must_include:
+  - - 2018-01-18
+    - 1月18日
+    - 1 月 18 日
+  - - 7353.84
+    - 7353.8
+  expected:
+    columns:
+    - 日期
+    - s
+    rows:
+    - - '2018-01-18'
+      - 7353.84

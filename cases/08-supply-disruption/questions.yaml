@@ -1,0 +1,128 @@
+case: 08-supply-disruption
+note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。剧本：华东配送中心（DC-EC）2026-10-12 因火灾停运。
+questions:
+- id: q01
+  question: 哪个配送中心停运了？什么时候、因为什么？
+  sql: SELECT 配送中心名称, 停运日期, 停运原因 FROM 配送中心 WHERE 状态 = '停运'
+  must_include:
+  - 华东配送中心
+  - - 2026-10-12
+    - 10月12日
+    - 10 月 12 日
+  - 火灾
+  expected:
+    columns:
+    - 配送中心名称
+    - 停运日期
+    - 停运原因
+    rows:
+    - - 华东配送中心
+      - '2026-10-12'
+      - 仓库火灾
+- id: q02
+  question: 由停运的配送中心发货、还处于「待发货」的订单有多少张？订单金额合计多少？
+  sql: SELECT COUNT(*), SUM(o.订单金额) FROM 销售订单 o JOIN 配送中心 d ON o.发货配送中心代码 = d.配送中心代码 WHERE d.状态 = '停运' AND o.订单状态 = '待发货'
+  must_include:
+  - 18
+  - - 1772600
+    - 177.26万
+    - 177.3万
+  expected:
+    columns:
+    - COUNT(*)
+    - SUM(o.订单金额)
+    rows:
+    - - 18
+      - 1772600
+- id: q03
+  question: 这些受影响的待发货订单涉及多少家客户？其中 A 级客户有几家？
+  sql: SELECT COUNT(DISTINCT o.客户编码), COUNT(DISTINCT CASE WHEN c.客户等级 = 'A' THEN o.客户编码 END) FROM 销售订单 o JOIN 客户 c ON o.客户编码 = c.客户编码 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货'
+  expected:
+    columns:
+    - COUNT(DISTINCT o.客户编码)
+    - COUNT(DISTINCT CASE WHEN c.客户等级 = 'A' THEN o.客户编码 END)
+    rows:
+    - - 11
+      - 3
+- id: q04
+  question: 受影响的 A 级客户分别是谁？各自受影响的订单金额是多少？
+  sql: SELECT c.客户名称, SUM(o.订单金额) FROM 销售订单 o JOIN 客户 c ON o.客户编码 = c.客户编码 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货' AND c.客户等级 = 'A' GROUP BY c.客户名称 ORDER BY 2 DESC
+  expected:
+    columns:
+    - 客户名称
+    - SUM(o.订单金额)
+    rows:
+    - - 蓝海化工集团
+      - 422500
+    - - 恒远电力股份有限公司
+      - 144600
+    - - 泰和制药有限公司
+      - 79000
+- id: q05
+  question: 受影响的待发货订单里，哪种成品的缺口数量最大？缺多少台？
+  sql: SELECT d.成品编码, SUM(d.数量) AS n FROM 订单明细 d JOIN 销售订单 o ON d.订单号 = o.订单号 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货' GROUP BY d.成品编码 ORDER BY n DESC LIMIT 1
+  expected:
+    columns:
+    - 成品编码
+    - n
+    rows:
+    - - FG-202
+      - 45
+- id: q06
+  question: 除华东外，其他三个配送中心的 FG-202 在库数量分别是多少？扣除安全库存后合计还能调出多少台？
+  sql: SELECT (SELECT GROUP_CONCAT(配送中心代码 || ':' || 在库数量, '、') FROM 配送中心库存 WHERE 成品编码 = 'FG-202' AND 配送中心代码 <> 'DC-EC'), SUM(在库数量 - 安全库存) FROM 配送中心库存 WHERE 成品编码 = 'FG-202' AND 配送中心代码 <> 'DC-EC'
+  must_include:
+  - 33
+  - 23
+  - 119
+  - 135
+  expected:
+    columns:
+    - (SELECT GROUP_CONCAT(配送中心代码 || ':' || 在库数量, '、') FROM 配送中心库存 WHERE 成品编码 = 'FG-202' AND 配送中心代码 <> 'DC-EC')
+    - SUM(在库数量 - 安全库存)
+    rows:
+    - - DC-NC:33、DC-SC:23、DC-WC:119
+      - 135
+- id: q07
+  question: 受影响的待发货订单中，有几张的承诺交期已经早于 2026-10-20？分别是哪几张？
+  sql: SELECT COUNT(*), GROUP_CONCAT(订单号, '、') FROM (SELECT 订单号 FROM 销售订单 WHERE 发货配送中心代码 = 'DC-EC' AND 订单状态 = '待发货' AND 承诺交期 < '2026-10-20' ORDER BY 订单号)
+  must_include:
+  - 3
+  - SO00048
+  - SO00068
+  - SO00078
+  expected:
+    columns:
+    - COUNT(*)
+    - GROUP_CONCAT(订单号, '、')
+    rows:
+    - - 3
+      - SO00048、SO00068、SO00078
+- id: q08
+  question: 受影响订单的金额按产品线分，哪个产品线最多？是多少？
+  sql: SELECT p.产品线, SUM(d.金额) AS s FROM 订单明细 d JOIN 成品 p ON d.成品编码 = p.成品编码 JOIN 销售订单 o ON d.订单号 = o.订单号 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货' GROUP BY p.产品线 ORDER BY s DESC LIMIT 1
+  expected:
+    columns:
+    - 产品线
+    - s
+    rows:
+    - - 阀门
+      - 652400
+- id: q09
+  question: 2026-10-20 前完工的生产计划里，FG-202 计划生产多少台？
+  sql: SELECT SUM(计划数量) FROM 生产计划 WHERE 成品编码 = 'FG-202' AND 计划完工日期 <= '2026-10-20'
+  expected:
+    columns:
+    - SUM(计划数量)
+    rows:
+    - - 20
+- id: q10
+  question: 全部配送中心中，在库数量合计最多的是哪个？有多少台？
+  sql: SELECT d.配送中心名称, SUM(k.在库数量) AS s FROM 配送中心库存 k JOIN 配送中心 d ON k.配送中心代码 = d.配送中心代码 GROUP BY d.配送中心名称 ORDER BY s DESC LIMIT 1
+  expected:
+    columns:
+    - 配送中心名称
+    - s
+    rows:
+    - - 华北配送中心
+      - 719

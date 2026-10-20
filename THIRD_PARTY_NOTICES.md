@@ -71,7 +71,7 @@ SOFTWARE
 
 ## 3. Microsoft AdventureWorks 示例数据库
 
-- 用于：`cases/03-bike-production-bom`
+- 用于：`cases/03-bike-production-bom`、`cases/05-purchasing-metrics`
 - 来源：<https://github.com/microsoft/sql-server-samples/tree/master/samples/databases/adventure-works/oltp-install-script>
 - 许可：MIT License，「Microsoft SQL Server Sample Code，Copyright (c) Microsoft Corporation」（仓库根目录 license.txt；子目录无单独声明，适用仓库级许可）。
 - 改动：见各案例 `prepare/build_data.py`（列名汉化、去掉审计列、按开工日期抽样等）。
@@ -103,3 +103,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 ```
+
+## 4. UCI 机器学习库数据集（CC BY 4.0）
+
+以下数据集按知识共享 署名 4.0 国际许可协议（CC BY 4.0，<https://creativecommons.org/licenses/by/4.0/>）使用。改编内容见对应案例的 `prepare/build_data.py`。
+
+| 用于 | 数据集 | 署名 | 来源 | 改动 |
+|---|---|---|---|---|
+| `cases/04-cnc-machine-failure` | AI4I 2020 Predictive Maintenance Dataset | AI4I 2020 Predictive Maintenance Dataset (2020). UCI Machine Learning Repository. https://doi.org/10.24432/C5HS5C ；论文 S. Matzka (2020) | <https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset> | 列名汉化；按行序分配到 10 台设备并生成加工时间与班组；由失效模式标志派生故障事件表；叠加自建的设备台账、产线、班组、失效模式主数据 |
+| `cases/09-steel-plant-energy` | Steel Industry Energy Consumption | V E, S., Shin, C., & Cho, Y. (2021). Steel Industry Energy Consumption [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C52G8C | <https://archive.ics.uci.edu/dataset/851/steel+industry+energy+consumption> | 只取 2018 年 1–3 月；列名汉化；时间格式改写；拆出日历表，叠加自建的负荷类型与班次表 |
+
+## 5. 自建合成数据
+
+`cases/06-auto-quality-analysis`、`cases/07-multi-plant-oee`、`cases/08-supply-disruption`、`cases/10-order-metric-types` 的数据由各自 `prepare/build_data.py` 以固定随机数种子生成，全部为虚构内容，不涉及任何真实企业或个人，按本仓库 LICENSE 第 2 类（CC BY 4.0）授权。

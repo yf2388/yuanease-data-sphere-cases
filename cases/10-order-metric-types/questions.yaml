@@ -1,0 +1,135 @@
+case: 10-order-metric-types
+note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。数据覆盖 2026 年 1–9 月。
+questions:
+- id: q01
+  question: 订单按状态各有多少张？
+  sql: SELECT 订单状态, COUNT(*) FROM 订单 GROUP BY 订单状态 ORDER BY 2 DESC
+  expected:
+    columns:
+    - 订单状态
+    - COUNT(*)
+    rows:
+    - - 已交付
+      - 186
+    - - 已取消
+      - 16
+    - - 生产中
+      - 15
+- id: q02
+  question: 不含已取消的订单，订单金额合计是多少？
+  sql: SELECT ROUND(SUM(订单金额), 2) FROM 订单 WHERE 订单状态 <> '已取消'
+  must_include:
+  - - 38871019
+    - 3887.1万
+    - 3887.10万
+  expected:
+    columns:
+    - ROUND(SUM(订单金额), 2)
+    rows:
+    - - 38871019.0
+- id: q03
+  question: 已交付订单的按期交付率是多少？
+  sql: SELECT ROUND(1.0 * SUM(是否按期 = '是') / SUM(订单状态 = '已交付'), 4) FROM 订单
+  must_include:
+  - - 0.7258
+    - 72.58
+    - 72.6
+  expected:
+    columns:
+    - ROUND(1.0 * SUM(是否按期 = '是') / SUM(订单状态 = '已交付'), 4)
+    rows:
+    - - 0.7258
+- id: q04
+  question: 报价的成交率是多少？一共报了多少次价？
+  sql: SELECT ROUND(1.0 * SUM(是否成交 = '是') / COUNT(*), 4), COUNT(*) FROM 报价单
+  must_include:
+  - - 0.5425
+    - 54.25
+    - 54.3
+  - 400
+  expected:
+    columns:
+    - ROUND(1.0 * SUM(是否成交 = '是') / COUNT(*), 4)
+    - COUNT(*)
+    rows:
+    - - 0.5425
+      - 400
+- id: q05
+  question: 不含已取消的订单，毛利（订单金额减订单成本）合计多少？毛利率是多少？
+  sql: SELECT ROUND(SUM(订单金额) - SUM(订单成本), 2), ROUND((SUM(订单金额) - SUM(订单成本)) / SUM(订单金额), 4) FROM 订单 WHERE 订单状态 <> '已取消'
+  must_include:
+  - - 10442712.06
+    - 1044.27万
+    - 1044.3万
+  - - 0.2687
+    - 26.87
+    - 26.9
+  expected:
+    columns:
+    - ROUND(SUM(订单金额) - SUM(订单成本), 2)
+    - ROUND((SUM(订单金额) - SUM(订单成本)) / SUM(订单金额), 4)
+    rows:
+    - - 10442712.06
+      - 0.2687
+- id: q06
+  question: 截至 2026 年 6 月底，累计订单金额（不含已取消）是多少？
+  sql: SELECT ROUND(SUM(订单金额), 2) FROM 订单 WHERE 订单状态 <> '已取消' AND 下单日期 < '2026-07-01'
+  must_include:
+  - - 23848201
+    - 2384.82万
+    - 2384.8万
+  expected:
+    columns:
+    - ROUND(SUM(订单金额), 2)
+    rows:
+    - - 23848201.0
+- id: q07
+  question: 哪个月的订单金额（不含已取消）最高？是多少？
+  sql: SELECT SUBSTR(下单日期, 1, 7) AS m, ROUND(SUM(订单金额), 2) AS s FROM 订单 WHERE 订单状态 <> '已取消' GROUP BY m ORDER BY s DESC LIMIT 1
+  must_include:
+  - - 2026-07
+    - 7 月
+    - 7月
+  - - 8201938.5
+    - 820.19万
+    - 820.2万
+  expected:
+    columns:
+    - m
+    - s
+    rows:
+    - - 2026-07
+      - 8201938.5
+- id: q08
+  question: 订单金额（不含已取消）最多的客户是谁？是多少？
+  sql: SELECT c.客户名称, ROUND(SUM(o.订单金额), 2) AS s FROM 订单 o JOIN 客户 c ON o.客户编码 = c.客户编码 WHERE o.订单状态 <> '已取消' GROUP BY c.客户名称 ORDER BY s DESC LIMIT 1
+  must_include:
+  - 西部能源装备
+  - - 5537111.5
+    - 553.71万
+    - 553.7万
+  expected:
+    columns:
+    - 客户名称
+    - s
+    rows:
+    - - 西部能源装备
+      - 5537111.5
+- id: q09
+  question: 按订货数量，哪个产品品类最多？订了多少件？
+  sql: SELECT p.品类, SUM(d.数量) AS n FROM 订单明细 d JOIN 产品 p ON d.产品编码 = p.产品编码 GROUP BY p.品类 ORDER BY n DESC LIMIT 1
+  expected:
+    columns:
+    - 品类
+    - n
+    rows:
+    - - 轴类件
+      - 18170
+- id: q10
+  question: 江南精密机械的报价成交率是多少？
+  sql: SELECT ROUND(1.0 * SUM(q.是否成交 = '是') / COUNT(*), 4) FROM 报价单 q JOIN 客户 c ON q.客户编码 = c.客户编码 WHERE c.客户名称 = '江南精密机械'
+  expected:
+    columns:
+    - ROUND(1.0 * SUM(q.是否成交 = '是') / COUNT(*), 4)
+    rows:
+    - - 0.6829
