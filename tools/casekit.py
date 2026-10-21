@@ -325,8 +325,70 @@ def cmd_readme(case_dir: Path) -> int:
     return 0
 
 
+# ── 题型与题库冻结 ────────────────────────────────────────────────────
+
+QTYPES = ("多表综合", "跨表关联", "比率", "排名", "时间筛选", "分组统计", "单表聚合")
+
+
+def qtype(sql: str) -> str:
+    """按 SQL 特征给题目定题型（确定性，取优先级最高的一类）。"""
+
+    s = " ".join(sql.upper().split())
+    joins = s.count(" JOIN ")
+    if joins >= 2 or "EXISTS" in s:
+        return "多表综合"
+    if joins == 1:
+        return "跨表关联"
+    if re.search(r"\)\s*/|/\s*(SUM|COUNT)\(", s):
+        return "比率"
+    if " LIMIT " in s:
+        return "排名"
+    if re.search(r"'\d{4}-\d{2}", s):
+        return "时间筛选"
+    if "GROUP BY" in s:
+        return "分组统计"
+    return "单表聚合"
+
+
+def cmd_classify(case_dir: Path) -> int:
+    qpath = case_dir / "questions.yaml"
+    doc = yaml.safe_load(qpath.read_text(encoding="utf-8"))
+    for q in doc["questions"]:
+        q["qtype"] = qtype(q["sql"])
+    qpath.write_text(yaml.safe_dump(doc, allow_unicode=True, sort_keys=False, width=1000), encoding="utf-8")
+    print(case_dir.name, " ".join(q["qtype"] for q in doc["questions"]))
+    return 0
+
+
+def cmd_bank(root: Path) -> int:
+    """题库清单：每个案例 questions.yaml 的 sha256、题数与题型分布，写到 BANK.md。"""
+
+    import hashlib
+    from collections import Counter
+
+    lines, total, types = [], 0, Counter()
+    for case in sorted((root / "cases").iterdir()):
+        raw = (case / "questions.yaml").read_bytes()
+        qs = yaml.safe_load(raw)["questions"]
+        total += len(qs)
+        types.update(q.get("qtype", "?") for q in qs)
+        lines.append(f"| {case.name} | {len(qs)} | `{hashlib.sha256(raw).hexdigest()}` |")
+    body = "\n".join([
+        "# 问答题库清单", "",
+        f"共 {total} 题。题型（按 SQL 特征自动判定，见 tools/casekit.py qtype）：" + "、".join(f"{t} {types[t]}" for t in QTYPES if types[t]) + "。", "",
+        "| 案例 | 题数 | questions.yaml 的 sha256 |", "|---|---|---|", *lines, "",
+    ])
+    (root / "BANK.md").write_text(body, encoding="utf-8")
+    print(body)
+    return 0
+
+
 def main(argv: list[str]) -> int:
     cmd, case = argv[0], Path(argv[1])
+    if cmd == "classify":
+        return cmd_classify(case)
+    if cmd == "bank":
+        return cmd_bank(case)
     if cmd == "readme":
         return cmd_readme(case)
     if cmd == "answers":

@@ -13,6 +13,8 @@ questions:
     - - 3000
       - 1097
       - 2172910
+  qtype: 单表聚合
+  source: 案例作者按本案例数据出题
 - id: q02
   question: 各车型的每千辆维修频次（维修次数 ÷ 该车型车辆数 × 1000）是多少？哪个车型最高？
   sql: SELECT m.车型名称, ROUND(1000.0 * COUNT(r.维修单号) / COUNT(DISTINCT v.VIN码), 1) AS f FROM 车辆 v JOIN 车型 m ON v.车型代码 = m.车型代码 LEFT JOIN 维修记录 r ON r.VIN码 = v.VIN码 GROUP BY m.车型名称 ORDER BY f DESC
@@ -40,6 +42,8 @@ questions:
       - 351.3
     - - 锐途 X1
       - 304.3
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题
 - id: q03
   question: 单车维修成本是多少？（维修费用合计 ÷ 维修过的车辆数）
   sql: SELECT ROUND(1.0 * SUM(维修费用合计) / COUNT(DISTINCT VIN码), 2) FROM 维修记录
@@ -48,6 +52,8 @@ questions:
     - ROUND(1.0 * SUM(维修费用合计) / COUNT(DISTINCT VIN码), 2)
     rows:
     - - 2514.94
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q04
   question: 按所属系统统计维修次数，哪个系统的问题最多？多少次？
   sql: SELECT f.所属系统, COUNT(*) AS n FROM 维修记录 r JOIN 故障代码 f ON r.故障代码 = f.故障代码 GROUP BY f.所属系统 ORDER BY n DESC LIMIT 1
@@ -58,6 +64,8 @@ questions:
     rows:
     - - 动力系统
       - 376
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q05
   question: 三个调查批次的每百辆问题数（PP100）分别是多少？
   sql: SELECT 调查批次, ROUND(100.0 * SUM(报告问题数) / SUM(样本车辆数), 1) FROM 市场调查 GROUP BY 调查批次 ORDER BY 调查批次
@@ -79,6 +87,8 @@ questions:
       - 141.3
     - - 2026Q3
       - 144.8
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q06
   question: 客户回访的平均满意度是多少分？有多少次回访是投诉？
   sql: SELECT ROUND(AVG(满意度评分), 2), SUM(是否投诉 = '是') FROM 客户回访
@@ -93,6 +103,8 @@ questions:
     rows:
     - - 4.25
       - 8
+  qtype: 单表聚合
+  source: 案例作者按本案例数据出题
 - id: q07
   question: 保修维修和自费维修各有多少次？
   sql: SELECT 维修类型, COUNT(*) FROM 维修记录 GROUP BY 维修类型 ORDER BY 2 DESC
@@ -105,6 +117,8 @@ questions:
       - 933
     - - 自费
       - 164
+  qtype: 分组统计
+  source: 案例作者按本案例数据出题
 - id: q08
   question: 纯电车型（启明 E3、启明 E5）因「动力电池」故障维修了多少次？
   sql: SELECT COUNT(*) FROM 维修记录 r JOIN 车辆 v ON r.VIN码 = v.VIN码 JOIN 车型 m ON v.车型代码 = m.车型代码 JOIN 故障代码 f ON r.故障代码 = f.故障代码 WHERE m.动力类型 = '纯电' AND f.故障部位 = '动力电池'
@@ -113,6 +127,8 @@ questions:
     - COUNT(*)
     rows:
     - - 88
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题
 - id: q09
   question: 维修次数最多的服务站是哪个？维修了多少次？
   sql: SELECT s.服务站名称, COUNT(*) AS n FROM 维修记录 r JOIN 服务站 s ON r.服务站代码 = s.服务站代码 GROUP BY s.服务站名称 ORDER BY n DESC LIMIT 1
@@ -123,6 +139,8 @@ questions:
     rows:
     - - 东北一号服务站
       - 91
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q10
   question: 2026 年第三季度（7 月至 9 月）发生了多少次维修？维修费用合计多少？
   sql: SELECT COUNT(*), SUM(维修费用合计) FROM 维修记录 WHERE 维修日期 >= '2026-07-01' AND 维修日期 < '2026-10-01'
@@ -133,3 +151,5 @@ questions:
     rows:
     - - 174
       - 347170
+  qtype: 时间筛选
+  source: 案例作者按本案例数据出题

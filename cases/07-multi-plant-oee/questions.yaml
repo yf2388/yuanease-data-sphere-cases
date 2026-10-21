@@ -13,6 +13,8 @@ questions:
     - ROUND(SUM(合格品理论时间_分钟) / SUM(计划时间_分钟), 4)
     rows:
     - - 0.8376
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q02
   question: 9 月全部设备的可用率、性能率、质量率分别是多少？
   sql: SELECT ROUND(1.0 * SUM(运行时间_分钟) / SUM(计划时间_分钟), 4), ROUND(SUM(理论加工时间_分钟) / SUM(运行时间_分钟), 4), ROUND(1.0 * SUM(合格品数) / SUM(实际产量), 4) FROM 设备班次运行
@@ -33,6 +35,8 @@ questions:
     - - 0.951
       - 0.894
       - 0.9853
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q03
   question: 三家工厂各自的 OEE 是多少？哪家最高？
   sql: SELECT f.工厂名称, ROUND(SUM(r.合格品理论时间_分钟) / SUM(r.计划时间_分钟), 4) AS oee FROM 设备班次运行 r JOIN 设备 d ON r.设备编号 = d.设备编号 JOIN 产线 l ON d.产线代码 = l.产线代码 JOIN 工厂 f ON l.工厂代码 = f.工厂代码 GROUP BY f.工厂名称 ORDER BY oee DESC
@@ -60,6 +64,8 @@ questions:
       - 0.8364
     - - 佛山工厂
       - 0.8346
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题
 - id: q04
   question: OEE 最低的设备是哪台？它的 OEE 是多少？
   sql: SELECT 设备编号, ROUND(SUM(合格品理论时间_分钟) / SUM(计划时间_分钟), 4) AS oee FROM 设备班次运行 GROUP BY 设备编号 ORDER BY oee LIMIT 1
@@ -75,6 +81,8 @@ questions:
     rows:
     - - EQ-212
       - 0.8074
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q05
   question: 按停机时长合计，排前两位的停机原因是什么？各停了多少分钟？
   sql: SELECT c.原因名称, SUM(e.停机时长_分钟) AS m FROM 停机事件 e JOIN 停机原因 c ON e.原因代码 = c.原因代码 GROUP BY c.原因名称 ORDER BY m DESC LIMIT 2
@@ -87,6 +95,8 @@ questions:
       - 6083
     - - 待料
       - 5864
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q06
   question: 停机类别为「故障停机」的停机一共多少次、合计多少分钟？
   sql: SELECT COUNT(*), SUM(e.停机时长_分钟) FROM 停机事件 e JOIN 停机原因 c ON e.原因代码 = c.原因代码 WHERE c.停机类别 = '故障停机'
@@ -97,6 +107,8 @@ questions:
     rows:
     - - 539
       - 20328
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q07
   question: 9 月全部设备的实际产量和合格品数各是多少？
   sql: SELECT SUM(实际产量), SUM(合格品数) FROM 设备班次运行
@@ -107,6 +119,8 @@ questions:
     rows:
     - - 2367585
       - 2332799
+  qtype: 单表聚合
+  source: 案例作者按本案例数据出题
 - id: q08
   question: 夜班（S3）的 OEE 是多少？
   sql: SELECT ROUND(SUM(合格品理论时间_分钟) / SUM(计划时间_分钟), 4) FROM 设备班次运行 WHERE 班次代码 = 'S3'
@@ -115,6 +129,8 @@ questions:
     - ROUND(SUM(合格品理论时间_分钟) / SUM(计划时间_分钟), 4)
     rows:
     - - 0.8369
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q09
   question: 冲压一线（L21）在 9 月的停机次数是多少？
   sql: SELECT COUNT(*) FROM 停机事件 e JOIN 设备 d ON e.设备编号 = d.设备编号 WHERE d.产线代码 = 'L21'
@@ -123,6 +139,8 @@ questions:
     - COUNT(*)
     rows:
     - - 225
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q10
   question: 9 月 15 日 EQ-312 三个班次合计的实际产量是多少？
   sql: SELECT SUM(实际产量) FROM 设备班次运行 WHERE 设备编号 = 'EQ-312' AND 生产日期 = '2026-09-15'
@@ -131,3 +149,5 @@ questions:
     - SUM(实际产量)
     rows:
     - - 1982
+  qtype: 时间筛选
+  source: 案例作者按本案例数据出题

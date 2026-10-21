@@ -18,6 +18,8 @@ questions:
     - - 10000
       - 339
       - 0.0339
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q02
   question: 各失效模式各发生了多少次故障事件？哪种最多？
   sql: SELECT m.失效模式名称, COUNT(*) FROM 故障事件 e JOIN 失效模式 m ON e.失效模式代码 = m.失效模式代码 GROUP BY m.失效模式名称 ORDER BY 2 DESC
@@ -36,6 +38,8 @@ questions:
       - 46
     - - 随机失效
       - 19
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q03
   question: 哪台设备的故障次数最多？故障了几次？
   sql: SELECT 设备编号, SUM(是否故障 = '是') AS n FROM 加工记录 GROUP BY 设备编号 ORDER BY n DESC LIMIT 1
@@ -46,6 +50,8 @@ questions:
     rows:
     - - CNC-05
       - 134
+  qtype: 排名
+  source: 案例作者按本案例数据出题
 - id: q04
   question: 低、中、高三个质量等级的产品，各自的故障率是多少？
   sql: SELECT 质量等级, ROUND(1.0 * SUM(是否故障 = '是') / COUNT(*), 4) FROM 加工记录 GROUP BY 质量等级 ORDER BY 质量等级
@@ -70,6 +76,8 @@ questions:
       - 0.0392
     - - 高
       - 0.0209
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q05
   question: 三个班组各发生了多少次设备故障？
   sql: SELECT b.班组名称, SUM(r.是否故障 = '是') FROM 加工记录 r JOIN 班组 b ON r.班组编号 = b.班组编号 GROUP BY b.班组名称 ORDER BY 1
@@ -84,6 +92,8 @@ questions:
       - 111
     - - 甲组
       - 102
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q06
   question: 哪条产线的设备故障次数最多？是多少次？
   sql: SELECT l.产线名称, SUM(r.是否故障 = '是') AS n FROM 加工记录 r JOIN 设备台账 d ON r.设备编号 = d.设备编号 JOIN 产线 l ON d.产线编号 = l.产线编号 GROUP BY l.产线名称 ORDER BY n DESC LIMIT 1
@@ -94,6 +104,8 @@ questions:
     rows:
     - - 法兰加工线
       - 177
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题
 - id: q07
   question: 发生故障的加工记录和没有故障的加工记录，平均刀具磨损分别是多少分钟？
   sql: SELECT ROUND(AVG(CASE WHEN 是否故障 = '是' THEN 刀具磨损_分钟 END), 2), ROUND(AVG(CASE WHEN 是否故障 = '否' THEN 刀具磨损_分钟 END), 2) FROM 加工记录
@@ -109,6 +121,8 @@ questions:
     rows:
     - - 143.78
       - 106.69
+  qtype: 单表聚合
+  source: 案例作者按本案例数据出题
 - id: q08
   question: 9 月 8 日到 9 月 14 日这一周，一共发生了多少次设备故障？
   sql: SELECT COUNT(*) FROM 加工记录 WHERE 加工时间 >= '2026-09-08' AND 加工时间 < '2026-09-15' AND 是否故障 = '是'
@@ -117,6 +131,8 @@ questions:
     - COUNT(*)
     rows:
     - - 89
+  qtype: 时间筛选
+  source: 案例作者按本案例数据出题
 - id: q09
   question: CNC-05 发生了多少次散热失效（HDF）？
   sql: SELECT COUNT(*) FROM 故障事件 WHERE 设备编号 = 'CNC-05' AND 失效模式代码 = 'HDF'
@@ -125,6 +141,8 @@ questions:
     - COUNT(*)
     rows:
     - - 108
+  qtype: 单表聚合
+  source: 案例作者按本案例数据出题
 - id: q10
   question: 有多少条加工记录标记了设备故障，却没有对应任何故障事件？
   sql: SELECT COUNT(*) FROM 加工记录 r WHERE r.是否故障 = '是' AND NOT EXISTS (SELECT 1 FROM 故障事件 e WHERE e.记录编号 = r.记录编号)
@@ -133,3 +151,5 @@ questions:
     - COUNT(*)
     rows:
     - - 9
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题

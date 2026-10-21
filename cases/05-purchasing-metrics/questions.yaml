@@ -17,6 +17,8 @@ questions:
       - 86
     - - 已批准
       - 12
+  qtype: 分组统计
+  source: 案例作者按本案例数据出题
 - id: q02
   question: 全部采购明细的采购金额（行金额）合计是多少？
   sql: SELECT ROUND(SUM(行金额), 2) FROM 采购明细
@@ -30,6 +32,8 @@ questions:
     - ROUND(SUM(行金额), 2)
     rows:
     - - 63791994.84
+  qtype: 单表聚合
+  source: 案例作者按本案例数据出题
 - id: q03
   question: 收货检验的拒收率是多少？（拒收数量合计 ÷ 收货数量合计）
   sql: SELECT ROUND(SUM(拒收数量) / SUM(收货数量), 4) FROM 采购明细
@@ -41,6 +45,8 @@ questions:
     - ROUND(SUM(拒收数量) / SUM(收货数量), 4)
     rows:
     - - 0.0312
+  qtype: 比率
+  source: 案例作者按本案例数据出题
 - id: q04
   question: 2025 年下单的采购单，应付总额合计是多少？
   sql: SELECT ROUND(SUM(应付总额), 2) FROM 采购单 WHERE 下单日期 >= '2025-01-01' AND 下单日期 < '2026-01-01'
@@ -53,6 +59,8 @@ questions:
     - ROUND(SUM(应付总额), 2)
     rows:
     - - 43246846.4
+  qtype: 时间筛选
+  source: 案例作者按本案例数据出题
 - id: q05
   question: 应付总额合计最高的 3 家供应商是哪几家？
   sql: SELECT v.供应商名称 FROM 采购单 h JOIN 供应商 v ON h.供应商编号 = v.供应商编号 GROUP BY v.供应商名称 ORDER BY SUM(h.应付总额) DESC LIMIT 3
@@ -63,6 +71,8 @@ questions:
     - - Superior Bicycles
     - - Professional Athletic Consultants
     - - Chicago City Saddles
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q06
   question: 采购单用得最多的运输方式是哪种？用了多少张单？
   sql: SELECT m.运输方式名称, COUNT(*) AS n FROM 采购单 h JOIN 运输方式 m ON h.运输方式编号 = m.运输方式编号 GROUP BY m.运输方式名称 ORDER BY n DESC LIMIT 1
@@ -73,6 +83,8 @@ questions:
     rows:
     - - CARGO TRANSPORT 5
       - 1523
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q07
   question: 采购到的「零部件」大类产品，采购金额合计是多少？
   sql: SELECT ROUND(SUM(d.行金额), 2) FROM 采购明细 d JOIN 产品 p ON d.产品编号 = p.产品编号 JOIN 产品子类 s ON p.产品子类编号 = s.产品子类编号 JOIN 产品大类 c ON s.产品大类编号 = c.产品大类编号 WHERE c.大类名称 = '零部件'
@@ -86,6 +98,8 @@ questions:
     - ROUND(SUM(d.行金额), 2)
     rows:
     - - 26742023.17
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题
 - id: q08
   question: 拒收数量最多的产品是哪个？拒收了多少件？
   sql: SELECT p.产品名称, SUM(d.拒收数量) AS n FROM 采购明细 d JOIN 产品 p ON d.产品编号 = p.产品编号 GROUP BY p.产品名称 ORDER BY n DESC LIMIT 1
@@ -96,6 +110,8 @@ questions:
     rows:
     - - Decal 1
       - 3248.0
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q09
   question: 有多少家供应商一张采购单都没有？
   sql: SELECT COUNT(*) FROM 供应商 v WHERE NOT EXISTS (SELECT 1 FROM 采购单 h WHERE h.供应商编号 = v.供应商编号)
@@ -104,6 +120,8 @@ questions:
     - COUNT(*)
     rows:
     - - 18
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题
 - id: q10
   question: 状态为「已完成」、2025 年下单的采购单，运费合计是多少？
   sql: SELECT ROUND(SUM(运费), 2) FROM 采购单 WHERE 状态 = '已完成' AND 下单日期 >= '2025-01-01' AND 下单日期 < '2026-01-01'
@@ -116,3 +134,5 @@ questions:
     - ROUND(SUM(运费), 2)
     rows:
     - - 828445.44
+  qtype: 时间筛选
+  source: 案例作者按本案例数据出题

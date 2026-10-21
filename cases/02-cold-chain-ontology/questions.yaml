@@ -16,6 +16,8 @@ questions:
     - GROUP_CONCAT(名称, '、')
     rows:
     - - Portland Market、San Francisco Market、Seattle Market
+  qtype: 单表聚合
+  source: 案例作者按本案例数据出题
 - id: q02
   question: 全部门店合计的货架可得率是多少？（货架可售数量合计除以货架容量合计）
   sql: SELECT ROUND(1.0 * SUM(货架可售数量) / SUM(货架容量), 4) FROM 库存
@@ -28,6 +30,8 @@ questions:
     - ROUND(1.0 * SUM(货架可售数量) / SUM(货架容量), 4)
     rows:
     - - 0.9623
+  qtype: 比率
+  source: Microsoft Fabric 本体教程（MIT 示例数据） 第 2 部分 Inventory 元数据「On-Shelf Availability %」
 - id: q03
   question: 哪些门店的货架可得率低于 95%？
   sql: SELECT GROUP_CONCAT(n, '、') FROM (SELECT l.名称 AS n FROM 库存 k JOIN 地点 l ON k.门店编号 = l.地点编号 GROUP BY l.名称 HAVING 1.0 * SUM(k.货架可售数量) / SUM(k.货架容量) < 0.95 ORDER BY 1)
@@ -43,6 +47,8 @@ questions:
     - GROUP_CONCAT(n, '、')
     rows:
     - - Denver Market、Portland Market、Seattle Market
+  qtype: 跨表关联
+  source: Microsoft Fabric 本体教程（MIT 示例数据） 第 2 部分 Inventory 元数据「Low On-Shelf Availability（低于 95%）」
 - id: q04
   question: 冷冻品（储存类别为 FROZEN）里，在库数量低于安全库存的库存记录有几条？分别在哪些门店、是什么产品？
   sql: SELECT COUNT(*), GROUP_CONCAT(l.名称 || '：' || p.产品名称, '、') FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 JOIN 地点 l ON l.地点编号 = k.门店编号 WHERE p.储存类别 = 'FROZEN' AND k.在库数量 < k.安全库存
@@ -62,6 +68,8 @@ questions:
     rows:
     - - 3
       - Denver Market：Vanilla Bean Ice Cream、Portland Market：Vanilla Bean Ice Cream、Seattle Market：Vanilla Bean Ice Cream
+  qtype: 多表综合
+  source: 案例作者按本案例数据出题
 - id: q05
   question: 冷柜遥测里，温度高于该冷柜最高安全温度的读数一共有多少条？涉及哪几台冷柜？
   sql: SELECT COUNT(*), (SELECT GROUP_CONCAT(u, '、') FROM (SELECT DISTINCT t.冷柜编号 AS u FROM 冷柜遥测 t JOIN 冷柜 c ON t.冷柜编号 = c.冷柜编号 WHERE t.温度_摄氏度 > c.最高安全温度_摄氏度 ORDER BY 1)) FROM 冷柜遥测 t JOIN 冷柜 c ON t.冷柜编号 = c.冷柜编号 WHERE t.温度_摄氏度 > c.最高安全温度_摄氏度
@@ -77,6 +85,8 @@ questions:
     rows:
     - - 24
       - RU-DEN-01、RU-SEA-01、RU-SFO-01
+  qtype: 多表综合
+  source: Microsoft Fabric 本体教程（MIT 示例数据） 第 2 部分业务规则「Cold-chain exception」（简化为高于冷柜最高安全温度的读数）
 - id: q06
   question: 库存状态为 0（有风险）的库存记录有多少条？
   sql: SELECT COUNT(*) FROM 库存 WHERE 库存状态 = 0
@@ -85,6 +95,8 @@ questions:
     - COUNT(*)
     rows:
     - - 45
+  qtype: 单表聚合
+  source: Microsoft Fabric 本体教程（MIT 示例数据） 第 2 部分属性元数据「InventoryStatus：0 is AT_RISK」
 - id: q07
   question: 发往 Seattle Market、还没送达的货运有哪几单？各自预计什么时候到达？
   sql: SELECT g.货运单号, g.预计到达时间 FROM 货运 g JOIN 地点 l ON g.目的门店编号 = l.地点编号 WHERE l.名称 = 'Seattle Market' AND g.状态 <> 'DELIVERED' ORDER BY g.预计到达时间
@@ -104,6 +116,8 @@ questions:
       - '2026-08-29 02:00:00'
     - - SH-1007
       - '2026-08-29 13:00:00'
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q08
   question: Northstar Frozen Foods 供应哪些产品？
   sql: SELECT GROUP_CONCAT(p.产品名称, '、') FROM 产品 p JOIN 供应商 s ON p.供应商编号 = s.供应商编号 WHERE s.供应商名称 = 'Northstar Frozen Foods'
@@ -115,6 +129,8 @@ questions:
     - GROUP_CONCAT(p.产品名称, '、')
     rows:
     - - Four Cheese Pizza、Vanilla Bean Ice Cream
+  qtype: 跨表关联
+  source: 案例作者按本案例数据出题
 - id: q09
   question: 预计到达时间比计划到达时间晚 4 小时以上的货运有几单？是哪几单？
   sql: SELECT COUNT(*), GROUP_CONCAT(货运单号, '、') FROM 货运 WHERE (julianday(预计到达时间) - julianday(计划到达时间)) * 24 > 4
@@ -128,6 +144,8 @@ questions:
     rows:
     - - 1
       - SH-1001
+  qtype: 单表聚合
+  source: Microsoft Fabric 本体教程（MIT 示例数据） 第 2 部分业务规则「Late replenishment」
 - id: q10
   question: 西部 Tier 1 门店里，哪家门店同时满足：有冷冻品低于安全库存、冷柜出现过高于最高安全温度的读数、货架可得率低于 95%？它下一批到货的货运单号和预计到达时间是什么？
   sql: SELECT l.名称, (SELECT 货运单号 FROM 货运 g WHERE g.目的门店编号 = l.地点编号 AND g.状态 <> 'DELIVERED' ORDER BY 预计到达时间 LIMIT 1), (SELECT 预计到达时间 FROM 货运 g WHERE g.目的门店编号 = l.地点编号 AND g.状态 <> 'DELIVERED' ORDER BY 预计到达时间 LIMIT 1) FROM 地点 l WHERE l.区域 = 'West' AND l.优先级 = 'Tier 1' AND EXISTS (SELECT 1 FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 WHERE k.门店编号 = l.地点编号 AND p.储存类别 = 'FROZEN' AND k.在库数量 < k.安全库存) AND EXISTS (SELECT 1 FROM 冷柜遥测 t JOIN 冷柜 c ON t.冷柜编号 = c.冷柜编号 WHERE c.门店编号 = l.地点编号 AND t.温度_摄氏度 > c.最高安全温度_摄氏度) AND (SELECT 1.0 * SUM(货架可售数量) / SUM(货架容量) FROM 库存 k WHERE k.门店编号 = l.地点编号) < 0.95
@@ -148,3 +166,5 @@ questions:
     - - Seattle Market
       - SH-1001
       - '2026-08-29 02:00:00'
+  qtype: 多表综合
+  source: Microsoft Fabric 本体教程（MIT 示例数据） 第 0 部分场景目标问题
