@@ -13,6 +13,7 @@
 - 许可：MIT License，Copyright (c) 2025 Snowflake Inc.
 - 仓库附带的 LEGAL.md 说明：该应用不属于 Snowflake 服务，受 LICENSE 条款约束，使用风险自负，Snowflake 无支持义务。
 - 改动：表名、列名译为中文；布尔值写成「是/否」；时间戳去掉时区后缀；不含天气表与会话表。
+- 问答题：`cases/01-supply-chain-network/questions.yaml` 中标注出处的题目改编自该仓库语义模型 `SUPPLY_CHAIN_ASSISTANT_MODEL.yaml` 的 verified_queries，以及配套指南的示例问题（问题意图与查询口径相同，改写为中文并把相对日期换成固定日期）。
 
 ```
 MIT License
@@ -44,6 +45,7 @@ SOFTWARE.
 - 来源：<https://github.com/microsoft/fabric-samples/tree/main/docs-samples/iq/ontology/new-experience>
 - 许可：MIT License，Copyright (c) Microsoft Corporation.
 - 改动：表名、列名译为中文；布尔值写成「是/否」；ISO 时间戳写成「YYYY-MM-DD HH:MM:SS」（仍为 UTC）；不含 SalesReport.pbix。
+- 问答题：`cases/02-cold-chain-ontology/questions.yaml` 中标注出处的题目取自 Microsoft Learn 本体教程（第 0、2、4 部分）的场景问题、业务规则与示例问句，改写为中文、不依赖上下文的问句；教程原文未复制。
 
 ```
 MIT License

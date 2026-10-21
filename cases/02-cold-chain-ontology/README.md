@@ -152,6 +152,12 @@
 | q08 | Northstar Frozen Foods 供应哪些产品？ | Four Cheese Pizza、Vanilla Bean Ice Cream |
 | q09 | 预计到达时间比计划到达时间晚 4 小时以上的货运有几单？是哪几单？ | 1、SH-1001 |
 | q10 | 西部 Tier 1 门店里，哪家门店同时满足：有冷冻品低于安全库存、冷柜出现过高于最高安全温度的读数、货架可得率低于 95%？它下一批到货的货运单号和预计到达时间是什么？ | Seattle Market、SH-1001、2026-08-29 02:00:00 |
+| q11 | 西部区域（West）Tier 1 门店的库存里有哪些冷冻品（储存类别为 FROZEN）？ | Four Cheese Pizza、Vanilla Bean Ice Cream、Wild Blueberries |
+| q12 | 西部区域 Tier 1 门店的冷冻品库存中，哪些库存记录的在库数量低于安全库存？分别是哪家门店、什么产品？ | Portland Market、Vanilla Bean Ice Cream、6、18；Seattle Market、Vanilla Bean Ice Cream、8、20 |
+| q13 | 按冷链异常规则（冷柜温度高于冷冻品最高储存温度 -18℃ 且持续 20 分钟以上；遥测每 5 分钟一条），哪些门店出现过合格的冷链异常？ | Denver Market、San Francisco Market、Seattle Market |
+| q14 | Seattle Market 和 Portland Market 低于安全库存的冷冻品是 Vanilla Bean Ice Cream（P-FRZ-001），这两家门店有哪些该产品的在途或计划中货运？各自预计什么时候到达？ | Portland Market、SH-1002、2026-08-29 00:00:00；Seattle Market、SH-1001、2026-08-29 02:00:00 |
+| q15 | 各门店冷冻品的货架可得率（冷冻品货架可售数量合计 ÷ 货架容量合计）分别是多少？ | Boston Market、1；Denver Market、0.7925；New York Market、1；Portland Market、0.7551；San Francisco Market、1；Seattle Market、0.7778 |
+| q16 | 哪些门店的冷冻品货架可得率低于 95%？ | Denver Market、Portland Market、Seattle Market |
 <!-- /自动生成 -->
 
 ## 自行核对

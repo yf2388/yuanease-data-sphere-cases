@@ -1,6 +1,6 @@
 """casekit 判分的自检：python3 -I tools/test_casekit.py（在仓库根目录运行）。
 
-正向：每题的标准答案原样作为回答，必须判对；阴性：把标准答案里的非零数字放大 10%，必须判错。
+正向：每题的标准答案原样作为回答，必须判对；阴性：判对条件里含非零数字的题，把标准答案里的数字放大 10%，必须判错。
 """
 
 import sys
@@ -21,8 +21,10 @@ def main() -> int:
             rows = q["expected"]["rows"]
             if not grade_one(q, "；".join("、".join(str(v) for v in r) for r in rows))[0]:
                 bad.append(f"正向判错 {case.name} {q['id']}")
-            nums = [v for r in rows for v in r if isinstance(v, (int, float)) and not isinstance(v, bool) and v != 0]
-            if nums:
+            items = q.get("must_include")
+            items = [v for r in rows for v in r] if items is None else [x for i in items for x in (i if isinstance(i, list) else [i])]
+            nums = [v for v in items if isinstance(v, (int, float)) and not isinstance(v, bool) and v != 0]
+            if nums:  # 判对条件里有数字的题，才做「改错数字必须判错」的阴性对照
                 wrong = "；".join("、".join(str(round(v * 1.1, 4)) if isinstance(v, (int, float)) and not isinstance(v, bool) else str(v) for v in r) for r in rows)
                 if grade_one(q, wrong)[0]:
                     bad.append(f"阴性判对 {case.name} {q['id']}")

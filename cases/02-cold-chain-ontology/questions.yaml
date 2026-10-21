@@ -168,3 +168,138 @@ questions:
       - '2026-08-29 02:00:00'
   qtype: 多表综合
   source: Microsoft Fabric 本体教程（MIT 示例数据） 第 0 部分场景目标问题
+- id: q11
+  question: 西部区域（West）Tier 1 门店的库存里有哪些冷冻品（储存类别为 FROZEN）？
+  sql: SELECT GROUP_CONCAT(n, '、') FROM (SELECT DISTINCT p.产品名称 AS n FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 JOIN 地点 l ON k.门店编号 = l.地点编号 WHERE l.区域 = 'West' AND l.优先级 = 'Tier 1' AND p.储存类别 = 'FROZEN' ORDER BY 1)
+  source: Microsoft Fabric 本体教程第 4 部分（Use the ontology agent）示例问题「Which frozen products are stocked at Tier 1 stores in the West?」
+  expected:
+    columns:
+    - GROUP_CONCAT(n, '、')
+    rows:
+    - - Four Cheese Pizza、Vanilla Bean Ice Cream、Wild Blueberries
+  qtype: 多表综合
+- id: q12
+  question: 西部区域 Tier 1 门店的冷冻品库存中，哪些库存记录的在库数量低于安全库存？分别是哪家门店、什么产品？
+  sql: SELECT l.名称, p.产品名称, k.在库数量, k.安全库存 FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 JOIN 地点 l ON k.门店编号 = l.地点编号 WHERE l.区域 = 'West' AND l.优先级 = 'Tier 1' AND p.储存类别 = 'FROZEN' AND k.在库数量 < k.安全库存 ORDER BY 1
+  must_include:
+  - - Portland Market
+    - S-PDX-01
+  - - Seattle Market
+    - S-SEA-01
+  - Vanilla Bean Ice Cream
+  source: Microsoft Fabric 本体教程第 4 部分（Use the ontology agent）示例问题追问「Which of those inventory positions are below safety stock?」（改写为不依赖上文）
+  expected:
+    columns:
+    - 名称
+    - 产品名称
+    - 在库数量
+    - 安全库存
+    rows:
+    - - Portland Market
+      - Vanilla Bean Ice Cream
+      - 6
+      - 18
+    - - Seattle Market
+      - Vanilla Bean Ice Cream
+      - 8
+      - 20
+  qtype: 多表综合
+- id: q13
+  question: 按冷链异常规则（冷柜温度高于冷冻品最高储存温度 -18℃ 且持续 20 分钟以上；遥测每 5 分钟一条），哪些门店出现过合格的冷链异常？
+  sql: WITH t AS (SELECT 冷柜编号, 时间, (温度_摄氏度 > -18) AS hot, ROW_NUMBER() OVER (PARTITION BY 冷柜编号 ORDER BY 时间) AS rn, ROW_NUMBER() OVER (PARTITION BY 冷柜编号, (温度_摄氏度 > -18) ORDER BY 时间) AS rk FROM 冷柜遥测), runs AS (SELECT 冷柜编号, MIN(时间) AS s, MAX(时间) AS e FROM t WHERE hot GROUP BY 冷柜编号, rn - rk) SELECT GROUP_CONCAT(n, '、') FROM (SELECT DISTINCT l.名称 AS n FROM runs r JOIN 冷柜 c ON r.冷柜编号 = c.冷柜编号 JOIN 地点 l ON c.门店编号 = l.地点编号 WHERE (julianday(r.e) - julianday(r.s)) * 1440 >= 20 ORDER BY 1)
+  must_include:
+  - - Denver Market
+    - S-DEN-01
+  - - San Francisco Market
+    - S-SFO-01
+  - - Seattle Market
+    - S-SEA-01
+  source: Microsoft Fabric 本体教程第 4 部分（Use the ontology agent）示例问题追问「Which affected stores had a qualifying refrigeration-temperature exception?」；规则取自教程第 2 部分「Cold-chain exception」
+  expected:
+    columns:
+    - GROUP_CONCAT(n, '、')
+    rows:
+    - - Denver Market、San Francisco Market、Seattle Market
+  qtype: 多表综合
+- id: q14
+  question: Seattle Market 和 Portland Market 低于安全库存的冷冻品是 Vanilla Bean Ice Cream（P-FRZ-001），这两家门店有哪些该产品的在途或计划中货运？各自预计什么时候到达？
+  sql: SELECT l.名称, g.货运单号, g.预计到达时间 FROM 货运 g JOIN 地点 l ON g.目的门店编号 = l.地点编号 WHERE l.名称 IN ('Seattle Market', 'Portland Market') AND g.产品编号 = 'P-FRZ-001' AND g.状态 <> 'DELIVERED' ORDER BY 1
+  must_include:
+  - SH-1001
+  - SH-1002
+  - - 2026-08-29 02:00
+    - 8月29日 02:00
+    - 02:00
+  - - 2026-08-29 00:00
+    - 8月29日 00:00
+    - 00:00
+  source: Microsoft Fabric 本体教程第 4 部分（Use the ontology agent）示例问题追问「What inbound shipments are expected for the affected products and stores?」（改写为不依赖上文）
+  expected:
+    columns:
+    - 名称
+    - 货运单号
+    - 预计到达时间
+    rows:
+    - - Portland Market
+      - SH-1002
+      - '2026-08-29 00:00:00'
+    - - Seattle Market
+      - SH-1001
+      - '2026-08-29 02:00:00'
+  qtype: 跨表关联
+- id: q15
+  question: 各门店冷冻品的货架可得率（冷冻品货架可售数量合计 ÷ 货架容量合计）分别是多少？
+  sql: SELECT l.名称, ROUND(1.0 * SUM(k.货架可售数量) / SUM(k.货架容量), 4) FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 JOIN 地点 l ON k.门店编号 = l.地点编号 WHERE p.储存类别 = 'FROZEN' GROUP BY l.名称 ORDER BY 1
+  must_include:
+  - - 0.7925
+    - 79.25
+    - 79.2
+    - 79.3
+  - - 0.7551
+    - 75.51
+    - 75.5
+  - - 0.7778
+    - 77.78
+    - 77.8
+  - - Denver Market
+    - S-DEN-01
+  - - Portland Market
+    - S-PDX-01
+  - - Seattle Market
+    - S-SEA-01
+  source: Microsoft Fabric 本体教程第 4 部分（Use the ontology agent）示例问题追问「What is the on-shelf availability of frozen products for each store?」
+  expected:
+    columns:
+    - 名称
+    - ROUND(1.0 * SUM(k.货架可售数量) / SUM(k.货架容量), 4)
+    rows:
+    - - Boston Market
+      - 1.0
+    - - Denver Market
+      - 0.7925
+    - - New York Market
+      - 1.0
+    - - Portland Market
+      - 0.7551
+    - - San Francisco Market
+      - 1.0
+    - - Seattle Market
+      - 0.7778
+  qtype: 多表综合
+- id: q16
+  question: 哪些门店的冷冻品货架可得率低于 95%？
+  sql: SELECT GROUP_CONCAT(n, '、') FROM (SELECT l.名称 AS n FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 JOIN 地点 l ON k.门店编号 = l.地点编号 WHERE p.储存类别 = 'FROZEN' GROUP BY l.名称 HAVING 1.0 * SUM(k.货架可售数量) / SUM(k.货架容量) < 0.95 ORDER BY 1)
+  must_include:
+  - - Denver Market
+    - S-DEN-01
+  - - Portland Market
+    - S-PDX-01
+  - - Seattle Market
+    - S-SEA-01
+  source: Microsoft Fabric 本体教程第 4 部分（Use the ontology agent）示例问题追问「Which of these stores have low on-shelf availability?」（低于 95% 取自教程第 2 部分 Low On-Shelf Availability）
+  expected:
+    columns:
+    - GROUP_CONCAT(n, '、')
+    rows:
+    - - Denver Market、Portland Market、Seattle Market
+  qtype: 多表综合

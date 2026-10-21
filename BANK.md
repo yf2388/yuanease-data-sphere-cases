@@ -1,11 +1,11 @@
 # 问答题库清单
 
-共 100 题。题型（按 SQL 特征自动判定，见 tools/casekit.py qtype）：多表综合 13、跨表关联 34、比率 15、排名 4、时间筛选 10、分组统计 4、单表聚合 20。
+共 111 题。题型（按 SQL 特征自动判定，见 tools/casekit.py qtype）：多表综合 20、跨表关联 36、比率 15、排名 4、时间筛选 10、分组统计 4、单表聚合 22。
 
 | 案例 | 题数 | questions.yaml 的 sha256 |
 |---|---|---|
-| 01-supply-chain-network | 10 | `e89401a7232f1ea484f8f56ce0ad11b3958ad287cec8127173db022e058fffd0` |
-| 02-cold-chain-ontology | 10 | `7f76eb6b4ec8496d1e1d545168b57c52a3cf16503b631a6196fddad720e4b6c0` |
+| 01-supply-chain-network | 15 | `aca1503ab9d0888852f3a803a068c8ea3e9a4cd440239ab4ecd8918abbeb45cf` |
+| 02-cold-chain-ontology | 16 | `06dc1366fdaa8467accb1e76d30cb552d6468a6fa651df337a35c608bcb413ec` |
 | 03-bike-production-bom | 10 | `3889bfb56232e5832c73b9a18ad8f3bacdebafb276d983472c7048b38885bc21` |
 | 04-cnc-machine-failure | 10 | `3dc9c517d6c760a0a9ca3c9ef9942f15f9a8425586988391323bbe03fa707ba9` |
 | 05-purchasing-metrics | 10 | `d41f90071cd9882d0f3a4e66211d9732917c92565a043a11cf562b185c767793` |

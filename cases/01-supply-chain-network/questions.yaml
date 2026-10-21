@@ -139,3 +139,65 @@ questions:
       - 1300000.0
   qtype: 跨表关联
   source: 案例作者按本案例数据出题
+- id: q11
+  question: 按「在库数量低于安全库存，且可支撑天数不超过采购提前期加提前期波动」判定低库存，全部工厂库存记录（原材料、零部件、成品都算）中有多少条处于低库存？涉及多少家工厂？
+  sql: SELECT COUNT(*), COUNT(DISTINCT 工厂编号) FROM 工厂库存 k WHERE k.在库数量 < k.安全库存 AND k.可支撑天数 <= k.采购提前期_天 + k.提前期波动_天
+  source: Snowflake 指南「Build a Supply Chain Assistant with Snowflake Intelligence」示例问题「Where do I have critical low inventory levels?」（低库存口径取自语义模型的 low_inventory 过滤器）
+  expected:
+    columns:
+    - COUNT(*)
+    - COUNT(DISTINCT 工厂编号)
+    rows:
+    - - 26
+      - 17
+  qtype: 单表聚合
+- id: q12
+  question: 稀土材料钕磁铁（Neodymium Magnet）在哪些工厂库存偏低（判定口径同上）？在库数量和安全库存各是多少？
+  sql: SELECT g.工厂名称, k.在库数量, k.安全库存 FROM 工厂库存 k JOIN 工厂 g ON k.工厂编号 = g.工厂编号 JOIN 原材料 m ON k.原材料编号 = m.原材料编号 WHERE m.原材料名称 = 'Neodymium Magnet' AND k.在库数量 < k.安全库存 AND k.可支撑天数 <= k.采购提前期_天 + k.提前期波动_天
+  source: Snowflake 指南「Build a Supply Chain Assistant with Snowflake Intelligence」示例问题「Where do we have low inventory of rare earth materials?」
+  expected:
+    columns:
+    - 工厂名称
+    - 在库数量
+    - 安全库存
+    rows:
+    - - Miami Facility Management
+      - 185
+      - 275
+  qtype: 多表综合
+- id: q13
+  question: 对每条偏低的原材料库存（判定口径同上），按补货目标量补足缺口：向供应商采购的成本 = 缺口 × 采购单价；如果另有工厂的同种原材料库存过剩（在库数量超过安全库存的 3 倍，且可支撑天数超过采购提前期的 2 倍），调拨成本 = 缺口 × 厂间运输基准成本 × 两厂之间的运输附加系数。有几条偏低库存可以从别的工厂调拨？这几条按调拨的成本合计、按采购的成本合计分别是多少？
+  sql: WITH low AS (SELECT k.工厂编号 AS lp, k.原材料编号 AS mid, k.补货目标量 - k.在库数量 AS need, m.采购单价 AS cost, m.厂间运输基准成本 AS tc FROM 工厂库存 k JOIN 原材料 m ON k.原材料编号 = m.原材料编号 WHERE k.在库数量 < k.安全库存 AND k.可支撑天数 <= k.采购提前期_天 + k.提前期波动_天), exc AS (SELECT k.工厂编号 AS ep, k.原材料编号 AS mid, k.在库数量 - k.补货目标量 AS avail FROM 工厂库存 k WHERE k.在库数量 > 3 * k.安全库存 AND k.可支撑天数 > 2 * k.采购提前期_天) SELECT COUNT(*), ROUND(SUM(l.tc * MIN(l.need, e.avail) * t.运输附加系数), 2), ROUND(SUM(l.cost * l.need), 2) FROM low l JOIN exc e ON l.mid = e.mid JOIN 厂间运输附加费 t ON e.ep = t.调出工厂编号 AND l.lp = t.调入工厂编号
+  source: Snowflake 指南「Build a Supply Chain Assistant with Snowflake Intelligence」示例问题「For plants with low inventory of a raw material, compare the cost of replenishing from a supplier vs transferring from another plant with excess inventory.」；口径取自 Snowflake 供应链助手仓库 SUPPLY_CHAIN_ASSISTANT_MODEL.yaml 的 verified_queries（MIT）「Material Transfer Cost Analysis」
+  expected:
+    columns:
+    - COUNT(*)
+    - ROUND(SUM(l.tc * MIN(l.need, e.avail) * t.运输附加系数), 2)
+    - ROUND(SUM(l.cost * l.need), 2)
+    rows:
+    - - 12
+      - 46548.37
+      - 173555.5
+  qtype: 多表综合
+- id: q14
+  question: 按「在库数量超过安全库存的 3 倍，且可支撑天数超过采购提前期的 2 倍」判定过剩，有多少条原材料库存过剩、可以支持调拨？涉及多少家工厂？
+  sql: SELECT COUNT(*), COUNT(DISTINCT 工厂编号) FROM 工厂库存 k WHERE k.原材料编号 IS NOT NULL AND k.在库数量 > 3 * k.安全库存 AND k.可支撑天数 > 2 * k.采购提前期_天
+  source: Snowflake 指南「Build a Supply Chain Assistant with Snowflake Intelligence」示例问题「Show me all plants with excess inventory that could support transfers.」（过剩口径取自语义模型的 excess_inventory 过滤器）
+  expected:
+    columns:
+    - COUNT(*)
+    - COUNT(DISTINCT 工厂编号)
+    rows:
+    - - 13
+      - 11
+  qtype: 单表聚合
+- id: q15
+  question: 按工厂统计库存里出现的成品种类数，哪两家工厂只有 1 种成品？
+  sql: SELECT GROUP_CONCAT(n, '、') FROM (SELECT g.工厂名称 AS n FROM 工厂库存 k JOIN 工厂 g ON k.工厂编号 = g.工厂编号 WHERE k.产品编号 IS NOT NULL GROUP BY g.工厂名称 HAVING COUNT(DISTINCT k.产品编号) = 1 ORDER BY 1)
+  source: Snowflake 供应链助手仓库 SUPPLY_CHAIN_ASSISTANT_MODEL.yaml 的 verified_queries（MIT）「What is the average production capacity utilization across our manufacturing plants?」（原查询实际统计各工厂库存中的成品种类数，按原查询口径改写）
+  expected:
+    columns:
+    - GROUP_CONCAT(n, '、')
+    rows:
+    - - Cincinnati Engine Components、Wichita Aviation Systems
+  qtype: 跨表关联
