@@ -220,14 +220,17 @@ def _number_in(value: float, text: str, tolerance: float) -> bool:
 
     text = re.sub(r"(?<=\d)[,，](?=\d{3})", "", text)
     for token, unit in re.findall(r"(-?\d+(?:\.\d+)?)\s*(万|亿|%)?", text):
-        scale = {"万": 1e4, "亿": 1e8, "%": 0.01}.get(unit, 1)
-        number = float(token) * scale
-        if abs(number - value) <= max(tolerance * abs(value), 1e-9):
-            return True
-        digits = len(token.split(".")[1]) if "." in token else 0
-        significant = len(token.lstrip("-").replace(".", "").lstrip("0"))
-        if significant >= 2 and round(value / scale, digits) == float(token):
-            return True
+        scales = [{"万": 1e4, "亿": 1e8, "%": 0.01}.get(unit, 1)]
+        if unit == "%" and abs(value) >= 1:  # 标准答案按百分点给（41.24）时，「41.24%」也按百分点比
+            scales.append(1)
+        for scale in scales:
+            number = float(token) * scale
+            if abs(number - value) <= max(tolerance * abs(value), 1e-9):
+                return True
+            digits = len(token.split(".")[1]) if "." in token else 0
+            significant = len(token.lstrip("-").replace(".", "").lstrip("0"))
+            if significant >= 2 and round(value / scale, digits) == float(token):
+                return True
     return False
 
 

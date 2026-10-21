@@ -30,6 +30,9 @@ def main() -> int:
                     bad.append(f"阴性判对 {case.name} {q['id']}")
     assert _number_in(0.0392, "3.9%", 0.005) and not _number_in(0.0392, "约 4%", 0.005)
     assert _number_in(63791994.84, "6379.2万", 0.005) and not _number_in(0.0392, "0.04", 0.005)
+    # 标准答案按百分点给（41.24），回答写成「41.24%」也算对；小于 1 的期望值不放宽，免得 0.5 与「0.5%」互相冒认
+    assert _number_in(41.24, "41.24%", 0.005) and _number_in(19.95, "占 20.0%", 0.005)
+    assert not _number_in(0.5, "0.5%", 0.005) and not _number_in(41.24, "42.5%", 0.005)
     print("\n".join(bad) or "判分自检通过")
     return 1 if bad else 0
 
