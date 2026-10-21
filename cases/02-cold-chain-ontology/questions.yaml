@@ -1,13 +1,16 @@
 case: 02-cold-chain-ontology
-note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。时间均为数据原样的 UTC 时间。
+note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。时间均为数据原样的 UTC 时间。 门店、冷柜等对象用名称或编号回答都算对。
 questions:
 - id: q01
   question: 西部区域（West）优先级为 Tier 1 的门店有哪几家？
   sql: SELECT GROUP_CONCAT(名称, '、') FROM (SELECT 名称 FROM 地点 WHERE 地点类型 = 'STORE' AND 区域 = 'West' AND 优先级 = 'Tier 1' ORDER BY 1)
   must_include:
-  - Portland Market
-  - San Francisco Market
-  - Seattle Market
+  - - Portland Market
+    - S-PDX-01
+  - - San Francisco Market
+    - S-SFO-01
+  - - Seattle Market
+    - S-SEA-01
   expected:
     columns:
     - GROUP_CONCAT(名称, '、')
@@ -29,9 +32,12 @@ questions:
   question: 哪些门店的货架可得率低于 95%？
   sql: SELECT GROUP_CONCAT(n, '、') FROM (SELECT l.名称 AS n FROM 库存 k JOIN 地点 l ON k.门店编号 = l.地点编号 GROUP BY l.名称 HAVING 1.0 * SUM(k.货架可售数量) / SUM(k.货架容量) < 0.95 ORDER BY 1)
   must_include:
-  - Denver Market
-  - Portland Market
-  - Seattle Market
+  - - Denver Market
+    - S-DEN-01
+  - - Portland Market
+    - S-PDX-01
+  - - Seattle Market
+    - S-SEA-01
   expected:
     columns:
     - GROUP_CONCAT(n, '、')
@@ -42,9 +48,12 @@ questions:
   sql: SELECT COUNT(*), GROUP_CONCAT(l.名称 || '：' || p.产品名称, '、') FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 JOIN 地点 l ON l.地点编号 = k.门店编号 WHERE p.储存类别 = 'FROZEN' AND k.在库数量 < k.安全库存
   must_include:
   - 3
-  - Denver Market
-  - Portland Market
-  - Seattle Market
+  - - Denver Market
+    - S-DEN-01
+  - - Portland Market
+    - S-PDX-01
+  - - Seattle Market
+    - S-SEA-01
   - Vanilla Bean Ice Cream
   expected:
     columns:
@@ -123,7 +132,8 @@ questions:
   question: 西部 Tier 1 门店里，哪家门店同时满足：有冷冻品低于安全库存、冷柜出现过高于最高安全温度的读数、货架可得率低于 95%？它下一批到货的货运单号和预计到达时间是什么？
   sql: SELECT l.名称, (SELECT 货运单号 FROM 货运 g WHERE g.目的门店编号 = l.地点编号 AND g.状态 <> 'DELIVERED' ORDER BY 预计到达时间 LIMIT 1), (SELECT 预计到达时间 FROM 货运 g WHERE g.目的门店编号 = l.地点编号 AND g.状态 <> 'DELIVERED' ORDER BY 预计到达时间 LIMIT 1) FROM 地点 l WHERE l.区域 = 'West' AND l.优先级 = 'Tier 1' AND EXISTS (SELECT 1 FROM 库存 k JOIN 产品 p ON k.产品编号 = p.产品编号 WHERE k.门店编号 = l.地点编号 AND p.储存类别 = 'FROZEN' AND k.在库数量 < k.安全库存) AND EXISTS (SELECT 1 FROM 冷柜遥测 t JOIN 冷柜 c ON t.冷柜编号 = c.冷柜编号 WHERE c.门店编号 = l.地点编号 AND t.温度_摄氏度 > c.最高安全温度_摄氏度) AND (SELECT 1.0 * SUM(货架可售数量) / SUM(货架容量) FROM 库存 k WHERE k.门店编号 = l.地点编号) < 0.95
   must_include:
-  - Seattle Market
+  - - Seattle Market
+    - S-SEA-01
   - SH-1001
   - - 2026-08-29 02:00
     - 2026-08-29T02:00

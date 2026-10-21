@@ -262,8 +262,69 @@ def cmd_grade(case_dir: Path, answers: Path) -> int:
     return 0
 
 
+# ── README 自动段落 ───────────────────────────────────────────────────
+
+
+def _cell(v) -> str:
+    if isinstance(v, float):
+        v = f"{v:,.4f}".rstrip("0").rstrip(".")
+    elif isinstance(v, int):
+        v = f"{v:,}"
+    return str(v).replace("|", "\\|")
+
+
+def _blocks(case_dir: Path) -> dict[str, str]:
+    gold, doc = load_gold(case_dir), yaml.safe_load((case_dir / "questions.yaml").read_text(encoding="utf-8"))
+    ids = {e["table"]: " 或 ".join("+".join(c) for c in e.get("identifier", [])) for e in gold["entities"]}
+    rows = ["| 文件 | 行数 | 列数 | 唯一标识列 |", "|---|---|---|---|"]
+    files = {p.stem: p.name for p in (case_dir / "data").iterdir()}
+    for name, (header, data) in _tables(case_dir / "data").items():
+        shown = files[name.split("/")[0]] + (f" / {name.split('/', 1)[1]}" if "/" in name else "")
+        rows.append(f"| `data/{shown}` | {len(data):,} | {len(header)} | {ids.get(name, '—')} |")
+    rels = ["| 从 | 到 | 关联列 | 必需 |", "|---|---|---|---|"]
+    for r in gold.get("relations", []):
+        rels.append(f"| {r['from']} | {r['to']} | {'，'.join(f'{a} = {b}' for a, b in r['on'])} | {'是' if r.get('required', True) else '可选'} |")
+    mets = ["| 实体 | 指标 | 口径 |", "|---|---|---|"]
+    for m in gold.get("metrics", []):
+        if m.get("required", True):
+            mets.append(f"| {m['table']} | {m['label']} | {_formula(m)} |")
+    qa = ["| 题号 | 问题 | 标准答案 |", "|---|---|---|"]
+    for q in doc["questions"]:
+        exp = "；".join("、".join(_cell(v) for v in row if v is not None) for row in q["expected"]["rows"])
+        qa.append(f"| {q['id']} | {q['question']} | {exp} |")
+    return {
+        "tables": "\n".join(rows),
+        "gold": f"实体 {len([e for e in gold['entities'] if e.get('kind') != 'exclude'])} 个（每张表一个），关系 {len(gold.get('relations', []))} 条：\n\n"
+        + "\n".join(rels) + "\n\n必需指标：\n\n" + "\n".join(mets),
+        "answers": "\n".join(qa),
+    }
+
+
+def _formula(m: dict) -> str:
+    def part(x: dict) -> str:
+        word = {"count": "计数", "sum": "合计", "avg": "平均", "min": "最小", "max": "最大", "count_distinct": "去重计数"}[x["aggregate"]]
+        col = "" if x["aggregate"] == "count" else f"「{x.get('column')}」"
+        cond = "，".join(f"{f['column']} {({'eq': '=', 'ne': '≠', 'gt': '>', 'gte': '≥', 'lt': '<', 'lte': '≤', 'in': '属于', 'not_in': '不属于', 'is_null': '为空' if f.get('value') else '非空'})[f['op']]}{'' if f['op'] == 'is_null' else ' ' + str(f.get('value'))}" for f in x.get("filters", []))
+        return f"{col}{word}" + (f"（{cond}）" if cond else "")
+    return f"{part(m['numerator'])} ÷ {part(m['denominator'])}" if m["aggregate"] == "ratio" else part(m)
+
+
+def cmd_readme(case_dir: Path) -> int:
+    """把 README.md 里 ``<!-- 自动生成:名称 -->`` 与 ``<!-- /自动生成 -->`` 之间的内容换成从数据算出的段落。"""
+
+    path = case_dir / "README.md"
+    text = path.read_text(encoding="utf-8")
+    for name, body in _blocks(case_dir).items():
+        text = re.sub(rf"(<!-- 自动生成:{name} -->).*?(<!-- /自动生成 -->)", lambda m: f"{m.group(1)}\n{body}\n{m.group(2)}", text, flags=re.S)
+    path.write_text(text, encoding="utf-8")
+    print(f"更新 {path}")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     cmd, case = argv[0], Path(argv[1])
+    if cmd == "readme":
+        return cmd_readme(case)
     if cmd == "answers":
         return cmd_answers(case, argv[2] if len(argv) > 2 else None)
     if cmd == "gold":
