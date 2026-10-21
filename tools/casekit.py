@@ -215,14 +215,18 @@ def _norm(text: str) -> str:
 
 
 def _number_in(value: float, text: str, tolerance: float) -> bool:
-    """回答里有没有这个数：去掉千分位逗号；「122万」「1.2亿」按单位折算；百分数也按小数比一次。"""
+    """回答里有没有这个数：去掉千分位逗号；「122万」「1.2亿」「3.9%」按单位折算。
+    两种算对：相对误差不超过 tolerance；或回答按自己的精度四舍五入后相等（如 3.92% 答成 3.9%），此时回答至少要有 2 位有效数字。"""
 
     text = re.sub(r"(?<=\d)[,，](?=\d{3})", "", text)
     for token, unit in re.findall(r"(-?\d+(?:\.\d+)?)\s*(万|亿|%)?", text):
-        number = float(token) * {"万": 1e4, "亿": 1e8, "%": 0.01}.get(unit, 1)
-        if unit == "%" and abs(float(token) - value) <= max(tolerance * abs(value), 1e-9):
+        scale = {"万": 1e4, "亿": 1e8, "%": 0.01}.get(unit, 1)
+        number = float(token) * scale
+        if abs(number - value) <= max(tolerance * abs(value), 1e-9):
             return True
-        if abs(number - value) <= max(tolerance * abs(value), 1e-9) or round(number, 2) == round(value, 2):
+        digits = len(token.split(".")[1]) if "." in token else 0
+        significant = len(token.lstrip("-").replace(".", "").lstrip("0"))
+        if significant >= 2 and round(value / scale, digits) == float(token):
             return True
     return False
 

@@ -57,6 +57,7 @@ cases/<编号-名称>/
   images/          教程截图
   prepare/         数据生成脚本
 tools/casekit.py   核对标准答案、核验金标、给回答打分
+tools/test_casekit.py  判分规则自检（标准答案必须判对、改错数字必须判错）
 ```
 
 ## 许可
