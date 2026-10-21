@@ -153,3 +153,79 @@ questions:
     - - 9
   qtype: 多表综合
   source: 案例作者按本案例数据出题
+- id: q11
+  question: 加工记录里，发生设备故障和没有发生故障的各有多少条？故障率是多少？
+  sql: SELECT SUM(是否故障 = '是') AS 故障, SUM(是否故障 = '否') AS 未故障, ROUND(1.0 * SUM(是否故障 = '是') / COUNT(*), 4) AS 故障率 FROM 加工记录
+  expected:
+    columns:
+    - 故障
+    - 未故障
+    - 故障率
+    rows:
+    - - 339
+      - 9661
+      - 0.0339
+  qtype: 比率
+  source: Microsoft Fabric 数据科学教程「predictive maintenance」 Step 3「Inspect the target variable for class imbalance」
+- id: q12
+  question: 各失效模式各触发了多少次故障事件？哪种最多？
+  sql: SELECT m.失效模式名称, COUNT(*) AS 次数 FROM 故障事件 f JOIN 失效模式 m ON m.失效模式代码 = f.失效模式代码 GROUP BY m.失效模式名称 ORDER BY 次数 DESC
+  expected:
+    columns:
+    - 失效模式名称
+    - 次数
+    rows:
+    - - 散热失效
+      - 115
+    - - 过应变失效
+      - 98
+    - - 功率失效
+      - 95
+    - - 刀具磨损失效
+      - 46
+    - - 随机失效
+      - 19
+  qtype: 跨表关联
+  source: Microsoft Fabric 数据科学教程「predictive maintenance」 Step 3 按故障类型计数；UCI AI4I 2020 数据集页失效模式说明（UCI 文字里 TWF、RNF 的次数与数据标志位不符，以数据为准）
+- id: q13
+  question: 发生故障和没有故障的加工记录，平均刀具磨损（分钟）和平均扭矩（Nm）分别是多少？
+  sql: SELECT 是否故障, ROUND(AVG(刀具磨损_分钟), 2) AS 平均刀具磨损_分钟, ROUND(AVG(扭矩_Nm), 2) AS 平均扭矩_Nm FROM 加工记录 GROUP BY 是否故障
+  expected:
+    columns:
+    - 是否故障
+    - 平均刀具磨损_分钟
+    - 平均扭矩_Nm
+    rows:
+    - - 否
+      - 106.69
+      - 39.63
+    - - 是
+      - 143.78
+      - 50.17
+  must_include:
+  - 143.78
+  - 50.17
+  - 106.69
+  - 39.63
+  qtype: 分组统计
+  source: Microsoft Fabric 数据科学教程「predictive maintenance」 Step 6 Power BI 结论：刀具磨损与扭矩在故障与非故障之间形成分界（改为两组均值对比）
+- id: q14
+  question: 低、中、高三个质量等级的加工记录各有多少条、各占多少比例？
+  sql: SELECT 质量等级, COUNT(*) AS 记录数, ROUND(1.0 * COUNT(*) / (SELECT COUNT(*) FROM 加工记录), 4) AS 占比 FROM 加工记录 GROUP BY 质量等级 ORDER BY 记录数 DESC
+  expected:
+    columns:
+    - 质量等级
+    - 记录数
+    - 占比
+    rows:
+    - - 低
+      - 6000
+      - 0.6
+    - - 中
+      - 2997
+      - 0.2997
+    - - 高
+      - 1003
+      - 0.1003
+  qtype: 比率
+  source: Microsoft Fabric 数据科学教程「predictive maintenance」 Step 2 数据说明（低 60%、中 30%、高 10%）

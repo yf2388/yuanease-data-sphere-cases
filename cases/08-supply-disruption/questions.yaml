@@ -146,3 +146,90 @@ questions:
       - 719
   qtype: 跨表关联
   source: 案例作者按本案例数据出题
+- id: q11
+  question: 华东配送中心火灾停运后，受影响的待发货订单里缺口最大的是哪种成品、缺多少台？哪些正常运营的配送中心扣除安全库存后能单独补足这个缺口？
+  sql: WITH gap AS (SELECT m.成品编码, SUM(m.数量) AS 缺口 FROM 销售订单 o JOIN 配送中心 d ON d.配送中心代码 = o.发货配送中心代码 JOIN 订单明细 m ON m.订单号 = o.订单号 WHERE d.状态 = '停运' AND o.订单状态 = '待发货' GROUP BY m.成品编码 ORDER BY 缺口 DESC LIMIT 1) SELECT p.成品名称, g.缺口, (SELECT GROUP_CONCAT(n, '、') FROM (SELECT d.配送中心名称 AS n FROM 配送中心库存 k JOIN 配送中心 d ON d.配送中心代码 = k.配送中心代码 WHERE d.状态 = '正常' AND k.成品编码 = g.成品编码 AND k.在库数量 - k.安全库存 >= g.缺口 ORDER BY 1)) AS 可单独补足的配送中心 FROM gap g JOIN 成品 p ON p.成品编码 = g.成品编码
+  expected:
+    columns:
+    - 成品名称
+    - 缺口
+    - 可单独补足的配送中心
+    rows:
+    - - 气动球阀 Q641F-DN80
+      - 45
+      - 西南配送中心
+  must_include:
+  - - 气动球阀
+    - FG-202
+  - 45
+  - 西南
+  qtype: 多表综合
+  source: 'Palantir 博客「Building with Palantir AIP: Logic Tools for RAG/OAG」 的主提示词（设施起火将导致成品短缺，问怎么办；逻辑块先找受影响成品与配送中心，再找库存足够补缺的配送中心；具体化为缺口最大的成品与能补足的中心）'
+- id: q12
+  question: 华东配送中心停运后，由它发货、仍处于待发货的订单有多少张？金额合计多少？涉及多少家客户，其中 A 级客户几家？
+  sql: SELECT COUNT(*) AS 受影响订单数, SUM(o.订单金额) AS 订单金额, COUNT(DISTINCT o.客户编码) AS 客户数, COUNT(DISTINCT CASE WHEN c.客户等级 = 'A' THEN o.客户编码 END) AS A级客户数 FROM 销售订单 o JOIN 配送中心 d ON d.配送中心代码 = o.发货配送中心代码 JOIN 客户 c ON c.客户编码 = o.客户编码 WHERE d.状态 = '停运' AND o.订单状态 = '待发货'
+  expected:
+    columns:
+    - 受影响订单数
+    - 订单金额
+    - 客户数
+    - A级客户数
+    rows:
+    - - 18
+      - 1772600
+      - 11
+      - 3
+  qtype: 多表综合
+  source: 'Palantir 博客「Building with Palantir AIP: Data Tools for RAG/OAG」 与 Palantir 博客「Building with Palantir AIP: Logic Tools for RAG/OAG」 共同的第一步：找出受火灾影响的客户订单'
+- id: q13
+  question: 华东配送中心停运后，受影响的待发货订单涉及的每种成品，缺口各是多少台？
+  sql: SELECT p.成品编码, p.成品名称, SUM(m.数量) AS 缺口 FROM 销售订单 o JOIN 配送中心 d ON d.配送中心代码 = o.发货配送中心代码 JOIN 订单明细 m ON m.订单号 = o.订单号 JOIN 成品 p ON p.成品编码 = m.成品编码 WHERE d.状态 = '停运' AND o.订单状态 = '待发货' GROUP BY p.成品编码, p.成品名称 ORDER BY 缺口 DESC
+  expected:
+    columns:
+    - 成品编码
+    - 成品名称
+    - 缺口
+    rows:
+    - - FG-202
+      - 气动球阀 Q641F-DN80
+      - 45
+    - - FG-203
+      - 蝶阀 D341X-DN300
+      - 31
+    - - FG-201
+      - 电动闸阀 Z941H-DN150
+      - 27
+    - - FG-301
+      - 隔膜计量泵 JMZ-500
+      - 24
+    - - FG-103
+      - 管道泵 ISG100
+      - 17
+    - - FG-101
+      - 单级离心泵 IS80-65
+      - 16
+    - - FG-302
+      - 柱塞计量泵 J-ZM
+      - 15
+    - - FG-102
+      - 多级离心泵 D46-50
+      - 10
+    - - FG-401
+      - 泵阀控制柜 PLC-A
+      - 8
+    - - FG-204
+      - 截止阀 J41H-DN50
+      - 7
+  must_include:
+  - 45
+  - 31
+  - 27
+  - 24
+  - 17
+  - 16
+  - 15
+  - 10
+  - 8
+  - 7
+  qtype: 多表综合
+  source: 'Palantir 博客「Building with Palantir AIP: Data Tools for RAG/OAG」 与 Palantir 博客「Building with Palantir AIP: Logic Tools for RAG/OAG」 共同的第二步：逐个缺货成品找补缺来源（本题只问各成品缺口）'

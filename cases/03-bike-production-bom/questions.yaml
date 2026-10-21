@@ -131,3 +131,120 @@ questions:
       - 110
   qtype: 跨表关联
   source: 案例作者按本案例数据出题
+- id: q11
+  question: 产品「Road-550-W Yellow, 44」（产品编号 800）当前有效的物料清单（失效日期为空）逐层展开后，一共有多少条组件记录？直接组件有几个？一共展开几层？
+  sql: WITH RECURSIVE parts(装配件, 组件, 级) AS (SELECT 装配件产品编号, 组件产品编号, 0 FROM 物料清单 WHERE 装配件产品编号 = 800 AND 失效日期 IS NULL UNION ALL SELECT b.装配件产品编号, b.组件产品编号, p.级 + 1 FROM 物料清单 b JOIN parts p ON b.装配件产品编号 = p.组件 AND b.失效日期 IS NULL) SELECT COUNT(*) AS 组件记录数, SUM(级 = 0) AS 直接组件数, MAX(级) + 1 AS 展开层数 FROM parts
+  expected:
+    columns:
+    - 组件记录数
+    - 直接组件数
+    - 展开层数
+    rows:
+    - - 89
+      - 14
+      - 4
+  qtype: 跨表关联
+  source: 微软 T-SQL 文档 WITH common_table_expression 示例 E（递归 CTE 展开产品 800 的多级物料清单），同一查询见 SQL Server 2005 文档 Manufacturing Scenario 示例 A（原查询输出明细，改为计数）
+- id: q12
+  question: 产品「LL Bottom Bracket」（产品编号 994）在杂项库（工位编号 6）的库存数量是多少？
+  sql: SELECT IFNULL(SUM(数量), 0) AS 库存 FROM 产品库存 WHERE 产品编号 = 994 AND 工位编号 = 6
+  expected:
+    columns:
+    - 库存
+    rows:
+    - - 358
+  qtype: 单表聚合
+  source: 微软 AdventureWorks 安装脚本 instawdb.sql 的函数 ufnGetStock（只统计 LocationID = 6 杂项库的库存）（产品为本案例选定）
+- id: q13
+  question: 产品「LL Bottom Bracket」（产品编号 994）在各库位（工位）分别有多少库存？
+  sql: SELECT w.工位名称, SUM(i.数量) AS 可用数量 FROM 产品库存 i JOIN 工位 w ON w.工位编号 = i.工位编号 WHERE i.产品编号 = 994 GROUP BY w.工位名称 ORDER BY 可用数量 DESC
+  expected:
+    columns:
+    - 工位名称
+    - 可用数量
+    rows:
+    - - 杂项库
+      - 358
+    - - 工具库
+      - 244
+    - - 部件装配
+      - 212
+  qtype: 跨表关联
+  source: SQL Server 2005 文档 AdventureWorks Manufacturing Scenario 示例 B「Viewing Product Inventory」（原查询列出全部产品，限定为一个产品）
+- id: q14
+  question: 山地车、公路车、旅行车三类整车产品的工单各有多少张？
+  sql: SELECT s.子类名称, COUNT(*) AS 工单数 FROM 工单 w JOIN 产品 p ON w.产品编号 = p.产品编号 JOIN 产品子类 s ON s.产品子类编号 = p.产品子类编号 WHERE p.产品子类编号 IN (1, 2, 3) GROUP BY s.子类名称 ORDER BY 工单数 DESC
+  expected:
+    columns:
+    - 子类名称
+    - 工单数
+    rows:
+    - - 公路车
+      - 312
+    - - 山地车
+      - 283
+    - - 旅行车
+      - 237
+  qtype: 多表综合
+  source: SQL Server 2005 文档 AdventureWorks Manufacturing Scenario 示例 C「Viewing work orders by product」（产品子类 1、2、3）（原查询输出明细，改为按子类计数）
+- id: q15
+  question: 工单表里出现过的产品一共有多少种？
+  sql: SELECT COUNT(*) AS 产品数 FROM (SELECT 产品编号 FROM 产品 INTERSECT SELECT 产品编号 FROM 工单)
+  expected:
+    columns:
+    - 产品数
+    rows:
+    - - 174
+  qtype: 单表聚合
+  source: 微软 T-SQL 文档 EXCEPT and INTERSECT 示例（Product INTERSECT WorkOrder：有工单的产品）
+- id: q16
+  question: 有多少种产品没有任何工单？
+  sql: SELECT COUNT(*) AS 产品数 FROM (SELECT 产品编号 FROM 产品 EXCEPT SELECT 产品编号 FROM 工单)
+  expected:
+    columns:
+    - 产品数
+    rows:
+    - - 330
+  qtype: 单表聚合
+  source: 微软 T-SQL 文档 EXCEPT and INTERSECT 示例（Product EXCEPT WorkOrder：没有工单的产品）
+- id: q17
+  question: 按制造天数分组，各组产品的平均标准成本是多少？
+  sql: SELECT 制造天数, ROUND(AVG(标准成本), 4) AS 平均标准成本 FROM 产品 GROUP BY 制造天数 ORDER BY 制造天数
+  expected:
+    columns:
+    - 制造天数
+    - 平均标准成本
+    rows:
+    - - 0
+      - 5.0886
+    - - 1
+      - 223.88
+    - - 2
+      - 359.1083
+    - - 4
+      - 949.4105
+  must_include:
+  - 5.0886
+  - 223.88
+  - 359.1083
+  - 949.4105
+  qtype: 分组统计
+  source: 微软 T-SQL 文档 FROM - Using PIVOT and UNPIVOT 的「Basic PIVOT example」（AVG(StandardCost) 按 DaysToManufacture，原文结果与本数据一致）
+- id: q18
+  question: 已分类的产品里，每个产品大类各有多少个产品？
+  sql: SELECT c.大类名称, COUNT(*) AS 产品数 FROM 产品 p JOIN 产品子类 s ON s.产品子类编号 = p.产品子类编号 JOIN 产品大类 c ON c.产品大类编号 = s.产品大类编号 GROUP BY c.大类名称 ORDER BY 产品数 DESC
+  expected:
+    columns:
+    - 大类名称
+    - 产品数
+    rows:
+    - - 零部件
+      - 134
+    - - 整车
+      - 97
+    - - 服装
+      - 35
+    - - 配件
+      - 29
+  qtype: 多表综合
+  source: SQL Server 2005 文档 AdventureWorks Product Scenario 示例 A（按大类、子类、型号列出产品）（原查询输出明细，改为计数）

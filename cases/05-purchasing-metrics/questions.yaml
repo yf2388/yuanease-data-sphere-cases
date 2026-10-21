@@ -136,3 +136,47 @@ questions:
     - - 828445.44
   qtype: 时间筛选
   source: 案例作者按本案例数据出题
+- id: q11
+  question: 2025 年 7 月下单的采购单，按状态分别的应付总额是多少？当月未结采购金额（待审批和已批准的应付总额）合计多少？
+  sql: SELECT 状态, ROUND(SUM(应付总额), 2) AS 应付总额, ROUND(SUM(CASE WHEN 状态 IN ('待审批', '已批准') THEN 应付总额 ELSE 0 END), 2) AS 未结采购金额 FROM 采购单 WHERE substr(下单日期, 1, 7) = '2025-07' GROUP BY 状态 ORDER BY 状态
+  expected:
+    columns:
+    - 状态
+    - 应付总额
+    - 未结采购金额
+    rows:
+    - - 已完成
+      - 4023320.47
+      - 0.0
+    - - 已驳回
+      - 100972.81
+      - 0.0
+    - - 待审批
+      - 3296964.7
+      - 3296964.7
+  must_include:
+  - 4023320.47
+  - 100972.81
+  - 3296964.7
+  qtype: 时间筛选
+  source: Databricks 指标视图 TPC-H 示例 Step 8「Query your metric view」 的按月与状态查询（total_revenue、open_order_revenue；TPC-H 订单改为采购单，固定为单数最多的 2025-07）
+- id: q12
+  question: 采购员 250、251、256、257、260 分别给供应商 Australia Bike Retailer（供应商编号 1492）下了多少张采购单？
+  sql: SELECT 采购员工号, COUNT(*) AS 采购单数 FROM 采购单 WHERE 供应商编号 = 1492 AND 采购员工号 IN (250, 251, 256, 257, 260) GROUP BY 采购员工号 ORDER BY 采购员工号
+  expected:
+    columns:
+    - 采购员工号
+    - 采购单数
+    rows:
+    - - 250
+      - 2
+    - - 251
+      - 5
+    - - 256
+      - 4
+    - - 257
+      - 4
+    - - 260
+      - 4
+  qtype: 分组统计
+  source: 微软 T-SQL 文档 FROM - Using PIVOT and UNPIVOT 的「Complex PIVOT example」（AdventureWorks 采购单按供应商与员工交叉计数，原文结果与本数据一致）

@@ -2,6 +2,7 @@
 
 > 场景参考自 Databricks 指标视图（Metric Views）公开教程（<https://docs.databricks.com/aws/en/business-semantics/metric-views/tpch-example>）的指标建模方法：多表关联、带筛选的指标、组合指标。
 > 原教程使用的 TPC-H 样例数据再分发条款未核实，本案例改用微软 AdventureWorks 的采购数据（MIT 许可）重做；教程文字、截图均为本仓库自行撰写与拍摄。
+> 问答题 q11 改写自上述 Databricks 教程的示例查询；q12 取自微软 PIVOT 文档里针对 AdventureWorks 采购单的示例查询（<https://learn.microsoft.com/en-us/sql/t-sql/queries/from-using-pivot-and-unpivot>）。
 
 ## 场景
 
@@ -155,6 +156,8 @@
 | q08 | 拒收数量最多的产品是哪个？拒收了多少件？ | Decal 1、3,248 |
 | q09 | 有多少家供应商一张采购单都没有？ | 18 |
 | q10 | 状态为「已完成」、2025 年下单的采购单，运费合计是多少？ | 828,445.44 |
+| q11 | 2025 年 7 月下单的采购单，按状态分别的应付总额是多少？当月未结采购金额（待审批和已批准的应付总额）合计多少？ | 已完成、4,023,320.47、0；已驳回、100,972.81、0；待审批、3,296,964.7、3,296,964.7 |
+| q12 | 采购员 250、251、256、257、260 分别给供应商 Australia Bike Retailer（供应商编号 1492）下了多少张采购单？ | 250、2；251、5；256、4；257、4；260、4 |
 <!-- /自动生成 -->
 
 ## 自行核对

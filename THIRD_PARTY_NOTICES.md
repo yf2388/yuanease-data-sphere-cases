@@ -118,3 +118,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 ## 5. 自建合成数据
 
 `cases/06-auto-quality-analysis`、`cases/07-multi-plant-oee`、`cases/08-supply-disruption`、`cases/10-order-metric-types` 的数据由各自 `prepare/build_data.py` 以固定随机数种子生成，全部为虚构内容，不涉及任何真实企业或个人，按本仓库 LICENSE 第 2 类（CC BY 4.0）授权。
+
+## 6. 问答题的公开出处（只借问题意图，不含数据）
+
+下列案例 `questions.yaml` 里 `source` 标注了出处的题目（q11 起），问题意图或示例查询口径取自对应的公开文档；题干改写为中文、不依赖上下文的问句，原文与代码未复制，标准答案全部由本仓库 `data/` 上的 SQL 独立算出。
+
+| 用于 | 出处 |
+|---|---|
+| `cases/03-bike-production-bom` | Microsoft Learn T-SQL 文档（WITH common_table_expression 示例 E、EXCEPT and INTERSECT 示例、FROM - Using PIVOT and UNPIVOT 的 Basic PIVOT example）；SQL Server 2005 文档 AdventureWorks Manufacturing Scenario 与 Product Scenario；AdventureWorks 安装脚本 instawdb.sql 的 ufnGetStock（MIT） |
+| `cases/04-cnc-machine-failure` | Microsoft Learn「Fabric 数据科学：predictive maintenance」教程 Step 2、3、6 的数据说明与分析结论；UCI AI4I 2020 数据集页的失效模式说明 |
+| `cases/05-purchasing-metrics` | Databricks 文档「Metric views TPC-H example」Step 8 的按月与状态查询；Microsoft Learn PIVOT 文档的 Complex PIVOT example（AdventureWorks 采购单） |
+| `cases/07-multi-plant-oee` | Databricks 解决方案加速器 databricks-industry-solutions/factory-optimization 的 notebook 场景问题与看板面板 |
+| `cases/08-supply-disruption` | Palantir 博客「Building with Palantir AIP」系列 Data Tools、Logic Tools 两篇的配送中心起火剧本（剧本步骤与提示词意图；博客数据与原文未使用） |
+| `cases/10-order-metric-types` | dbt Semantic Layer 快速入门（docs.getdbt.com/guides/sl-qs）的示例查询与练习；dbt Labs 示例仓库 dbt-labs/jaffle-sl-template 的 saved queries 与 Evidence 报表查询 |

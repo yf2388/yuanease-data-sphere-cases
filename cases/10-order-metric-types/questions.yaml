@@ -153,3 +153,167 @@ questions:
     - - 0.6829
   qtype: 跨表关联
   source: 案例作者按本案例数据出题
+- id: q11
+  question: 2026 年每个月（不含已取消订单）的订单金额和订单数分别是多少？
+  sql: SELECT substr(下单日期, 1, 7) AS 月份, ROUND(SUM(订单金额), 2) AS 订单金额, COUNT(*) AS 订单数 FROM 订单 WHERE 订单状态 <> '已取消' GROUP BY 月份 ORDER BY 月份
+  expected:
+    columns:
+    - 月份
+    - 订单金额
+    - 订单数
+    rows:
+    - - 2026-01
+      - 2878326.5
+      - 21
+    - - 2026-02
+      - 2758055.0
+      - 23
+    - - 2026-03
+      - 6008253.5
+      - 29
+    - - 2026-04
+      - 5524980.0
+      - 25
+    - - 2026-05
+      - 3200293.0
+      - 25
+    - - 2026-06
+      - 3478293.0
+      - 12
+    - - 2026-07
+      - 8201938.5
+      - 26
+    - - 2026-08
+      - 3997333.0
+      - 26
+    - - 2026-09
+      - 2823546.5
+      - 14
+  must_include:
+  - 2878326.5
+  - 2758055
+  - 6008253.5
+  - 5524980
+  - 3200293
+  - 3478293
+  - 8201938.5
+  - 3997333
+  - 2823546.5
+  qtype: 分组统计
+  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs 「Test and query metrics」的 dbt sl query --metrics order_total,order_count --group-by order_id__order_date（按日改为按月）
+- id: q12
+  question: 每个月有多少位新客户（首次下单）？
+  sql: SELECT substr(首单日期, 1, 7) AS 月份, COUNT(*) AS 新客户数 FROM (SELECT 客户编码, MIN(下单日期) AS 首单日期 FROM 订单 GROUP BY 客户编码) GROUP BY 月份 ORDER BY 月份
+  expected:
+    columns:
+    - 月份
+    - 新客户数
+    rows:
+    - - 2026-01
+      - 9
+    - - 2026-02
+      - 1
+  must_include:
+  - 9
+  - 1
+  qtype: 分组统计
+  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs Hex 小节练习：按首单日期看每天新增客户数（按日改为按月）
+- id: q13
+  question: 2026 年 9 月（不含已取消）的订单金额和订单数是多少？
+  sql: SELECT ROUND(SUM(订单金额), 2) AS 订单金额, COUNT(*) AS 订单数 FROM 订单 WHERE 订单状态 <> '已取消' AND 下单日期 BETWEEN '2026-09-01' AND '2026-09-30'
+  expected:
+    columns:
+    - 订单金额
+    - 订单数
+    rows:
+    - - 2823546.5
+      - 14
+  qtype: 时间筛选
+  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs Google Sheets 小节练习：查询 order_total 并按 order_date 筛选（日期为本案例选定）
+- id: q14
+  question: 1–9 月（不含已取消）的订单金额、订单数、大额订单数（订单金额不低于 10 万元）、下单客户数、平均订单金额、大额订单占比分别是多少？
+  sql: SELECT ROUND(SUM(订单金额), 2) AS 订单金额, COUNT(*) AS 订单数, SUM(订单金额 >= 100000) AS 大额订单数, COUNT(DISTINCT 客户编码) AS 下单客户数, ROUND(SUM(订单金额) / COUNT(*), 2) AS 平均订单金额, ROUND(1.0 * SUM(订单金额 >= 100000) / COUNT(*), 4) AS 大额订单占比 FROM 订单 WHERE 订单状态 <> '已取消'
+  expected:
+    columns:
+    - 订单金额
+    - 订单数
+    - 大额订单数
+    - 下单客户数
+    - 平均订单金额
+    - 大额订单占比
+    rows:
+    - - 38871019.0
+      - 201
+      - 105
+      - 10
+      - 193388.15
+      - 0.5224
+  qtype: 比率
+  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs Sigma 小节的六指标查询（order_total、order_count、large_orders、customers_with_orders、avg_order_value、pct_of_orders_that_are_large；去掉按日分组，大额门槛由 20 美元改为 10 万元）
+- id: q15
+  question: 按周（周一起算）统计不含已取消的订单金额，哪一周最高？是多少？
+  sql: SELECT DATE(o.下单日期, '-6 days', 'weekday 1') AS 周一, ROUND(SUM(m.金额), 2) AS 周订单金额 FROM 订单 o JOIN 订单明细 m ON m.订单号 = o.订单号 WHERE o.订单状态 <> '已取消' GROUP BY 周一 ORDER BY 周订单金额 DESC LIMIT 1
+  expected:
+    columns:
+    - 周一
+    - 周订单金额
+    rows:
+    - - '2026-07-06'
+      - 3323580.0
+  must_include:
+  - - '2026-07-06'
+    - 7月6日
+    - 07-06
+    - 7/6
+  - 3323580
+  qtype: 跨表关联
+  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template 的 saved query weekly_revenue（改为求最高的一周）
+- id: q16
+  question: 一共下了多少张订单（含已取消）？其中已取消多少张？
+  sql: SELECT COUNT(*) AS 全部订单, SUM(订单状态 = '已取消') AS 其中已取消 FROM 订单
+  expected:
+    columns:
+    - 全部订单
+    - 其中已取消
+    rows:
+    - - 217
+      - 16
+  qtype: 单表聚合
+  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template 的 saved query total_orders_full_aggregate
+- id: q17
+  question: 2026 年 9 月（不含已取消）的订单金额、订单数、下单客户数，较 8 月分别变化了多少（环比）？
+  sql: WITH m AS (SELECT substr(下单日期, 1, 7) AS 月份, SUM(订单金额) AS 金额, COUNT(*) AS 单数, COUNT(DISTINCT 客户编码) AS 客户数 FROM 订单 WHERE 订单状态 <> '已取消' GROUP BY 月份) SELECT ROUND(a.金额 / b.金额 - 1, 4) AS 金额环比, ROUND(1.0 * a.单数 / b.单数 - 1, 4) AS 订单数环比, ROUND(1.0 * a.客户数 / b.客户数 - 1, 4) AS 客户数环比 FROM m a JOIN m b ON a.月份 = '2026-09' AND b.月份 = '2026-08'
+  expected:
+    columns:
+    - 金额环比
+    - 订单数环比
+    - 客户数环比
+    rows:
+    - - -0.2936
+      - -0.4615
+      - -0.1
+  must_include:
+  - - -0.2936
+    - 0.2936
+  - - -0.4615
+    - 0.4615
+  - - -0.1
+    - 0.1
+  qtype: 跨表关联
+  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template Evidence 首页的 monthly_stats（最近一个月与上月的收入、订单数、客户数对比；固定为 2026-09 对 2026-08）
+- id: q18
+  question: 累计消费（不含已取消订单）最高的客户是谁？累计多少张订单、平均每单多少？
+  sql: SELECT c.客户名称, COUNT(*) AS 累计订单数, ROUND(SUM(o.订单金额), 2) AS 累计消费, ROUND(SUM(o.订单金额) / COUNT(*), 2) AS 平均订单金额 FROM 订单 o JOIN 客户 c ON c.客户编码 = o.客户编码 WHERE o.订单状态 <> '已取消' GROUP BY c.客户名称 ORDER BY 累计消费 DESC LIMIT 1
+  expected:
+    columns:
+    - 客户名称
+    - 累计订单数
+    - 累计消费
+    - 平均订单金额
+    rows:
+    - - 西部能源装备
+      - 24
+      - 5537111.5
+      - 230712.98
+  qtype: 跨表关联
+  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template Evidence 客户页的 customers 查询（每个客户的累计订单数、累计消费、平均订单金额，按累计消费降序）
