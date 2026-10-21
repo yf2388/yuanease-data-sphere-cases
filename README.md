@@ -7,7 +7,7 @@
 - `data/`：用 CSV 文件模拟一个业务数据库，体积在几 MB 以内；
 - `README.md`：从新建资料库、上传表格、构筑实体模型、审核发布到问数的逐步教程，配 Yuanease 实拍截图；
 - `gold.yaml`：实体、唯一标识列、关系与指标的金标，有主外键的数据集直接从原始建表语句推导；
-- `questions.yaml`：10 道问答题，标准答案由题目里的 SQL 在 `data/` 上独立算出；
+- `questions.yaml`：10–16 道问答题，标准答案由题目里的 SQL 在 `data/` 上独立算出；每题的 `source` 写明出处：出自竞品或开源项目公开教程、示例查询的题（「原作者题」），或案例作者按数据补出的题（「自补题」）；
 - `prepare/`：从原始公开数据（或固定随机数种子）重新生成 `data/` 的脚本。
 
 ## 案例一览
@@ -41,7 +41,7 @@ python3 -I tools/casekit.py answers cases/01-supply-chain-network --check
 ## 评测口径
 
 - **首扫加权准确率**：上传表格后点一次「构筑实体模型」，中途员工提问一律回答「不知道，请你按数据自己判断。」，把得到的实体模型与 `gold.yaml` 比对。实体、唯一标识列、关系、指标四项分别计算 F1，按 0.3 / 0.2 / 0.3 / 0.2 加权。
-- **问答准确率**：模型审核发布后，逐题提问；回答中包含标准答案的全部取值（数字允许 0.5% 相对误差）判为正确。
+- **问答准确率**：模型审核发布后，逐题提问；回答中包含标准答案的全部取值（数字允许 0.5% 相对误差）判为正确。主指标只算原作者题，自补题单独报告；题库在实跑前冻结，`BANK.md` 记录每个 questions.yaml 的 sha256。
 - **独立复现**：由没有参与制作的智能体，只拿到本仓库与 Yuanease 安装包，照 README 从零完成全部步骤。
 
 各案例的实测成绩见对应 README 的「实测记录」。
@@ -68,4 +68,4 @@ tools/test_casekit.py  判分规则自检（标准答案必须判对、改错数
 
 ## English summary
 
-**Yuanease Data Sphere** turns scattered spreadsheets and database tables into a governed entity model (entities, keys, relationships, metrics) that AI workers use to answer business questions consistently. This repository contains 10 reproducible manufacturing and supply-chain cases. Each case ships CSV data, a step-by-step tutorial with screenshots of the Yuanease desktop app, a gold-standard entity model derived from the source schema, and 10 questions whose answers are computed independently with SQL (`tools/casekit.py`). Cases derived from other vendors' public tutorials reproduce only the business scenario and question list; all text and screenshots are original. Code is MIT; tutorials, gold files and synthetic data are CC BY 4.0; third-party data keeps its original license (see THIRD_PARTY_NOTICES.md).
+**Yuanease Data Sphere** turns scattered spreadsheets and database tables into a governed entity model (entities, keys, relationships, metrics) that AI workers use to answer business questions consistently. This repository contains 10 reproducible manufacturing and supply-chain cases. Each case ships CSV data, a step-by-step tutorial with screenshots of the Yuanease desktop app, a gold-standard entity model derived from the source schema, and 10–16 questions whose answers are computed independently with SQL (`tools/casekit.py`); questions taken from the original vendor or open-source tutorials are reported separately from questions written for this repository. Cases derived from other vendors' public tutorials reproduce only the business scenario and question list; all text and screenshots are original. Code is MIT; tutorials, gold files and synthetic data are CC BY 4.0; third-party data keeps its original license (see THIRD_PARTY_NOTICES.md).
