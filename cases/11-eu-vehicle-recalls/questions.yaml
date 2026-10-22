@@ -1,0 +1,203 @@
+case: 11-eu-vehicle-recalls
+note: q06 实跑后修订（2026-10-22 22:40，独立判分发现第 2 周与第 33 周并列 22 条）：题干补「如有并列，全部列出」，答出任一并列周即算对，修订前的回答（第 33 周）判定不变。产品类型有几处首尾多了空格（例如「 Passenger car」），按去掉首尾空格后的写法统计。标准答案由 sql 在 data/ 上算出（tools/casekit.py answers），并由 prepare/truth_from_raw.py 直接从 Safety Gate 原始周报 XML 独立重算核对。品牌、国家等按通报里的原始写法统计，不合并大小写或别名。
+questions:
+- id: q01
+  question: 2025 年 Safety Gate 一共发布了多少条机动车召回通报？其中乘用车（Passenger car）多少条？
+  sql: SELECT COUNT(*), SUM(TRIM(产品类型) = 'Passenger car') FROM 召回通报
+  must_include:
+  - - 448
+  - - 243
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    - SUM(TRIM(产品类型) = 'Passenger car')
+    rows:
+    - - 448
+      - 243
+  qtype: 单表聚合
+- id: q02
+  question: 按品牌统计召回通报数，排前三的品牌是哪些？各多少条？
+  sql: SELECT 品牌, COUNT(*) AS c FROM 召回通报 GROUP BY 品牌 ORDER BY c DESC, 品牌 LIMIT 3
+  must_include:
+  - - Mercedes-Benz
+    - 奔驰
+  - - 29
+  - - Peugeot
+    - 标致
+  - - 24
+  - - Kia
+    - 起亚
+  - - 23
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 品牌
+    - c
+    rows:
+    - - Mercedes-Benz
+      - 29
+    - - Peugeot
+      - 24
+    - - Kia
+      - 23
+  qtype: 排名
+- id: q03
+  question: 涉及火灾风险（Fire，含与其他风险并列的复合类型）的通报有多少条？占全部机动车通报的比例是多少？
+  sql: SELECT COUNT(DISTINCT 通报编号), ROUND(1.0 * COUNT(DISTINCT 通报编号) / (SELECT COUNT(*) FROM 召回通报), 4) FROM 通报风险 WHERE 风险类型 = 'Fire'
+  must_include:
+  - - 123
+  - - 0.2746
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(DISTINCT 通报编号)
+    - ROUND(1.0 * COUNT(DISTINCT 通报编号) / (SELECT COUNT(*) FROM 召回通报), 4)
+    rows:
+    - - 123
+      - 0.2746
+  qtype: 比率
+- id: q04
+  question: 哪个国家发出的机动车召回通报最多？多少条？
+  sql: SELECT 通报国, COUNT(*) AS c FROM 召回通报 GROUP BY 通报国 ORDER BY c DESC LIMIT 1
+  must_include:
+  - - Germany
+    - 德国
+  - - 231
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 通报国
+    - c
+    rows:
+    - - Germany
+      - 231
+  qtype: 排名
+- id: q05
+  question: 原产国为中国（People's Republic of China）的机动车通报有多少条？其中最多的产品类型是什么、几条？
+  sql: SELECT (SELECT COUNT(*) FROM 召回通报 WHERE 原产国 = 'People''s Republic of China'), TRIM(产品类型) AS t, COUNT(*) AS c FROM 召回通报 WHERE 原产国 = 'People''s Republic of China' GROUP BY t ORDER BY c DESC LIMIT 1
+  must_include:
+  - - 25
+  - - Motorcycle
+    - 摩托车
+  - - 6
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - (SELECT COUNT(*) FROM 召回通报 WHERE 原产国 = 'People''s Republic of China')
+    - t
+    - c
+    rows:
+    - - 25
+      - Motorcycle
+      - 6
+  qtype: 排名
+- id: q06
+  question: 哪一份周报里的机动车召回通报最多？是哪天发布的？有多少条？（如有并列，全部列出）
+  sql: WITH t AS (SELECT w.周报编号, w.标准日期, COUNT(*) AS c FROM 召回通报 n JOIN 周报 w ON n.周报编号 = w.周报编号 GROUP BY w.周报编号) SELECT * FROM t WHERE c = (SELECT MAX(c) FROM t) ORDER BY 周报编号
+  must_include:
+  - - Report-2025-33
+    - 2025-33
+    - 第33周
+    - 第 33 周
+    - Report-2025-2
+    - 第2周
+    - 第 2 周
+  - - 22
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 周报编号
+    - 标准日期
+    - c
+    rows:
+    - - Report-2025-2
+      - '2025-01-10'
+      - 22
+    - - Report-2025-33
+      - '2025-08-15'
+      - 22
+  qtype: 跨表关联
+- id: q07
+  question: 2025 年第三季度（7 月 1 日至 9 月 30 日发布的周报）一共有多少条机动车召回通报？
+  sql: SELECT COUNT(*) FROM 召回通报 n JOIN 周报 w ON n.周报编号 = w.周报编号 WHERE w.标准日期 BETWEEN '2025-07-01' AND '2025-09-30'
+  must_include:
+  - - 155
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 155
+  qtype: 跨表关联
+- id: q08
+  question: 用户类型为 Professional（专业用途）的机动车通报有多少条？其中货车（Lorry）几条？
+  sql: SELECT COUNT(*), SUM(TRIM(产品类型) = 'Lorry') FROM 召回通报 WHERE 用户类型 = 'Professional'
+  must_include:
+  - - 46
+  - - 21
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    - SUM(TRIM(产品类型) = 'Lorry')
+    rows:
+    - - 46
+      - 21
+  qtype: 单表聚合
+- id: q09
+  question: 品牌为 Kia 的召回通报有多少条？其中风险类型含 Injuries 的有几条？
+  sql: SELECT (SELECT COUNT(*) FROM 召回通报 WHERE 品牌 = 'Kia'), COUNT(DISTINCT r.通报编号) FROM 通报风险 r JOIN 召回通报 n ON r.通报编号 = n.通报编号 WHERE n.品牌 = 'Kia' AND r.风险类型 = 'Injuries'
+  must_include:
+  - - 23
+  - - 5
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - (SELECT COUNT(*) FROM 召回通报 WHERE 品牌 = 'Kia')
+    - COUNT(DISTINCT r.通报编号)
+    rows:
+    - - 23
+      - 5
+  qtype: 跨表关联
+- id: q10
+  question: 风险等级不是「Serious risk」的机动车通报有几条？各是哪个品牌？
+  sql: SELECT (SELECT COUNT(*) FROM 召回通报 WHERE 风险等级 <> 'Serious risk'), 通报编号, 品牌 FROM 召回通报 WHERE 风险等级 <> 'Serious risk' ORDER BY 通报编号
+  must_include:
+  - - 6
+  - - SAMEBIKE
+  - - Alpine
+  - - Goodyear
+    - 固特异
+  - - Renault
+    - 雷诺
+  - - Honda
+    - 本田
+  - - Dacia
+    - 达契亚
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - (SELECT COUNT(*) FROM 召回通报 WHERE 风险等级 <> 'Serious risk')
+    - 通报编号
+    - 品牌
+    rows:
+    - - 6
+      - OR/00002/25
+      - SAMEBIKE
+    - - 6
+      - OR/00007/25
+      - Alpine
+    - - 6
+      - OR/00060/25
+      - Goodyear
+    - - 6
+      - OR/00145/25
+      - Renault
+    - - 6
+      - OR/00149/25
+      - Honda
+    - - 6
+      - OR/00152/25
+      - Dacia
+  qtype: 单表聚合

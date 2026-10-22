@@ -1,53 +1,24 @@
-gold_version: case06-auto-quality-v1
+gold_version: case06-malloy-recalls-v1
 status: frozen
 protocol: entity-model-score-v1
 weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
 weights_rationale: 沿用协议默认权重。
 derivation: >-
-  本案例为自建合成数据，表结构、主键与外键由 prepare/build_data.py 的生成规则决定，金标按生成规则写出并用 tools/casekit.py gold 核验。
-  指标按公开的汽车行业质量评价口径：维修次数、维修费用、每百辆问题数（PP100 = 报告问题数合计 / 样本车辆数合计，产品里的比率不含 ×100）、
-  客户满意度（满意度评分平均值）、投诉率（投诉回访数 / 回访数）。每千辆维修频次与单车维修成本跨表或需要去重计数，列在 format_gaps。
+  召回表就是 Malloy 样例 auto_recalls.csv（裁剪到 2021 年起），NHTSA编号在 1,574 行里唯一；日历、部件、召回类型三张表由召回表的取值派生，
+  关系就是派生它们的那一列。指标取自 Malloy 样例的语义模型 auto_recalls.malloy：recall_count（召回数）、total_defects
+  （潜在受影响数量合计）与 percent_of_recalls（占比，是召回数对全体的比值，不是单表指标，列在 format_gaps）。已用 tools/casekit.py gold 核验。
 entities:
-  - {table: 车型, kind: object, label: 车型, identifier: [[车型代码], [车型名称]]}
-  - {table: 生产基地, kind: object, label: 生产基地, identifier: [[基地代码]]}
-  - {table: 服务站, kind: object, label: 服务站, identifier: [[服务站代码]]}
-  - {table: 故障代码, kind: object, label: 故障代码, identifier: [[故障代码]]}
-  - {table: 车辆, kind: object, label: 车辆, identifier: [[VIN码]]}
-  - {table: 维修记录, kind: event, label: 维修记录, identifier: [[维修单号]]}
-  - {table: 客户回访, kind: event, label: 客户回访, identifier: [[回访编号]]}
-  - {table: 市场调查, kind: event, label: 市场调查, identifier: [[调查编号], [调查批次, 车型代码]]}
+  - {table: 召回, kind: event, label: 召回, identifier: [[NHTSA编号]]}
+  - {table: 日历, kind: object, label: 日历, identifier: [[日期], [标准日期]]}
+  - {table: 部件, kind: object, label: 部件, identifier: [[部件], [部件中文名]]}
+  - {table: 召回类型, kind: object, label: 召回类型, identifier: [[召回类型], [召回类型中文名]]}
 relations:
-  - {from: 车辆, to: 车型, on: [[车型代码, 车型代码]], relationship: many_to_one}
-  - {from: 车辆, to: 生产基地, on: [[基地代码, 基地代码]], relationship: many_to_one}
-  - {from: 维修记录, to: 车辆, on: [[VIN码, VIN码]], relationship: many_to_one}
-  - {from: 维修记录, to: 故障代码, on: [[故障代码, 故障代码]], relationship: many_to_one}
-  - {from: 维修记录, to: 服务站, on: [[服务站代码, 服务站代码]], relationship: many_to_one}
-  - {from: 客户回访, to: 车辆, on: [[VIN码, VIN码]], relationship: many_to_one}
-  - {from: 市场调查, to: 车型, on: [[车型代码, 车型代码]], relationship: many_to_one}
+  - {from: 召回, to: 日历, on: [[报告接收日期, 日期]], relationship: many_to_one}
+  - {from: 召回, to: 部件, on: [[部件, 部件]], relationship: many_to_one}
+  - {from: 召回, to: 召回类型, on: [[召回类型, 召回类型]], relationship: many_to_one}
 metrics:
-  - {table: 维修记录, label: 维修次数, aggregate: count, column: null, filters: []}
-  - {table: 维修记录, label: 维修费用, aggregate: sum, column: 维修费用合计, filters: []}
-  - {table: 客户回访, label: 客户满意度, aggregate: avg, column: 满意度评分, filters: []}
-  - table: 客户回访
-    label: 投诉率
-    aggregate: ratio
-    numerator: {aggregate: count, filters: [{column: 是否投诉, op: eq, value: 是}]}
-    denominator: {aggregate: count, filters: []}
-  - table: 市场调查
-    label: 每百辆问题数
-    aggregate: ratio
-    numerator: {aggregate: sum, column: 报告问题数, filters: []}
-    denominator: {aggregate: sum, column: 样本车辆数, filters: []}
-  - {table: 车辆, label: 车辆数, aggregate: count, column: null, filters: []}
-  - {table: 维修记录, label: 保修维修次数, aggregate: count, column: null, filters: [{column: 维修类型, op: eq, value: 保修}], required: false}
-  - {table: 维修记录, label: 工时费, aggregate: sum, column: 工时费, filters: [], required: false}
-  - {table: 维修记录, label: 配件费, aggregate: sum, column: 配件费, filters: [], required: false}
-  - {table: 维修记录, label: 平均维修费用, aggregate: avg, column: 维修费用合计, filters: [], required: false}
-  - {table: 维修记录, label: 维修车辆数, aggregate: count_distinct, column: VIN码, filters: [], required: false}
-  - {table: 客户回访, label: 回访数, aggregate: count, column: null, filters: [], required: false}
-  - {table: 客户回访, label: 投诉数, aggregate: count, column: null, filters: [{column: 是否投诉, op: eq, value: 是}], required: false}
-  - {table: 市场调查, label: 样本车辆数, aggregate: sum, column: 样本车辆数, filters: [], required: false}
-  - {table: 市场调查, label: 报告问题数, aggregate: sum, column: 报告问题数, filters: [], required: false}
+  - {table: 召回, label: 召回数, aggregate: count, column: null, filters: []}
+  - {table: 召回, label: 潜在受影响数量, aggregate: sum, column: 潜在受影响数量, filters: []}
+  - {table: 召回, label: 厂商数, aggregate: count_distinct, column: 厂商, filters: [], required: false}
 format_gaps:
-  - {area: metric, description: 每千辆维修频次 = 维修次数 / 车辆数 × 1000，分子分母在两张表, tables: [维修记录, 车辆]}
-  - {area: metric, description: 单车维修成本 = 维修费用合计 / 维修过的车辆数（去重计数），比率里不能用去重计数, tables: [维修记录]}
+  - {area: metric, description: Malloy 模型的 percent_of_recalls 是某组召回数占全体召回数的百分比（recall_count / all(recall_count)），要按分组计算，单表指标的分子分母都是全表合计时恒为 100%, tables: [召回]}

@@ -1,235 +1,306 @@
 case: 08-supply-disruption
-note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。剧本：华东配送中心（DC-EC）2026-10-12 因火灾停运。
+note: 标准答案由 sql 在 data/ 上算出（tools/casekit.py answers），并由 prepare/truth_from_raw.py 直接从 Brunel 原始 xlsx 独立重算核对。停运是假设情景：原始数据本身没有停运记录，题目问的是「如果某仓库停运，哪些订单、客户、产品受影响，哪些仓库能替代」。
 questions:
 - id: q01
-  question: 哪个配送中心停运了？什么时候、因为什么？
-  sql: SELECT 配送中心名称, 停运日期, 停运原因 FROM 配送中心 WHERE 状态 = '停运'
+  question: 订单数据是哪一天的？一共多少张订单、来自多少家客户、涉及多少种产品？
+  sql: SELECT MIN(订单日期), MAX(订单日期), COUNT(*), COUNT(DISTINCT 客户), COUNT(DISTINCT 产品编号) FROM 订单
   must_include:
-  - 华东配送中心
-  - - 2026-10-12
-    - 10月12日
-    - 10 月 12 日
-  - 火灾
+  - - '2013-05-26'
+    - 2013年5月26日
+    - 5月26日
+  - - 9215
+  - - 46
+  - - 772
+  source: 案例作者按本案例数据出题
   expected:
     columns:
-    - 配送中心名称
-    - 停运日期
-    - 停运原因
+    - MIN(订单日期)
+    - MAX(订单日期)
+    - COUNT(*)
+    - COUNT(DISTINCT 客户)
+    - COUNT(DISTINCT 产品编号)
     rows:
-    - - 华东配送中心
-      - '2026-10-12'
-      - 仓库火灾
+    - - '2013-05-26'
+      - '2013-05-26'
+      - 9215
+      - 46
+      - 772
   qtype: 单表聚合
-  source: 案例作者按本案例数据出题
 - id: q02
-  question: 由停运的配送中心发货、还处于「待发货」的订单有多少张？订单金额合计多少？
-  sql: SELECT COUNT(*), SUM(o.订单金额) FROM 销售订单 o JOIN 配送中心 d ON o.发货配送中心代码 = d.配送中心代码 WHERE d.状态 = '停运' AND o.订单状态 = '待发货'
+  question: 有发出订单的仓库一共几个？发单最多的是哪个仓库、多少张？
+  sql: SELECT (SELECT COUNT(DISTINCT 仓库代码) FROM 订单), 仓库代码, COUNT(*) AS c FROM 订单 GROUP BY 仓库代码 ORDER BY c DESC LIMIT 1
   must_include:
-  - 18
-  - - 1772600
-    - 177.26万
-    - 177.3万
+  - - 7
+  - - PLANT03
+  - - 8541
+  source: 案例作者按本案例数据出题
   expected:
     columns:
-    - COUNT(*)
-    - SUM(o.订单金额)
+    - (SELECT COUNT(DISTINCT 仓库代码) FROM 订单)
+    - 仓库代码
+    - c
     rows:
-    - - 18
-      - 1772600
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
+    - - 7
+      - PLANT03
+      - 8541
+  qtype: 排名
 - id: q03
-  question: 这些受影响的待发货订单涉及多少家客户？其中 A 级客户有几家？
-  sql: SELECT COUNT(DISTINCT o.客户编码), COUNT(DISTINCT CASE WHEN c.客户等级 = 'A' THEN o.客户编码 END) FROM 销售订单 o JOIN 客户 c ON o.客户编码 = c.客户编码 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货'
-  expected:
-    columns:
-    - COUNT(DISTINCT o.客户编码)
-    - COUNT(DISTINCT CASE WHEN c.客户等级 = 'A' THEN o.客户编码 END)
-    rows:
-    - - 11
-      - 3
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
-- id: q04
-  question: 受影响的 A 级客户分别是谁？各自受影响的订单金额是多少？
-  sql: SELECT c.客户名称, SUM(o.订单金额) FROM 销售订单 o JOIN 客户 c ON o.客户编码 = c.客户编码 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货' AND c.客户等级 = 'A' GROUP BY c.客户名称 ORDER BY 2 DESC
-  expected:
-    columns:
-    - 客户名称
-    - SUM(o.订单金额)
-    rows:
-    - - 蓝海化工集团
-      - 422500
-    - - 恒远电力股份有限公司
-      - 144600
-    - - 泰和制药有限公司
-      - 79000
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
-- id: q05
-  question: 受影响的待发货订单里，哪种成品的缺口数量最大？缺多少台？
-  sql: SELECT d.成品编码, SUM(d.数量) AS n FROM 订单明细 d JOIN 销售订单 o ON d.订单号 = o.订单号 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货' GROUP BY d.成品编码 ORDER BY n DESC LIMIT 1
-  expected:
-    columns:
-    - 成品编码
-    - n
-    rows:
-    - - FG-202
-      - 45
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
-- id: q06
-  question: 除华东外，其他三个配送中心的 FG-202 在库数量分别是多少？扣除安全库存后合计还能调出多少台？
-  sql: SELECT (SELECT GROUP_CONCAT(配送中心代码 || ':' || 在库数量, '、') FROM 配送中心库存 WHERE 成品编码 = 'FG-202' AND 配送中心代码 <> 'DC-EC'), SUM(在库数量 - 安全库存) FROM 配送中心库存 WHERE 成品编码 = 'FG-202' AND 配送中心代码 <> 'DC-EC'
+  question: 仓库 PLANT12 发出的订单有多少张？数量合计多少件？涉及几家客户？
+  sql: SELECT COUNT(*), SUM(数量), COUNT(DISTINCT 客户) FROM 订单 WHERE 仓库代码 = 'PLANT12'
   must_include:
-  - 33
-  - 23
-  - 119
-  - 135
-  expected:
-    columns:
-    - (SELECT GROUP_CONCAT(配送中心代码 || ':' || 在库数量, '、') FROM 配送中心库存 WHERE 成品编码 = 'FG-202' AND 配送中心代码 <> 'DC-EC')
-    - SUM(在库数量 - 安全库存)
-    rows:
-    - - DC-NC:33、DC-SC:23、DC-WC:119
-      - 135
-  qtype: 单表聚合
+  - - 300
+  - - 112000
+  - - 13
   source: 案例作者按本案例数据出题
-- id: q07
-  question: 受影响的待发货订单中，有几张的承诺交期已经早于 2026-10-20？分别是哪几张？
-  sql: SELECT COUNT(*), GROUP_CONCAT(订单号, '、') FROM (SELECT 订单号 FROM 销售订单 WHERE 发货配送中心代码 = 'DC-EC' AND 订单状态 = '待发货' AND 承诺交期 < '2026-10-20' ORDER BY 订单号)
-  must_include:
-  - 3
-  - SO00048
-  - SO00068
-  - SO00078
   expected:
     columns:
     - COUNT(*)
-    - GROUP_CONCAT(订单号, '、')
+    - SUM(数量)
+    - COUNT(DISTINCT 客户)
     rows:
-    - - 3
-      - SO00048、SO00068、SO00078
-  qtype: 时间筛选
-  source: 案例作者按本案例数据出题
-- id: q08
-  question: 受影响订单的金额按产品线分，哪个产品线最多？是多少？
-  sql: SELECT p.产品线, SUM(d.金额) AS s FROM 订单明细 d JOIN 成品 p ON d.成品编码 = p.成品编码 JOIN 销售订单 o ON d.订单号 = o.订单号 WHERE o.发货配送中心代码 = 'DC-EC' AND o.订单状态 = '待发货' GROUP BY p.产品线 ORDER BY s DESC LIMIT 1
-  expected:
-    columns:
-    - 产品线
-    - s
-    rows:
-    - - 阀门
-      - 652400
-  qtype: 多表综合
-  source: 案例作者按本案例数据出题
-- id: q09
-  question: 2026-10-20 前完工的生产计划里，FG-202 计划生产多少台？
-  sql: SELECT SUM(计划数量) FROM 生产计划 WHERE 成品编码 = 'FG-202' AND 计划完工日期 <= '2026-10-20'
-  expected:
-    columns:
-    - SUM(计划数量)
-    rows:
-    - - 20
-  qtype: 时间筛选
-  source: 案例作者按本案例数据出题
-- id: q10
-  question: 全部配送中心中，在库数量合计最多的是哪个？有多少台？
-  sql: SELECT d.配送中心名称, SUM(k.在库数量) AS s FROM 配送中心库存 k JOIN 配送中心 d ON k.配送中心代码 = d.配送中心代码 GROUP BY d.配送中心名称 ORDER BY s DESC LIMIT 1
-  expected:
-    columns:
-    - 配送中心名称
-    - s
-    rows:
-    - - 华北配送中心
-      - 719
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
-- id: q11
-  question: 华东配送中心火灾停运后，受影响的待发货订单里缺口最大的是哪种成品、缺多少台？哪些正常运营的配送中心扣除安全库存后能单独补足这个缺口？
-  sql: WITH gap AS (SELECT m.成品编码, SUM(m.数量) AS 缺口 FROM 销售订单 o JOIN 配送中心 d ON d.配送中心代码 = o.发货配送中心代码 JOIN 订单明细 m ON m.订单号 = o.订单号 WHERE d.状态 = '停运' AND o.订单状态 = '待发货' GROUP BY m.成品编码 ORDER BY 缺口 DESC LIMIT 1) SELECT p.成品名称, g.缺口, (SELECT GROUP_CONCAT(n, '、') FROM (SELECT d.配送中心名称 AS n FROM 配送中心库存 k JOIN 配送中心 d ON d.配送中心代码 = k.配送中心代码 WHERE d.状态 = '正常' AND k.成品编码 = g.成品编码 AND k.在库数量 - k.安全库存 >= g.缺口 ORDER BY 1)) AS 可单独补足的配送中心 FROM gap g JOIN 成品 p ON p.成品编码 = g.成品编码
-  expected:
-    columns:
-    - 成品名称
-    - 缺口
-    - 可单独补足的配送中心
-    rows:
-    - - 气动球阀 Q641F-DN80
-      - 45
-      - 西南配送中心
+    - - 300
+      - 112000
+      - 13
+  qtype: 单表聚合
+- id: q04
+  question: 仓库 PLANT08 的订单涉及几种产品？其中有没有除 PLANT08 之外没有任何其他仓库能供应的产品？是哪种？
+  sql: SELECT (SELECT COUNT(DISTINCT 产品编号) FROM 订单 WHERE 仓库代码 = 'PLANT08'), o.产品编号 FROM 订单 o WHERE o.仓库代码 = 'PLANT08' AND NOT EXISTS (SELECT 1 FROM 仓库可供产品 p WHERE p.产品编号 = o.产品编号 AND p.仓库代码 <> 'PLANT08') GROUP BY o.产品编号
   must_include:
-  - - 气动球阀
-    - FG-202
-  - 45
-  - 西南
-  qtype: 多表综合
-  source: 'Palantir 博客「Building with Palantir AIP: Logic Tools for RAG/OAG」 的主提示词（设施起火将导致成品短缺，问怎么办；逻辑块先找受影响成品与配送中心，再找库存足够补缺的配送中心；具体化为缺口最大的成品与能补足的中心）'
-- id: q12
-  question: 华东配送中心停运后，由它发货、仍处于待发货的订单有多少张？金额合计多少？涉及多少家客户，其中 A 级客户几家？
-  sql: SELECT COUNT(*) AS 受影响订单数, SUM(o.订单金额) AS 订单金额, COUNT(DISTINCT o.客户编码) AS 客户数, COUNT(DISTINCT CASE WHEN c.客户等级 = 'A' THEN o.客户编码 END) AS A级客户数 FROM 销售订单 o JOIN 配送中心 d ON d.配送中心代码 = o.发货配送中心代码 JOIN 客户 c ON c.客户编码 = o.客户编码 WHERE d.状态 = '停运' AND o.订单状态 = '待发货'
+  - - 14
+  - - '1681882'
+  source: 案例作者按本案例数据出题
   expected:
     columns:
-    - 受影响订单数
-    - 订单金额
-    - 客户数
-    - A级客户数
+    - (SELECT COUNT(DISTINCT 产品编号) FROM 订单 WHERE 仓库代码 = 'PLANT08')
+    - 产品编号
+    rows:
+    - - 14
+      - 1681882
+  qtype: 多表综合
+- id: q05
+  question: 仓库 PLANT08 的订单中，有多少张延迟发货（延迟发货天数大于 0）？
+  sql: SELECT COUNT(*) FROM 订单 WHERE 仓库代码 = 'PLANT08' AND 延迟发货天数 > 0
+  must_include:
+  - - 18
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
     rows:
     - - 18
-      - 1772600
-      - 11
-      - 3
-  qtype: 多表综合
-  source: 'Palantir 博客「Building with Palantir AIP: Data Tools for RAG/OAG」 与 Palantir 博客「Building with Palantir AIP: Logic Tools for RAG/OAG」 共同的第一步：找出受火灾影响的客户订单'
-- id: q13
-  question: 华东配送中心停运后，受影响的待发货订单涉及的每种成品，缺口各是多少台？
-  sql: SELECT p.成品编码, p.成品名称, SUM(m.数量) AS 缺口 FROM 销售订单 o JOIN 配送中心 d ON d.配送中心代码 = o.发货配送中心代码 JOIN 订单明细 m ON m.订单号 = o.订单号 JOIN 成品 p ON p.成品编码 = m.成品编码 WHERE d.状态 = '停运' AND o.订单状态 = '待发货' GROUP BY p.成品编码, p.成品名称 ORDER BY 缺口 DESC
+  qtype: 单表聚合
+- id: q06
+  question: 全部订单按服务方式统计，DTD、DTP、CRF 各有多少张？
+  sql: SELECT 服务方式, COUNT(*) FROM 订单 GROUP BY 服务方式 ORDER BY 服务方式
+  must_include:
+  - - 854
+  - - 2143
+  - - 6218
+  source: 案例作者按本案例数据出题
   expected:
     columns:
-    - 成品编码
-    - 成品名称
-    - 缺口
+    - 服务方式
+    - COUNT(*)
     rows:
-    - - FG-202
-      - 气动球阀 Q641F-DN80
-      - 45
-    - - FG-203
-      - 蝶阀 D341X-DN300
-      - 31
-    - - FG-201
-      - 电动闸阀 Z941H-DN150
-      - 27
-    - - FG-301
-      - 隔膜计量泵 JMZ-500
-      - 24
-    - - FG-103
-      - 管道泵 ISG100
-      - 17
-    - - FG-101
-      - 单级离心泵 IS80-65
-      - 16
-    - - FG-302
-      - 柱塞计量泵 J-ZM
-      - 15
-    - - FG-102
-      - 多级离心泵 D46-50
-      - 10
-    - - FG-401
-      - 泵阀控制柜 PLC-A
-      - 8
-    - - FG-204
-      - 截止阀 J41H-DN50
-      - 7
+    - - CRF
+      - 854
+    - - DTD
+      - 2143
+    - - DTP
+      - 6218
+  qtype: 分组统计
+- id: q07
+  question: 日处理订单能力最大的仓库是哪个、能力是多少？单位仓储成本最高的仓库是哪个、成本是多少？
+  sql: SELECT a.仓库代码, a.日处理订单能力, b.仓库代码, ROUND(b.单位仓储成本, 4) FROM (SELECT * FROM 仓库产能 ORDER BY 日处理订单能力 DESC LIMIT 1) a, (SELECT * FROM 仓库成本 ORDER BY 单位仓储成本 DESC LIMIT 1) b
   must_include:
-  - 45
-  - 31
-  - 27
-  - 24
-  - 17
-  - 16
-  - 15
-  - 10
-  - 8
-  - 7
+  - - PLANT01
+  - - 1070
+  - - PLANT18
+  - - 2.0363
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 仓库代码
+    - 日处理订单能力
+    - 仓库代码
+    - ROUND(b.单位仓储成本, 4)
+    rows:
+    - - PLANT01
+      - 1070
+      - PLANT18
+      - 2.0363
+  qtype: 排名
+- id: q08
+  question: 哪些仓库有 VMI 专属客户？各有几家？
+  sql: SELECT 仓库代码, COUNT(*) FROM VMI客户 GROUP BY 仓库代码 ORDER BY 仓库代码
+  must_include:
+  - - PLANT02
+  - - 7
+  - - PLANT06
+  - - PLANT10
+  - - 4
+  - - PLANT11
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 仓库代码
+    - COUNT(*)
+    rows:
+    - - PLANT02
+      - 7
+    - - PLANT06
+      - 2
+    - - PLANT10
+      - 4
+    - - PLANT11
+      - 1
+  qtype: 分组统计
+- id: q09
+  question: 承运商 V444_0 承运了多少张订单？这些订单的重量合计是多少？
+  sql: SELECT COUNT(*), ROUND(SUM(重量), 2) FROM 订单 WHERE 承运商 = 'V444_0'
+  must_include:
+  - - 6264
+  - - 121440.44
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    - ROUND(SUM(重量), 2)
+    rows:
+    - - 6264
+      - 121440.44
+  qtype: 单表聚合
+- id: q10
+  question: 从 PORT04 起运的订单占全部订单的比例是多少？
+  sql: SELECT SUM(起运港 = 'PORT04'), COUNT(*), ROUND(1.0 * SUM(起运港 = 'PORT04') / COUNT(*), 4) FROM 订单
+  must_include:
+  - - 0.9811
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - SUM(起运港 = 'PORT04')
+    - COUNT(*)
+    - ROUND(1.0 * SUM(起运港 = 'PORT04') / COUNT(*), 4)
+    rows:
+    - - 9041
+      - 9215
+      - 0.9811
+  qtype: 比率
+- id: q11
+  question: 假设仓库 PLANT08 停运，受影响订单里订购数量合计最大的是哪种产品、多少件？除 PLANT08 外还有哪些仓库能供应这种产品，它们的日处理订单能力各是多少？
+  sql: WITH top AS (SELECT 产品编号, SUM(数量) AS q FROM 订单 WHERE 仓库代码 = 'PLANT08' GROUP BY 产品编号 ORDER BY q DESC LIMIT 1) SELECT top.产品编号, top.q, p.仓库代码, c.日处理订单能力 FROM top JOIN 仓库可供产品 p ON p.产品编号 = top.产品编号 AND p.仓库代码 <> 'PLANT08' JOIN 仓库产能 c ON c.仓库代码 = p.仓库代码 ORDER BY p.仓库代码
+  must_include:
+  - - '1691700'
+  - - 172034
+  - - PLANT03
+  - - 1013
+  - - PLANT07
+  - - 265
+  - - PLANT10
+  - - 118
+  source: Palantir 博客「Building with Palantir AIP：Logic Tools for RAG/OAG」配送中心起火剧本中「找出缺口最大的产品、看哪些正常运营的配送中心能补上」一步的问题意图，改写为本案例的仓库停运假设
+  expected:
+    columns:
+    - 产品编号
+    - q
+    - 仓库代码
+    - 日处理订单能力
+    rows:
+    - - 1691700
+      - 172034
+      - PLANT03
+      - 1013
+    - - 1691700
+      - 172034
+      - PLANT07
+      - 265
+    - - 1691700
+      - 172034
+      - PLANT10
+      - 118
   qtype: 多表综合
-  source: 'Palantir 博客「Building with Palantir AIP: Data Tools for RAG/OAG」 与 Palantir 博客「Building with Palantir AIP: Logic Tools for RAG/OAG」 共同的第二步：逐个缺货成品找补缺来源（本题只问各成品缺口）'
+- id: q12
+  question: 假设仓库 PLANT08 停运，由它发货的订单有多少张？数量合计多少件？涉及多少家客户？
+  sql: SELECT COUNT(*), SUM(数量), COUNT(DISTINCT 客户) FROM 订单 WHERE 仓库代码 = 'PLANT08'
+  must_include:
+  - - 102
+  - - 277008
+  - - 5
+  source: Palantir 博客「Building with Palantir AIP：Data Tools for RAG/OAG」配送中心起火剧本中「找出受影响订单、金额与客户」一步的问题意图（本数据没有金额，改问数量），改写为本案例的仓库停运假设
+  expected:
+    columns:
+    - COUNT(*)
+    - SUM(数量)
+    - COUNT(DISTINCT 客户)
+    rows:
+    - - 102
+      - 277008
+      - 5
+  qtype: 单表聚合
+- id: q13
+  question: 假设仓库 PLANT08 停运，受影响订单涉及的每种产品，订购数量合计各是多少件？
+  sql: SELECT 产品编号, SUM(数量) AS q FROM 订单 WHERE 仓库代码 = 'PLANT08' GROUP BY 产品编号 ORDER BY q DESC
+  must_include:
+  - - '1691700'
+  - - 172034
+  - - '1672344'
+  - - 25926
+  - - '1696263'
+  - - 15952
+  - - '1681878'
+  - - 11895
+  - - '1681885'
+  - - 9457
+  - - '1681890'
+  - - 8731
+  - - '1681888'
+  - - 8095
+  - - '1696262'
+  - - 7075
+  - - '1672986'
+  - - 6903
+  - - '1672345'
+  - - 4169
+  - - '1672347'
+  - - 2928
+  - - '1696260'
+  - - 1690
+  - - '1681882'
+  - - 1086
+  - - '1681883'
+  - - 1067
+  source: Palantir 博客「Building with Palantir AIP：Data Tools for RAG/OAG」配送中心起火剧本中「按产品列出缺口」一步的问题意图，改写为本案例的仓库停运假设
+  expected:
+    columns:
+    - 产品编号
+    - q
+    rows:
+    - - 1691700
+      - 172034
+    - - 1672344
+      - 25926
+    - - 1696263
+      - 15952
+    - - 1681878
+      - 11895
+    - - 1681885
+      - 9457
+    - - 1681890
+      - 8731
+    - - 1681888
+      - 8095
+    - - 1696262
+      - 7075
+    - - 1672986
+      - 6903
+    - - 1672345
+      - 4169
+    - - 1672347
+      - 2928
+    - - 1696260
+      - 1690
+    - - 1681882
+      - 1086
+    - - 1681883
+      - 1067
+  qtype: 分组统计

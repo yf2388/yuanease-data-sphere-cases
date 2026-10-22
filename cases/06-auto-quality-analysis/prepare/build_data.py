@@ -1,40 +1,39 @@
-"""生成本案例（整车质量分析）的合成数据 data/*.csv。全部为自建虚构数据，随机数种子固定，重复运行逐字节相同。
+"""从 Google Malloy 官方样例仓库 malloydata/malloy-samples 的 auto_recalls/auto_recalls.csv 生成本案例的 data/*.csv。
 
-业务口径（与公开的汽车行业质量评价体系一致）：
-- 每千辆维修频次 = 维修次数 / 在保车辆数 × 1000；单车维修成本 = 维修费用合计 / 维修过的车辆数；
-- 每百辆问题数（PP100）= 市场调查报告问题数合计 / 调查样本车辆数合计 × 100；
-- 客户满意度 = 回访满意度评分（1–5 分）的平均值；投诉率 = 投诉回访数 / 回访数。
-维修费用合计 = 工时费 + 配件费。
+原始文件：美国国家公路交通安全管理局（NHTSA）的全量召回数据（1966–2022 年 26,020 条），Malloy 样例 README 注明取自
+https://catalog.data.gov/dataset/recalls-data ；样例仓库 MIT 许可，底层是美国联邦政府作品（公有领域）。
+Malloy 用它演示语义模型：auto_recalls.malloy 定义了召回数、占比、潜在受影响合计三个度量和按厂商、类型、年份等视图。
+改动只有三类，原始取值一律不改：
+- 裁剪行：只取报告接收日期在 2021 年及以后的召回（2021-01-01 至数据截止的 2022-06，共 1,574 条）；列名译成中文，行序不变。
+- 日历：从召回表取全部不同的接收日期（原始写法 MM/DD/YYYY），给出由它推出的标准日期、年份、月份、季度。
+- 部件、召回类型：取召回表里出现的全部原始取值，另给出本仓库的中文译名，是对照表，召回表里仍是英文原文。
 
-用法：python3 -I build_data.py <输出目录>
+用法：python3 -I build_data.py <auto_recalls.csv> <输出目录>
 """
 
 import csv
-import random
 import sys
-from datetime import date, timedelta
 from pathlib import Path
 
-SEED = 20261021
-MODELS = [  # 车型代码, 车型名称, 级别, 动力类型, 上市日期, 质量系数（越大问题越多，不写进数据）
-    ("M01", "远航 S5", "紧凑型 SUV", "燃油", "2023-03-18", 1.0), ("M02", "远航 S7", "中型 SUV", "混动", "2024-04-26", 1.3),
-    ("M03", "启明 E3", "紧凑型轿车", "纯电", "2024-09-10", 1.6), ("M04", "启明 E5", "中型轿车", "纯电", "2025-05-20", 1.1),
-    ("M05", "锐途 X1", "小型 SUV", "燃油", "2022-08-08", 0.8), ("M06", "家悦 M8", "MPV", "混动", "2025-01-15", 1.2),
-]
-BASES = [("B1", "华东基地", "浙江"), ("B2", "西南基地", "重庆"), ("B3", "华南基地", "广东")]
-REGIONS = ["华东", "华南", "华北", "华中", "西南", "西北", "东北"]
-STATIONS = [(f"SS{i:02d}", f"{REGIONS[(i - 1) % 7]}{'一二'[(i - 1) // 7]}号服务站", REGIONS[(i - 1) % 7]) for i in range(1, 15)]
-FAULTS = [  # 故障代码, 故障部位, 所属系统, 故障描述, 工时费区间, 配件费区间
-    ("P101", "发动机", "动力系统", "怠速抖动", (200, 600), (0, 1500)), ("P102", "变速箱", "动力系统", "换挡顿挫", (300, 900), (0, 4000)),
-    ("P103", "动力电池", "动力系统", "续航衰减异常", (300, 800), (0, 9000)), ("P104", "电驱总成", "动力系统", "异响", (400, 900), (0, 6000)),
-    ("C201", "悬架", "底盘系统", "过坎异响", (150, 500), (100, 1800)), ("C202", "制动系统", "底盘系统", "制动尖叫", (100, 400), (100, 1200)),
-    ("C203", "转向系统", "底盘系统", "方向盘跑偏", (150, 450), (0, 1500)), ("B301", "车门", "车身系统", "关门异响", (100, 300), (0, 800)),
-    ("B302", "天窗", "车身系统", "漏水", (200, 600), (0, 2500)), ("B303", "车漆", "车身系统", "漆面起泡", (300, 900), (0, 600)),
-    ("E401", "中控屏", "电气系统", "黑屏死机", (100, 300), (0, 3500)), ("E402", "车机系统", "电气系统", "蓝牙连接失败", (80, 200), (0, 0)),
-    ("E403", "倒车影像", "电气系统", "画面延迟", (80, 250), (0, 1200)), ("E404", "车灯", "电气系统", "灯罩起雾", (100, 300), (100, 900)),
-    ("I501", "座椅", "内饰系统", "加热失效", (100, 300), (0, 1500)), ("I502", "空调", "内饰系统", "制冷不足", (200, 500), (0, 2200)),
-]
-COMPLAINTS = ["维修等待时间长", "同一问题重复维修", "服务态度", "费用争议", "配件缺货"]
+COLUMNS = {
+    "Report Received Date": "报告接收日期", "NHTSA ID": "NHTSA编号", "Recall Link": "召回链接", "Manufacturer": "厂商",
+    "Subject": "主题", "Component": "部件", "Mfr Campaign Number": "厂商召回编号", "Recall Type": "召回类型",
+    "Potentially Affected": "潜在受影响数量", "Recall Description": "召回描述", "Consequence Summary": "后果摘要",
+    "Corrective Action": "纠正措施",
+}
+COMPONENTS = {  # 原始取值 → 本仓库译名
+    "AIR BAGS": "安全气囊", "BACK OVER PREVENTION": "倒车防撞", "CHILD SEAT": "儿童座椅", "COMMUNICATION": "通信",
+    "ELECTRICAL SYSTEM": "电气系统", "ELECTRONIC STABILITY CONTROL": "电子稳定控制", "ENGINE": "发动机",
+    "ENGINE AND ENGINE COOLING": "发动机及冷却", "EQUIPMENT": "设备", "EQUIPMENT ADAPTIVE/MOBILITY": "无障碍改装设备",
+    "EXTERIOR LIGHTING": "外部照明", "FORWARD COLLISION AVOIDANCE": "前向防撞", "FUEL SYSTEM, DIESEL": "燃油系统（柴油）",
+    "FUEL SYSTEM, GASOLINE": "燃油系统（汽油）", "FUEL SYSTEM, OTHER": "燃油系统（其他）", "HYBRID PROPULSION SYSTEM": "混合动力系统",
+    "LANE DEPARTURE": "车道偏离", "LATCHES/LOCKS/LINKAGES": "门锁与连杆", "OTHER": "其他", "PARKING BRAKE": "驻车制动",
+    "POWER TRAIN": "动力总成", "SEAT BELTS": "安全带", "SEATS": "座椅", "SERVICE BRAKES": "行车制动",
+    "SERVICE BRAKES, AIR": "行车制动（气压）", "SERVICE BRAKES, HYDRAULIC": "行车制动（液压）", "STEERING": "转向",
+    "STRUCTURE": "车身结构", "SUSPENSION": "悬架", "TIRES": "轮胎", "TRAILER HITCHES": "挂车连接装置",
+    "UNKNOWN OR OTHER": "未知或其他", "VEHICLE SPEED CONTROL": "车速控制", "VISIBILITY": "视野", "WHEELS": "车轮",
+}
+TYPES = {"Vehicle": "整车", "Equipment": "设备", "Tire": "轮胎", "Child Seat": "儿童座椅"}
 
 
 def write(out: Path, name: str, header: list, rows: list) -> None:
@@ -45,58 +44,28 @@ def write(out: Path, name: str, header: list, rows: list) -> None:
     print(f"{name}.csv\t{len(rows)} 行")
 
 
-def vin(rnd: random.Random, n: int) -> str:
-    return "LYE" + "".join(rnd.choice("ABCDEFGHJKLMNPRSTUVWXYZ0123456789") for _ in range(8)) + f"{n:06d}"
+def iso(mdy: str) -> str:
+    m, d, y = mdy.split("/")
+    return f"{y}-{m}-{d}"
 
 
-def main(out_dir: str) -> None:
+def main(src: str, out_dir: str) -> None:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    rnd = random.Random(SEED)
-    vehicles, repairs, visits = [], [], []
-    quality = {m[0]: m[5] for m in MODELS}
-    for n in range(1, 3001):
-        model = rnd.choices(MODELS, weights=[25, 18, 15, 12, 20, 10])[0]
-        built = max(date.fromisoformat(model[4]), date(2025, 1, 1)) + timedelta(days=rnd.randint(0, 420))
-        built = min(built, date(2026, 3, 31))
-        sold = built + timedelta(days=rnd.randint(7, 60))
-        vehicles.append([vin(rnd, n), model[0], rnd.choice(BASES)[0], built.isoformat(), sold.isoformat(), rnd.choice(REGIONS)])
-    for v in vehicles:
-        q = quality[v[1]]
-        sold = date.fromisoformat(v[4])
-        for _ in range(rnd.choices([0, 1, 2, 3], weights=[100, 30 * q, 8 * q, 2 * q])[0]):
-            day = sold + timedelta(days=rnd.randint(10, 300))
-            if day > date(2026, 9, 30):
-                continue
-            fault = rnd.choice(FAULTS[2:4] if v[1] in ("M03", "M04") and rnd.random() < 0.4 else FAULTS)
-            labor, parts = rnd.randint(*fault[4]) // 10 * 10, rnd.randint(*fault[5]) // 10 * 10
-            warranty = "保修" if rnd.random() < 0.85 else "自费"
-            station = rnd.choice([s for s in STATIONS if s[2] == v[5]])
-            repairs.append([f"WX{len(repairs) + 1:06d}", v[0], day.isoformat(), (day - sold).days * rnd.randint(30, 80), fault[0],
-                            warranty, labor, parts, labor + parts, station[0]])
-        if rnd.random() < 0.7:
-            day = sold + timedelta(days=rnd.randint(30, 200))
-            if day <= date(2026, 9, 30):
-                score = max(1, min(5, round(rnd.gauss(4.4 - 0.4 * (q - 1), 0.7))))
-                complaint = score <= 2 and rnd.random() < 0.7
-                visits.append([f"HF{len(visits) + 1:06d}", v[0], day.isoformat(), score, "是" if complaint else "否",
-                               rnd.choice(COMPLAINTS) if complaint else ""])
-    surveys = []
-    for batch, period in (("2026Q1", "2026-03-31"), ("2026Q2", "2026-06-30"), ("2026Q3", "2026-09-30")):
-        for m in MODELS:
-            sample = rnd.randint(180, 320)
-            problems = round(sample * rnd.uniform(0.9, 1.2) * m[5] * 1.1)
-            surveys.append([f"DC-{batch}-{m[0]}", batch, period, m[0], sample, problems])
-    write(out, "车型", ["车型代码", "车型名称", "级别", "动力类型", "上市日期"], [m[:5] for m in MODELS])
-    write(out, "生产基地", ["基地代码", "基地名称", "省份"], BASES)
-    write(out, "服务站", ["服务站代码", "服务站名称", "区域"], STATIONS)
-    write(out, "故障代码", ["故障代码", "故障部位", "所属系统", "故障描述"], [f[:4] for f in FAULTS])
-    write(out, "车辆", ["VIN码", "车型代码", "基地代码", "生产日期", "销售日期", "销售区域"], vehicles)
-    write(out, "维修记录", ["维修单号", "VIN码", "维修日期", "行驶里程_km", "故障代码", "维修类型", "工时费", "配件费",
-                          "维修费用合计", "服务站代码"], repairs)
-    write(out, "客户回访", ["回访编号", "VIN码", "回访日期", "满意度评分", "是否投诉", "投诉类别"], visits)
-    write(out, "市场调查", ["调查编号", "调查批次", "截止日期", "车型代码", "样本车辆数", "报告问题数"], surveys)
+    with open(src, encoding="utf-8-sig", newline="") as fh:
+        rows = list(csv.reader(fh))
+    header = rows[0]
+    assert header == list(COLUMNS), header
+    body = [r for r in rows[1:] if iso(r[0]) >= "2021-01-01"]
+    write(out, "召回", [COLUMNS[h] for h in header], body)
+    days = sorted({r[0] for r in body}, key=iso)
+    write(out, "日历", ["日期", "标准日期", "年份", "月份", "季度"],
+          [[d, iso(d), iso(d)[:4], iso(d)[:7], f"{iso(d)[:4]}-Q{(int(iso(d)[5:7]) - 1) // 3 + 1}"] for d in days])
+    comps = sorted({r[5] for r in body})
+    write(out, "部件", ["部件", "部件中文名"], [[c, COMPONENTS[c]] for c in comps])
+    types = sorted({r[7] for r in body})
+    write(out, "召回类型", ["召回类型", "召回类型中文名"], [[t, TYPES[t]] for t in types])
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:3])

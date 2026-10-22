@@ -1,5 +1,7 @@
 # 案例 01 · 多工厂供应链：库存、物料清单与订单
 
+> **数据档位：厂商样例**。数据是 Snowflake 为教程公开发布的样例库（公司与数据为虚构，但出自第三方、不是本仓库编的），本仓库只译了表名列名、改写了布尔与时间格式，取值未改。出处、许可、原始文件 sha256 与复现方法见 [PROVENANCE.md](../../PROVENANCE.md)。
+
 > 场景参考自 Snowflake 的公开教程「Build a Supply Chain Assistant with Snowflake Intelligence」（<https://snowflake.com/en/developers/guides/snowflake-agentic-ai-in-supply-chain/>）。
 > 本案例只复现其业务场景与问题；数据来自该教程仓库（MIT 许可），表名与列名已译为中文；教程文字、截图均为本仓库自行撰写与拍摄。
 
@@ -43,7 +45,7 @@
 - 「工厂库存」的一行是「某工厂的某一种库存物料」，原材料编号、零部件编号、产品编号三列中只有一列有值，因此需要四列组合才能唯一定位一行。
 - 金额没有币种，回答里的币种符号以原数据为准。
 
-数据来源与改动：取自 Snowflake-Labs/sfguide-supply-chain-assistant-with-snowflake-intelligence 仓库 `scripts/setup.sql` 中的 INSERT 数据；表名、列名译为中文；布尔值写成「是/否」；时间戳去掉时区后缀；不含天气表。重新生成方法见 `prepare/build_data.py` 文件头。
+数据来源与改动：取自 Snowflake-Labs/sfguide-supply-chain-assistant-with-snowflake-intelligence 仓库 `scripts/setup.sql` 中的 INSERT 数据；表名、列名译为中文；布尔值写成「是/否」；时间戳去掉时区后缀；不含天气表。原指南建库时会用 UPDATE 把订单、发货等日期平移到安装当天附近，本案例保留 INSERT 里的原始日期。重新生成方法见 `prepare/build_data.py` 文件头。
 
 ## 操作步骤
 
@@ -194,12 +196,10 @@ python3 -I tools/casekit.py grade cases/01-supply-chain-network answers
 <!-- 实测记录 -->
 | 项目 | 结果 |
 |---|---|
-| 版本 | Yuanease Dev 0.8.7（源码提交 dcd59a5d9），2026-10-20 |
-| 上传 | 11 个文件 |
-| 首扫 | 8 分 31 秒，28.2 积分，员工提问 1 次（按「不知道」回答） |
-| 首扫加权准确率 | **0.843**（实体 1.00 / 唯一标识列 0.95 / 关系 0.97 / 指标 0.31；打分协议 entity-model-score-v1） |
-| 问答准确率 | 10/10；单题耗时中位数 101 秒，合计 746 积分 |
-| 独立复现 | 成功：没有参与制作的智能体只看本 README，从零走完全部步骤用时约 30 分钟，抽问 3 题答对 3 题 |
-
-说明：第 5 题员工先弹卡确认「订单数 = 按行计数」的口径，确认后又请求把确认写回实体模型（授权卡选「允许一次」），随后答对。独立复现中发现的教程偏差（按钮文字、构筑进度入口、审核步骤写死具体关系、问数输入框前缀）已据此修订本 README。
+| 版本与模型 | Yuanease Dev 0.8.7（源码提交 dcd59a5d9），三档模型 deepseek-v4.1-flash-1017，2026-10-22 |
+| 上传 | 11 个文件，约 7 秒全部可查询 |
+| 首扫 | 8 分 34 秒，68.3 积分，员工提问 1 次（按「不知道」回答） |
+| 首扫加权准确率 | **0.857**（实体 1.00 / 唯一标识列 1.00 / 关系 0.97 / 指标 0.33；打分协议 entity-model-score-v1） |
+| 问答准确率 | 15/15，其中原作者题 13/13；由没有参与制作的智能体逐题判分；单题耗时中位数 59 秒，合计 138 积分 |
+| 10-21 旧模型对照 | 首扫 0.843，原作者题 12/13、自补题 2/2（qwen3.8-max）；独立复现：成功，29.8 分钟 |
 <!-- /实测记录 -->

@@ -1,155 +1,278 @@
 case: 06-auto-quality-analysis
-note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。
+note: 标准答案由 sql 在 data/ 上算出（tools/casekit.py answers），并由 prepare/truth_from_raw.py 直接从 Malloy 样例里的原始 CSV 独立重算核对。q01–q07 的问题意图取自 Malloy 官方样例 auto_recalls 的语义模型与演示查询，统计范围是本案例裁剪后的 2021-01 至 2022-06。q06 按不分大小写匹配 brake（144 条）；Malloy 原查询按小写正则匹配（124 条），两种口径的条数都算对，召回数最多的厂商相同。
 questions:
 - id: q01
-  question: 一共有多少辆车？发生了多少次维修？维修费用合计多少元？
-  sql: SELECT (SELECT COUNT(*) FROM 车辆), COUNT(*), SUM(维修费用合计) FROM 维修记录
+  question: 召回数最多的 3 个厂商是哪些？各自的召回数、潜在受影响数量合计、占全部召回的百分比是多少？
+  sql: SELECT 厂商, COUNT(*) AS c, SUM(潜在受影响数量), ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM 召回), 2) FROM 召回 GROUP BY 厂商 ORDER BY c DESC LIMIT 3
+  must_include:
+  - - Ford
+  - - 93
+  - - 12006149
+  - - 5.91
+  - - Mercedes-Benz
+  - - 68
+  - - 2545032
+  - - 4.32
+  - - Daimler Trucks
+  - - 64
+  - - 445168
+  - - 4.07
+  source: Malloy 官方样例 auto_recalls.malloy 的 view by_manufacturer（度量 recall_count、total_defects、percent_of_recalls）
   expected:
     columns:
-    - (SELECT COUNT(*) FROM 车辆)
-    - COUNT(*)
-    - SUM(维修费用合计)
+    - 厂商
+    - c
+    - SUM(潜在受影响数量)
+    - ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM 召回), 2)
     rows:
-    - - 3000
-      - 1097
-      - 2172910
-  qtype: 单表聚合
-  source: 案例作者按本案例数据出题
+    - - Ford Motor Company
+      - 93
+      - 12006149
+      - 5.91
+    - - Mercedes-Benz USA, LLC
+      - 68
+      - 2545032
+      - 4.32
+    - - Daimler Trucks North America, LLC
+      - 64
+      - 445168
+      - 4.07
+  qtype: 比率
 - id: q02
-  question: 各车型的每千辆维修频次（维修次数 ÷ 该车型车辆数 × 1000）是多少？哪个车型最高？
-  sql: SELECT m.车型名称, ROUND(1000.0 * COUNT(r.维修单号) / COUNT(DISTINCT v.VIN码), 1) AS f FROM 车辆 v JOIN 车型 m ON v.车型代码 = m.车型代码 LEFT JOIN 维修记录 r ON r.VIN码 = v.VIN码 GROUP BY m.车型名称 ORDER BY f DESC
+  question: 按召回类型统计，各类型的召回数和占全部召回的百分比是多少？
+  sql: SELECT 召回类型, COUNT(*) AS c, ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM 召回), 2) FROM 召回 GROUP BY 召回类型 ORDER BY c DESC
   must_include:
-  - 启明 E3
-  - - 439.3
-    - 439
-  - 锐途 X1
-  - - 304.3
-    - 304
+  - - Vehicle
+    - 整车
+  - - 1412
+  - - 89.71
+  - - Equipment
+    - 设备
+  - - 139
+  - - 8.83
+  - - Tire
+    - 轮胎
+  - - 15
+  - - 0.95
+  - - Child Seat
+    - 儿童座椅
+  - - 8
+  - - 0.51
+  source: Malloy 官方样例 auto_recalls.malloy 的 view by_type
   expected:
     columns:
-    - 车型名称
-    - f
+    - 召回类型
+    - c
+    - ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM 召回), 2)
     rows:
-    - - 启明 E3
-      - 439.3
-    - - 家悦 M8
-      - 405.7
-    - - 远航 S7
-      - 371.8
-    - - 启明 E5
-      - 357.6
-    - - 远航 S5
-      - 351.3
-    - - 锐途 X1
-      - 304.3
-  qtype: 多表综合
-  source: 案例作者按本案例数据出题
-- id: q03
-  question: 单车维修成本是多少？（维修费用合计 ÷ 维修过的车辆数）
-  sql: SELECT ROUND(1.0 * SUM(维修费用合计) / COUNT(DISTINCT VIN码), 2) FROM 维修记录
-  expected:
-    columns:
-    - ROUND(1.0 * SUM(维修费用合计) / COUNT(DISTINCT VIN码), 2)
-    rows:
-    - - 2514.94
-  qtype: 比率
-  source: 案例作者按本案例数据出题
-- id: q04
-  question: 按所属系统统计维修次数，哪个系统的问题最多？多少次？
-  sql: SELECT f.所属系统, COUNT(*) AS n FROM 维修记录 r JOIN 故障代码 f ON r.故障代码 = f.故障代码 GROUP BY f.所属系统 ORDER BY n DESC LIMIT 1
-  expected:
-    columns:
-    - 所属系统
-    - n
-    rows:
-    - - 动力系统
-      - 376
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
-- id: q05
-  question: 三个调查批次的每百辆问题数（PP100）分别是多少？
-  sql: SELECT 调查批次, ROUND(100.0 * SUM(报告问题数) / SUM(样本车辆数), 1) FROM 市场调查 GROUP BY 调查批次 ORDER BY 调查批次
-  must_include:
-  - - 143.3
-    - 143
-  - - 141.3
-    - 141
-  - - 144.8
-    - 145
-  expected:
-    columns:
-    - 调查批次
-    - ROUND(100.0 * SUM(报告问题数) / SUM(样本车辆数), 1)
-    rows:
-    - - 2026Q1
-      - 143.3
-    - - 2026Q2
-      - 141.3
-    - - 2026Q3
-      - 144.8
-  qtype: 比率
-  source: 案例作者按本案例数据出题
-- id: q06
-  question: 客户回访的平均满意度是多少分？有多少次回访是投诉？
-  sql: SELECT ROUND(AVG(满意度评分), 2), SUM(是否投诉 = '是') FROM 客户回访
-  must_include:
-  - - 4.25
-    - 4.252
-  - 8
-  expected:
-    columns:
-    - ROUND(AVG(满意度评分), 2)
-    - SUM(是否投诉 = '是')
-    rows:
-    - - 4.25
+    - - Vehicle
+      - 1412
+      - 89.71
+    - - Equipment
+      - 139
+      - 8.83
+    - - Tire
+      - 15
+      - 0.95
+    - - Child Seat
       - 8
-  qtype: 单表聚合
-  source: 案例作者按本案例数据出题
-- id: q07
-  question: 保修维修和自费维修各有多少次？
-  sql: SELECT 维修类型, COUNT(*) FROM 维修记录 GROUP BY 维修类型 ORDER BY 2 DESC
+      - 0.51
+  qtype: 比率
+- id: q03
+  question: 按报告接收年份统计，2021 年和 2022 年各有多少条召回？
+  sql: SELECT c.年份, COUNT(*) FROM 召回 r JOIN 日历 c ON r.报告接收日期 = c.日期 GROUP BY c.年份 ORDER BY c.年份
+  must_include:
+  - - 1093
+  - - 481
+  source: Malloy 官方样例 auto_recalls.malloy 的 view by_year
   expected:
     columns:
-    - 维修类型
+    - 年份
     - COUNT(*)
     rows:
-    - - 保修
-      - 933
-    - - 自费
-      - 164
-  qtype: 分组统计
-  source: 案例作者按本案例数据出题
-- id: q08
-  question: 纯电车型（启明 E3、启明 E5）因「动力电池」故障维修了多少次？
-  sql: SELECT COUNT(*) FROM 维修记录 r JOIN 车辆 v ON r.VIN码 = v.VIN码 JOIN 车型 m ON v.车型代码 = m.车型代码 JOIN 故障代码 f ON r.故障代码 = f.故障代码 WHERE m.动力类型 = '纯电' AND f.故障部位 = '动力电池'
-  expected:
-    columns:
-    - COUNT(*)
-    rows:
-    - - 88
-  qtype: 多表综合
-  source: 案例作者按本案例数据出题
-- id: q09
-  question: 维修次数最多的服务站是哪个？维修了多少次？
-  sql: SELECT s.服务站名称, COUNT(*) AS n FROM 维修记录 r JOIN 服务站 s ON r.服务站代码 = s.服务站代码 GROUP BY s.服务站名称 ORDER BY n DESC LIMIT 1
-  expected:
-    columns:
-    - 服务站名称
-    - n
-    rows:
-    - - 东北一号服务站
-      - 91
+    - - 2021
+      - 1093
+    - - 2022
+      - 481
   qtype: 跨表关联
+- id: q04
+  question: 最近一次接收召回是哪一天？那天接收了几条召回，厂商与 NHTSA 编号是什么？
+  sql: SELECT c.标准日期, COUNT(*), r.厂商, r.NHTSA编号 FROM 召回 r JOIN 日历 c ON r.报告接收日期 = c.日期 WHERE c.标准日期 = (SELECT MAX(标准日期) FROM 日历) GROUP BY c.标准日期
+  must_include:
+  - - '2022-06-23'
+    - 6月23日
+    - 06/23/2022
+  - - Toyota
+    - 丰田
+  - - 22V444000
+  source: Malloy 官方样例 auto_recalls.malloy 的 view recent_recalls
+  expected:
+    columns:
+    - 标准日期
+    - COUNT(*)
+    - 厂商
+    - NHTSA编号
+    rows:
+    - - '2022-06-23'
+      - 1
+      - Toyota Motor Engineering & Manufacturing
+      - 22V444000
+  qtype: 跨表关联
+- id: q05
+  question: 潜在受影响数量最大的 3 条召回是哪几条？各自的厂商、NHTSA 编号与潜在受影响数量是多少？
+  sql: SELECT 厂商, NHTSA编号, 潜在受影响数量 FROM 召回 ORDER BY 潜在受影响数量 DESC LIMIT 3
+  must_include:
+  - - 22V413000
+  - - 2925968
+  - - 21V050000
+  - - 2641272
+  - - 21V158000
+  - - 2602668
+  source: Malloy 官方样例 auto_recalls.malloy 的 view biggest_recalls
+  expected:
+    columns:
+    - 厂商
+    - NHTSA编号
+    - 潜在受影响数量
+    rows:
+    - - Ford Motor Company
+      - 22V413000
+      - 2925968
+    - - General Motors, LLC
+      - 21V050000
+      - 2641272
+    - - Ford Motor Company
+      - 21V158000
+      - 2602668
+  qtype: 排名
+- id: q06
+  question: 召回描述里提到刹车（brake）的召回有多少条？其中召回数最多的厂商是哪个、几条？
+  sql: SELECT (SELECT COUNT(*) FROM 召回 WHERE 召回描述 LIKE '%brake%'), 厂商, COUNT(*) AS c FROM 召回 WHERE 召回描述 LIKE '%brake%' GROUP BY 厂商 ORDER BY c DESC LIMIT 1
+  must_include:
+  - - 144
+    - 124
+  - - Daimler Trucks
+  - - 13
+  source: Malloy 官方样例 auto_recalls 的 README「Recalls involving Brakes」（召回描述按正则 brake 筛选后的看板）
+  expected:
+    columns:
+    - (SELECT COUNT(*) FROM 召回 WHERE 召回描述 LIKE '%brake%')
+    - 厂商
+    - c
+    rows:
+    - - 144
+      - Daimler Trucks North America, LLC
+      - 13
+  qtype: 排名
+- id: q07
+  question: 2021 年接收的召回里，召回数最多的 5 个厂商各有多少条？
+  sql: SELECT r.厂商, COUNT(*) AS c FROM 召回 r JOIN 日历 d ON r.报告接收日期 = d.日期 WHERE d.年份 = 2021 GROUP BY r.厂商 ORDER BY c DESC LIMIT 5
+  must_include:
+  - - Ford
+  - - 53
+  - - Mercedes-Benz
+  - - 49
+  - - Daimler Trucks
+  - - 46
+  - - General Motors
+  - - 44
+  - - Chrysler
+    - FCA
+  - - 38
+  source: Malloy 官方样例 auto_recalls.malloy 的 view by_year_manufacturer_line_chart（按年份看前 5 个厂商）
+  expected:
+    columns:
+    - 厂商
+    - c
+    rows:
+    - - Ford Motor Company
+      - 53
+    - - Mercedes-Benz USA, LLC
+      - 49
+    - - Daimler Trucks North America, LLC
+      - 46
+    - - General Motors, LLC
+      - 44
+    - - Chrysler (FCA US, LLC)
+      - 38
+  qtype: 跨表关联
+- id: q08
+  question: 部件为安全气囊（AIR BAGS）的召回有多少条？潜在受影响数量合计多少？
+  sql: SELECT COUNT(*), SUM(潜在受影响数量) FROM 召回 WHERE 部件 = 'AIR BAGS'
+  must_include:
+  - - 93
+  - - 13167475
   source: 案例作者按本案例数据出题
-- id: q10
-  question: 2026 年第三季度（7 月至 9 月）发生了多少次维修？维修费用合计多少？
-  sql: SELECT COUNT(*), SUM(维修费用合计) FROM 维修记录 WHERE 维修日期 >= '2026-07-01' AND 维修日期 < '2026-10-01'
   expected:
     columns:
     - COUNT(*)
-    - SUM(维修费用合计)
+    - SUM(潜在受影响数量)
     rows:
-    - - 174
-      - 347170
-  qtype: 时间筛选
+    - - 93
+      - 13167475
+  qtype: 单表聚合
+- id: q09
+  question: 2022 年第一季度接收的召回有多少条？
+  sql: SELECT COUNT(*) FROM 召回 r JOIN 日历 c ON r.报告接收日期 = c.日期 WHERE c.季度 = '2022-Q1'
+  must_include:
+  - - 240
   source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    rows:
+    - - 240
+  qtype: 跨表关联
+- id: q10
+  question: Ford Motor Company 的召回一共多少条、潜在受影响数量合计多少？它涉及最多的部件是什么、几条？
+  sql: SELECT (SELECT COUNT(*) FROM 召回 WHERE 厂商 = 'Ford Motor Company'), (SELECT SUM(潜在受影响数量) FROM 召回 WHERE 厂商 = 'Ford Motor Company'), 部件, COUNT(*) AS c FROM 召回 WHERE 厂商 = 'Ford Motor Company' GROUP BY 部件 ORDER BY c DESC LIMIT 1
+  must_include:
+  - - 93
+  - - 12006149
+  - - POWER TRAIN
+    - 动力总成
+  - - 16
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - (SELECT COUNT(*) FROM 召回 WHERE 厂商 = 'Ford Motor Company')
+    - (SELECT SUM(潜在受影响数量) FROM 召回 WHERE 厂商 = 'Ford Motor Company')
+    - 部件
+    - c
+    rows:
+    - - 93
+      - 12006149
+      - POWER TRAIN
+      - 16
+  qtype: 排名
+- id: q11
+  question: 召回类型为轮胎（Tire）的召回有多少条？潜在受影响数量合计多少？
+  sql: SELECT COUNT(*), SUM(潜在受影响数量) FROM 召回 WHERE 召回类型 = 'Tire'
+  must_include:
+  - - 15
+  - - 911820
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    - SUM(潜在受影响数量)
+    rows:
+    - - 15
+      - 911820
+  qtype: 单表聚合
+- id: q12
+  question: 哪个部件的召回潜在受影响数量合计最大？是多少？
+  sql: SELECT 部件, SUM(潜在受影响数量) AS s FROM 召回 GROUP BY 部件 ORDER BY s DESC LIMIT 1
+  must_include:
+  - - AIR BAGS
+    - 安全气囊
+  - - 13167475
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 部件
+    - s
+    rows:
+    - - AIR BAGS
+      - 13167475
+  qtype: 排名

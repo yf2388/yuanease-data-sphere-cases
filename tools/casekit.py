@@ -282,7 +282,7 @@ def _cell(v) -> str:
 
 def _blocks(case_dir: Path) -> dict[str, str]:
     gold, doc = load_gold(case_dir), yaml.safe_load((case_dir / "questions.yaml").read_text(encoding="utf-8"))
-    ids = {e["table"]: " 或 ".join("+".join(c) for c in e.get("identifier", [])) for e in gold["entities"]}
+    ids = {e["table"]: " 或 ".join("+".join(c) for c in e.get("identifier", [])) or "无" for e in gold["entities"]}
     rows = ["| 文件 | 行数 | 列数 | 唯一标识列 |", "|---|---|---|---|"]
     files = {p.stem: p.name for p in (case_dir / "data").iterdir()}
     for name, (header, data) in _tables(case_dir / "data").items():

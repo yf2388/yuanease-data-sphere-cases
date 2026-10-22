@@ -1,43 +1,44 @@
-gold_version: case08-supply-disruption-v1
+gold_version: case08-brunel-v1
 status: frozen
 protocol: entity-model-score-v1
 weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
 weights_rationale: 沿用协议默认权重。
 derivation: >-
-  本案例为自建合成数据，表结构、主键与外键由 prepare/build_data.py 的生成规则决定，金标按生成规则写出并用 tools/casekit.py gold 核验。
-  订单金额 = 订单明细金额之和（生成时保证一致）。指标取剧本里要回答的量：订单金额、订单数、待发货订单数、在库数量、订货数量、计划数量。
+  七张表就是原始 xlsx 的七个工作表。原始文件没有声明主键与外键：唯一标识列按数据核验（tools/casekit.py gold），
+  关系按数据集说明（figshare 页与论文第 4.1 节：订单表的 Plant Code 是发货仓库；仓库产能、仓库成本各列一个仓库一行；
+  ProductsPerPlant 列出仓库能供应的产品，VmiCustomers 列出仓库的专属客户，PlantPorts 列出仓库能用的港口）。
+  仓库产能与仓库成本都是一个仓库一行，下游表的仓库代码与两张表都对得上；以仓库产能为必需目标，连到仓库成本的列为可选。
+  运费费率表有 3 行完全重复（1,540 行里只有 1,537 种），没有唯一标识列；它与订单按承运商、起运港、目的港、服务方式和重量区间对应，
+  不是普通的多对一，不列入关系（见 format_gaps）。
+  指标取停运分析要用的量：订单数、订购数量合计、重量合计、延迟发货订单数，以及仓库的日处理订单能力合计。
 entities:
-  - {table: 配送中心, kind: object, label: 配送中心, identifier: [[配送中心代码], [配送中心名称]]}
-  - {table: 成品, kind: object, label: 成品, identifier: [[成品编码], [成品名称]]}
-  - {table: 工厂, kind: object, label: 工厂, identifier: [[工厂代码], [工厂名称]]}
-  - {table: 客户, kind: object, label: 客户, identifier: [[客户编码]]}
-  - {table: 配送中心库存, kind: object, label: 配送中心库存, identifier: [[配送中心代码, 成品编码]]}
-  - {table: 销售订单, kind: event, label: 销售订单, identifier: [[订单号]]}
-  - {table: 订单明细, kind: event, label: 订单明细, identifier: [[订单号, 行号]]}
-  - {table: 生产计划, kind: event, label: 生产计划, identifier: [[计划号]]}
+  - {table: 订单, kind: event, label: 订单, identifier: [[订单编号]]}
+  - {table: 仓库产能, kind: object, label: 仓库产能, identifier: [[仓库代码]]}
+  - {table: 仓库成本, kind: object, label: 仓库成本, identifier: [[仓库代码]]}
+  - {table: 仓库可供产品, kind: object, label: 仓库可供产品, identifier: [[仓库代码, 产品编号]]}
+  - {table: VMI客户, kind: object, label: VMI客户, identifier: [[仓库代码, 客户]]}
+  - {table: 仓库港口, kind: object, label: 仓库港口, identifier: [[仓库代码, 港口]]}
+  - {table: 运费费率, kind: object, label: 运费费率, identifier: []}
 relations:
-  - {from: 配送中心库存, to: 配送中心, on: [[配送中心代码, 配送中心代码]], relationship: many_to_one}
-  - {from: 配送中心库存, to: 成品, on: [[成品编码, 成品编码]], relationship: many_to_one}
-  - {from: 销售订单, to: 客户, on: [[客户编码, 客户编码]], relationship: many_to_one}
-  - {from: 销售订单, to: 配送中心, on: [[发货配送中心代码, 配送中心代码]], relationship: many_to_one}
-  - {from: 订单明细, to: 销售订单, on: [[订单号, 订单号]], relationship: many_to_one}
-  - {from: 订单明细, to: 成品, on: [[成品编码, 成品编码]], relationship: many_to_one}
-  - {from: 生产计划, to: 工厂, on: [[工厂代码, 工厂代码]], relationship: many_to_one}
-  - {from: 生产计划, to: 成品, on: [[成品编码, 成品编码]], relationship: many_to_one}
+  - {from: 订单, to: 仓库产能, on: [[仓库代码, 仓库代码]], relationship: many_to_one}
+  - {from: 仓库可供产品, to: 仓库产能, on: [[仓库代码, 仓库代码]], relationship: many_to_one}
+  - {from: VMI客户, to: 仓库产能, on: [[仓库代码, 仓库代码]], relationship: many_to_one}
+  - {from: 仓库港口, to: 仓库产能, on: [[仓库代码, 仓库代码]], relationship: many_to_one}
+  - {from: 订单, to: 仓库可供产品, on: [[仓库代码, 仓库代码], [产品编号, 产品编号]], relationship: many_to_one, required: false}
+  - {from: 仓库成本, to: 仓库产能, on: [[仓库代码, 仓库代码]], relationship: one_to_one, required: false}
+  - {from: 订单, to: 仓库成本, on: [[仓库代码, 仓库代码]], relationship: many_to_one, required: false}
+  - {from: 仓库可供产品, to: 仓库成本, on: [[仓库代码, 仓库代码]], relationship: many_to_one, required: false}
+  - {from: VMI客户, to: 仓库成本, on: [[仓库代码, 仓库代码]], relationship: many_to_one, required: false}
+  - {from: 仓库港口, to: 仓库成本, on: [[仓库代码, 仓库代码]], relationship: many_to_one, required: false}
 metrics:
-  - {table: 销售订单, label: 订单金额, aggregate: sum, column: 订单金额, filters: []}
-  - {table: 销售订单, label: 订单数, aggregate: count, column: null, filters: []}
-  - {table: 销售订单, label: 待发货订单数, aggregate: count, column: null, filters: [{column: 订单状态, op: eq, value: 待发货}]}
-  - {table: 配送中心库存, label: 在库数量, aggregate: sum, column: 在库数量, filters: []}
-  - {table: 订单明细, label: 订货数量, aggregate: sum, column: 数量, filters: []}
-  - {table: 生产计划, label: 计划数量, aggregate: sum, column: 计划数量, filters: []}
-  - {table: 销售订单, label: 待发货订单金额, aggregate: sum, column: 订单金额, filters: [{column: 订单状态, op: eq, value: 待发货}], required: false}
-  - {table: 订单明细, label: 明细金额, aggregate: sum, column: 金额, filters: [], required: false}
-  - {table: 配送中心库存, label: 安全库存, aggregate: sum, column: 安全库存, filters: [], required: false}
-  - {table: 客户, label: 客户数, aggregate: count, column: null, filters: [], required: false}
-  - {table: 客户, label: A 级客户数, aggregate: count, column: null, filters: [{column: 客户等级, op: eq, value: A}], required: false}
-  - {table: 销售订单, label: 已签收订单数, aggregate: count, column: null, filters: [{column: 订单状态, op: eq, value: 已签收}], required: false}
-  - {table: 销售订单, label: 已发货订单数, aggregate: count, column: null, filters: [{column: 订单状态, op: eq, value: 已发货}], required: false}
+  - {table: 订单, label: 订单数, aggregate: count, column: null, filters: []}
+  - {table: 订单, label: 订购数量, aggregate: sum, column: 数量, filters: []}
+  - {table: 订单, label: 重量, aggregate: sum, column: 重量, filters: []}
+  - {table: 订单, label: 延迟发货订单数, aggregate: count, column: null, filters: [{column: 延迟发货天数, op: gt, value: 0}]}
+  - {table: 仓库产能, label: 日处理订单能力, aggregate: sum, column: 日处理订单能力, filters: []}
+  - {table: 订单, label: 客户数, aggregate: count_distinct, column: 客户, filters: [], required: false}
+  - {table: 订单, label: 产品数, aggregate: count_distinct, column: 产品编号, filters: [], required: false}
+  - {table: 仓库成本, label: 平均单位仓储成本, aggregate: avg, column: 单位仓储成本, filters: [], required: false}
 format_gaps:
-  - {area: metric, description: 可调拨量（在库数量 − 安全库存）需要列与列运算, tables: [配送中心库存]}
-  - {area: metric, description: 受停运影响的订单需要关联配送中心的状态（跨表筛选）, tables: [销售订单, 配送中心]}
+  - {area: relation, description: 订单与运费费率按承运商、起运港、目的港、服务方式四列相连，再按重量落在最小重量与最大重量之间取一行，是区间匹配，不是等值的多对一, tables: [订单, 运费费率]}
+  - {area: metric, description: 某仓库停运时的受影响订单数与数量，是按仓库代码筛选的订单数与订购数量，筛选值随情景变化，不写成固定指标, tables: [订单]}

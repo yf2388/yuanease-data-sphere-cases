@@ -1,0 +1,26 @@
+gold_version: case11-safetygate-v1
+status: frozen
+protocol: entity-model-score-v1
+weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
+weights_rationale: 沿用协议默认权重。
+derivation: >-
+  召回通报一条通报一行，通报编号（Safety Gate 的 caseNumber）在 448 条里唯一；周报编号是周报索引的 reference，52 份周报各一行；
+  通报风险由通报的风险类型按「, 」拆出，一条通报的同一风险只出现一次，通报编号 + 风险类型唯一。关系就是派生时用的两列。
+  已用 tools/casekit.py gold 核验。指标取召回统计常看的量：通报条数、涉及品牌数，以及按风险计的通报条数。
+entities:
+  - {table: 召回通报, kind: event, label: 召回通报, identifier: [[通报编号]]}
+  - {table: 周报, kind: object, label: 周报, identifier: [[周报编号], [标准日期], [发布日期], [周次]]}
+  - {table: 通报风险, kind: object, label: 通报风险, identifier: [[通报编号, 风险类型]]}
+relations:
+  - {from: 召回通报, to: 周报, on: [[周报编号, 周报编号]], relationship: many_to_one}
+  - {from: 通报风险, to: 召回通报, on: [[通报编号, 通报编号]], relationship: many_to_one}
+metrics:
+  - {table: 召回通报, label: 通报数, aggregate: count, column: null, filters: []}
+  - {table: 召回通报, label: 品牌数, aggregate: count_distinct, column: 品牌, filters: []}
+  - {table: 通报风险, label: 涉及风险的通报数, aggregate: count_distinct, column: 通报编号, filters: []}
+  - {table: 召回通报, label: 严重风险通报数, aggregate: count, column: null, filters: [{column: 风险等级, op: eq, value: Serious risk}], required: false}
+  - {table: 召回通报, label: 通报国数, aggregate: count_distinct, column: 通报国, filters: [], required: false}
+  - {table: 周报, label: 周报数, aggregate: count, column: null, filters: [], required: false}
+format_gaps:
+  - {area: metric, description: 按产品类型（如乘用车）统计需要先去掉首尾空格合并写法（原始数据有「 Passenger car」等 8 处首尾空格），单表指标只能按原始取值筛选, tables: [召回通报]}
+  - {area: metric, description: 按季度统计需要关联周报取发布日期，单表指标不能跨表筛选, tables: [召回通报, 周报]}
