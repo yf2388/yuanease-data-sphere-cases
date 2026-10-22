@@ -1,319 +1,248 @@
 case: 10-order-metric-types
-note: 期望值由 sql 在 data/ 上独立算出（python3 -I tools/casekit.py answers <案例目录> --write）。判对规则同 01 案例。数据覆盖 2026 年 1–9 月。
+note: 标准答案由 sql 在 data/ 上算出（tools/casekit.py answers），并由 prepare/truth_from_raw.py 直接从 Malloy 样例的原始 parquet 独立重算核对。销售额、毛利沿用 Malloy 演示模型的口径：按全部订单明细的售价合计（含已取消、已退货），毛利 = 售价合计 − 对应库存件成本合计。q01–q08 的问题意图取自 Malloy 官方样例 ecommerce.malloy 的度量与看板视图，统计范围是本案例裁剪后的 Florida 用户。
 questions:
 - id: q01
-  question: 订单按状态各有多少张？
-  sql: SELECT 订单状态, COUNT(*) FROM 订单 GROUP BY 订单状态 ORDER BY 2 DESC
+  question: 全部订单明细（含所有状态）的总销售额、订单数和总毛利各是多少？
+  sql: SELECT ROUND(SUM(o.售价), 2), COUNT(DISTINCT o.订单编号), ROUND(SUM(o.售价) - SUM(i.成本), 2) FROM 订单明细 o JOIN 库存件 i ON o.库存件编号 = i.库存件编号
+  must_include:
+  - - 447473.07
+  - - 9201
+  - - 232905.84
+  source: Malloy 官方样例 ecommerce.malloy 的 view business_overview_dashboard（度量 total_sales、order_count、total_gross_margin）
   expected:
     columns:
-    - 订单状态
-    - COUNT(*)
+    - ROUND(SUM(o.售价), 2)
+    - COUNT(DISTINCT o.订单编号)
+    - ROUND(SUM(o.售价) - SUM(i.成本), 2)
     rows:
-    - - 已交付
-      - 186
-    - - 已取消
-      - 16
-    - - 生产中
-      - 15
-  qtype: 分组统计
-  source: 案例作者按本案例数据出题
+    - - 447473.07
+      - 9201
+      - 232905.84
+  qtype: 跨表关联
 - id: q02
-  question: 不含已取消的订单，订单金额合计是多少？
-  sql: SELECT ROUND(SUM(订单金额), 2) FROM 订单 WHERE 订单状态 <> '已取消'
+  question: 按商品品类统计销售额（含所有状态），排前 5 的品类是哪些？各多少？
+  sql: SELECT i.商品品类, ROUND(SUM(o.售价), 2) AS s FROM 订单明细 o JOIN 库存件 i ON o.库存件编号 = i.库存件编号 GROUP BY i.商品品类 ORDER BY s DESC LIMIT 5
   must_include:
-  - - 38871019
-    - 3887.1万
-    - 3887.10万
+  - - Jeans
+    - 牛仔裤
+  - - 66745.31
+  - - Accessories
+    - 配饰
+  - - 44310.84
+  - - Fashion Hoodies
+    - 卫衣
+  - - 40287.99
+  - - Outerwear
+    - 外套
+  - - 35251.31
+  - - Tops & Tees
+    - Tops
+    - T恤
+  - - 32315.4
+  source: Malloy 官方样例 ecommerce.malloy 的 view top_categories
   expected:
     columns:
-    - ROUND(SUM(订单金额), 2)
+    - 商品品类
+    - s
     rows:
-    - - 38871019.0
-  qtype: 单表聚合
-  source: 案例作者按本案例数据出题
+    - - Jeans
+      - 66745.31
+    - - Accessories
+      - 44310.84
+    - - Fashion Hoodies & Sweatshirts
+      - 40287.99
+    - - Outerwear & Coats
+      - 35251.31
+    - - Tops & Tees
+      - 32315.4
+  qtype: 跨表关联
 - id: q03
-  question: 已交付订单的按期交付率是多少？
-  sql: SELECT ROUND(1.0 * SUM(是否按期 = '是') / SUM(订单状态 = '已交付'), 4) FROM 订单
+  question: 按品牌统计销售额（含所有状态），排前 3 的品牌是哪些？各自的销售额和占总销售额的比例是多少？
+  sql: SELECT i.商品品牌, ROUND(SUM(o.售价), 2) AS s, ROUND(SUM(o.售价) / (SELECT SUM(售价) FROM 订单明细), 4) FROM 订单明细 o JOIN 库存件 i ON o.库存件编号 = i.库存件编号 GROUP BY i.商品品牌 ORDER BY s DESC LIMIT 3
   must_include:
-  - - 0.7258
-    - 72.58
-    - 72.6
+  - - Levi's
+    - Levi
+    - 李维斯
+  - - 60215.79
+  - - 0.1346
+  - - Ray-Ban
+    - 雷朋
+  - - 32758.0
+  - - 0.0732
+  - - Columbia
+    - 哥伦比亚
+  - - 28607.97
+  - - 0.0639
+  source: Malloy 官方样例 ecommerce.malloy 的 view top_brands（度量 total_sales、percent_of_sales）
   expected:
     columns:
-    - ROUND(1.0 * SUM(是否按期 = '是') / SUM(订单状态 = '已交付'), 4)
+    - 商品品牌
+    - s
+    - ROUND(SUM(o.售价) / (SELECT SUM(售价) FROM 订单明细), 4)
     rows:
-    - - 0.7258
-  qtype: 比率
-  source: 案例作者按本案例数据出题
+    - - Levi's
+      - 60215.79
+      - 0.1346
+    - - Ray-Ban
+      - 32758.0
+      - 0.0732
+    - - Columbia
+      - 28607.97
+      - 0.0639
+  qtype: 跨表关联
 - id: q04
-  question: 报价的成交率是多少？一共报了多少次价？
-  sql: SELECT ROUND(1.0 * SUM(是否成交 = '是') / COUNT(*), 4), COUNT(*) FROM 报价单
+  question: 2022 年哪个月的销售额（含所有状态）最高？是多少？
+  sql: SELECT substr(下单时间, 1, 7) AS m, ROUND(SUM(售价), 2) AS s FROM 订单明细 WHERE 下单时间 LIKE '2022-%' GROUP BY m ORDER BY s DESC LIMIT 1
   must_include:
-  - - 0.5425
-    - 54.25
-    - 54.3
-  - 400
-  expected:
-    columns:
-    - ROUND(1.0 * SUM(是否成交 = '是') / COUNT(*), 4)
-    - COUNT(*)
-    rows:
-    - - 0.5425
-      - 400
-  qtype: 比率
-  source: 案例作者按本案例数据出题
-- id: q05
-  question: 不含已取消的订单，毛利（订单金额减订单成本）合计多少？毛利率是多少？
-  sql: SELECT ROUND(SUM(订单金额) - SUM(订单成本), 2), ROUND((SUM(订单金额) - SUM(订单成本)) / SUM(订单金额), 4) FROM 订单 WHERE 订单状态 <> '已取消'
-  must_include:
-  - - 10442712.06
-    - 1044.27万
-    - 1044.3万
-  - - 0.2687
-    - 26.87
-    - 26.9
-  expected:
-    columns:
-    - ROUND(SUM(订单金额) - SUM(订单成本), 2)
-    - ROUND((SUM(订单金额) - SUM(订单成本)) / SUM(订单金额), 4)
-    rows:
-    - - 10442712.06
-      - 0.2687
-  qtype: 比率
-  source: 案例作者按本案例数据出题
-- id: q06
-  question: 截至 2026 年 6 月底，累计订单金额（不含已取消）是多少？
-  sql: SELECT ROUND(SUM(订单金额), 2) FROM 订单 WHERE 订单状态 <> '已取消' AND 下单日期 < '2026-07-01'
-  must_include:
-  - - 23848201
-    - 2384.82万
-    - 2384.8万
-  expected:
-    columns:
-    - ROUND(SUM(订单金额), 2)
-    rows:
-    - - 23848201.0
-  qtype: 时间筛选
-  source: 案例作者按本案例数据出题
-- id: q07
-  question: 哪个月的订单金额（不含已取消）最高？是多少？
-  sql: SELECT SUBSTR(下单日期, 1, 7) AS m, ROUND(SUM(订单金额), 2) AS s FROM 订单 WHERE 订单状态 <> '已取消' GROUP BY m ORDER BY s DESC LIMIT 1
-  must_include:
-  - - 2026-07
-    - 7 月
-    - 7月
-  - - 8201938.5
-    - 820.19万
-    - 820.2万
+  - - 2022-09
+    - 9月
+    - 2022年9月
+  - - 17911.37
+  source: Malloy 官方样例 ecommerce.malloy 的 view sales_by_month_2022
   expected:
     columns:
     - m
     - s
     rows:
-    - - 2026-07
-      - 8201938.5
+    - - 2022-09
+      - 17911.37
   qtype: 排名
-  source: 案例作者按本案例数据出题
-- id: q08
-  question: 订单金额（不含已取消）最多的客户是谁？是多少？
-  sql: SELECT c.客户名称, ROUND(SUM(o.订单金额), 2) AS s FROM 订单 o JOIN 客户 c ON o.客户编码 = c.客户编码 WHERE o.订单状态 <> '已取消' GROUP BY c.客户名称 ORDER BY s DESC LIMIT 1
+- id: q05
+  question: 按订单明细的状态统计订单数（同一状态下按订单编号去重），各状态各有多少个订单？
+  sql: SELECT 状态, COUNT(DISTINCT 订单编号) FROM 订单明细 GROUP BY 状态 ORDER BY 状态
   must_include:
-  - 西部能源装备
-  - - 5537111.5
-    - 553.71万
-    - 553.7万
+  - - 298
+  - - 8721
+  - - 45
+  - - 79
+  - - 61
+  source: Malloy 官方样例 ecommerce.malloy 的 view orders_by_status
   expected:
     columns:
-    - 客户名称
+    - 状态
+    - COUNT(DISTINCT 订单编号)
+    rows:
+    - - Cancelled
+      - 298
+    - - Complete
+      - 8721
+    - - Processing
+      - 45
+    - - Returned
+      - 79
+    - - Shipped
+      - 61
+  qtype: 分组统计
+- id: q06
+  question: 退货不止一件的用户有哪些（用户编号）？各退了几件、退货金额合计多少？
+  sql: SELECT 用户编号, COUNT(*) AS c, ROUND(SUM(售价), 2) FROM 订单明细 WHERE 状态 = 'Returned' GROUP BY 用户编号 HAVING COUNT(*) > 1 ORDER BY 用户编号
+  must_include:
+  - - '21722'
+  - - 52.99
+  - - '147602'
+  - - 74.3
+  source: Malloy 官方样例 ecommerce.malloy 的 view frequent_returners
+  expected:
+    columns:
+    - 用户编号
+    - c
+    - ROUND(SUM(售价), 2)
+    rows:
+    - - 21722
+      - 2
+      - 52.99
+    - - 147602
+      - 2
+      - 74.3
+  qtype: 分组统计
+- id: q07
+  question: 2022 年的销售额（含所有状态）是多少？比 2021 年增长了多少？同比增长率是多少？
+  sql: SELECT ROUND(a.s, 2), ROUND(a.s - b.s, 2), ROUND(a.s / b.s - 1, 4) FROM (SELECT SUM(售价) AS s FROM 订单明细 WHERE 下单时间 LIKE '2022-%') a, (SELECT SUM(售价) AS s FROM 订单明细 WHERE 下单时间 LIKE '2021-%') b
+  must_include:
+  - - 162878.33
+  - - 26125.56
+  - - 0.191
+  source: Malloy 官方样例 ecommerce.malloy 的 view sales_summary_yoy（total_sales_2022、sales_growth、sales_yoy）
+  expected:
+    columns:
+    - ROUND(a.s, 2)
+    - ROUND(a.s - b.s, 2)
+    - ROUND(a.s / b.s - 1, 4)
+    rows:
+    - - 162878.33
+      - 26125.56
+      - 0.191
+  qtype: 单表聚合
+- id: q08
+  question: 销售额（含所有状态）最高的商品是哪个？销售额多少？
+  sql: SELECT i.商品名称, ROUND(SUM(o.售价), 2) AS s FROM 订单明细 o JOIN 库存件 i ON o.库存件编号 = i.库存件编号 GROUP BY i.商品名称 ORDER BY s DESC LIMIT 1
+  must_include:
+  - - RB2132
+    - New Wayfarer
+  - - 29668.45
+  source: Malloy 官方样例 ecommerce.malloy 的 view top_products
+  expected:
+    columns:
+    - 商品名称
     - s
     rows:
-    - - 西部能源装备
-      - 5537111.5
+    - - Ray-Ban RB2132  New Wayfarer Sunglasses
+      - 29668.45
   qtype: 跨表关联
-  source: 案例作者按本案例数据出题
 - id: q09
-  question: 按订货数量，哪个产品品类最多？订了多少件？
-  sql: SELECT p.品类, SUM(d.数量) AS n FROM 订单明细 d JOIN 产品 p ON d.产品编码 = p.产品编码 GROUP BY p.品类 ORDER BY n DESC LIMIT 1
-  expected:
-    columns:
-    - 品类
-    - n
-    rows:
-    - - 轴类件
-      - 18170
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
-- id: q10
-  question: 江南精密机械的报价成交率是多少？
-  sql: SELECT ROUND(1.0 * SUM(q.是否成交 = '是') / COUNT(*), 4) FROM 报价单 q JOIN 客户 c ON q.客户编码 = c.客户编码 WHERE c.客户名称 = '江南精密机械'
-  expected:
-    columns:
-    - ROUND(1.0 * SUM(q.是否成交 = '是') / COUNT(*), 4)
-    rows:
-    - - 0.6829
-  qtype: 跨表关联
-  source: 案例作者按本案例数据出题
-- id: q11
-  question: 2026 年每个月（不含已取消订单）的订单金额和订单数分别是多少？
-  sql: SELECT substr(下单日期, 1, 7) AS 月份, ROUND(SUM(订单金额), 2) AS 订单金额, COUNT(*) AS 订单数 FROM 订单 WHERE 订单状态 <> '已取消' GROUP BY 月份 ORDER BY 月份
-  expected:
-    columns:
-    - 月份
-    - 订单金额
-    - 订单数
-    rows:
-    - - 2026-01
-      - 2878326.5
-      - 21
-    - - 2026-02
-      - 2758055.0
-      - 23
-    - - 2026-03
-      - 6008253.5
-      - 29
-    - - 2026-04
-      - 5524980.0
-      - 25
-    - - 2026-05
-      - 3200293.0
-      - 25
-    - - 2026-06
-      - 3478293.0
-      - 12
-    - - 2026-07
-      - 8201938.5
-      - 26
-    - - 2026-08
-      - 3997333.0
-      - 26
-    - - 2026-09
-      - 2823546.5
-      - 14
+  question: 已退货的订单明细占全部订单明细的比例是多少？
+  sql: SELECT SUM(状态 = 'Returned'), COUNT(*), ROUND(1.0 * SUM(状态 = 'Returned') / COUNT(*), 4) FROM 订单明细
   must_include:
-  - 2878326.5
-  - 2758055
-  - 6008253.5
-  - 5524980
-  - 3200293
-  - 3478293
-  - 8201938.5
-  - 3997333
-  - 2823546.5
-  qtype: 分组统计
-  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs 「Test and query metrics」的 dbt sl query --metrics order_total,order_count --group-by order_id__order_date（按日改为按月）
-- id: q12
-  question: 每个月有多少位新客户（首次下单）？
-  sql: SELECT substr(首单日期, 1, 7) AS 月份, COUNT(*) AS 新客户数 FROM (SELECT 客户编码, MIN(下单日期) AS 首单日期 FROM 订单 GROUP BY 客户编码) GROUP BY 月份 ORDER BY 月份
+  - - 0.0084
+  source: 案例作者按本案例数据出题
   expected:
     columns:
-    - 月份
-    - 新客户数
+    - SUM(状态 = 'Returned')
+    - COUNT(*)
+    - ROUND(1.0 * SUM(状态 = 'Returned') / COUNT(*), 4)
     rows:
-    - - 2026-01
-      - 9
-    - - 2026-02
-      - 1
-  must_include:
-  - 9
-  - 1
-  qtype: 分组统计
-  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs Hex 小节练习：按首单日期看每天新增客户数（按日改为按月）
-- id: q13
-  question: 2026 年 9 月（不含已取消）的订单金额和订单数是多少？
-  sql: SELECT ROUND(SUM(订单金额), 2) AS 订单金额, COUNT(*) AS 订单数 FROM 订单 WHERE 订单状态 <> '已取消' AND 下单日期 BETWEEN '2026-09-01' AND '2026-09-30'
-  expected:
-    columns:
-    - 订单金额
-    - 订单数
-    rows:
-    - - 2823546.5
-      - 14
-  qtype: 时间筛选
-  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs Google Sheets 小节练习：查询 order_total 并按 order_date 筛选（日期为本案例选定）
-- id: q14
-  question: 1–9 月（不含已取消）的订单金额、订单数、大额订单数（订单金额不低于 10 万元）、下单客户数、平均订单金额、大额订单占比分别是多少？
-  sql: SELECT ROUND(SUM(订单金额), 2) AS 订单金额, COUNT(*) AS 订单数, SUM(订单金额 >= 100000) AS 大额订单数, COUNT(DISTINCT 客户编码) AS 下单客户数, ROUND(SUM(订单金额) / COUNT(*), 2) AS 平均订单金额, ROUND(1.0 * SUM(订单金额 >= 100000) / COUNT(*), 4) AS 大额订单占比 FROM 订单 WHERE 订单状态 <> '已取消'
-  expected:
-    columns:
-    - 订单金额
-    - 订单数
-    - 大额订单数
-    - 下单客户数
-    - 平均订单金额
-    - 大额订单占比
-    rows:
-    - - 38871019.0
-      - 201
-      - 105
-      - 10
-      - 193388.15
-      - 0.5224
+    - - 79
+      - 9448
+      - 0.0084
   qtype: 比率
-  source: dbt Semantic Layer 快速入门 https://docs.getdbt.com/guides/sl-qs Sigma 小节的六指标查询（order_total、order_count、large_orders、customers_with_orders、avg_order_value、pct_of_orders_that_are_large；去掉按日分组，大额门槛由 20 美元改为 10 万元）
-- id: q15
-  question: 按周（周一起算）统计不含已取消的订单金额，哪一周最高？是多少？
-  sql: SELECT DATE(o.下单日期, '-6 days', 'weekday 1') AS 周一, ROUND(SUM(m.金额), 2) AS 周订单金额 FROM 订单 o JOIN 订单明细 m ON m.订单号 = o.订单号 WHERE o.订单状态 <> '已取消' GROUP BY 周一 ORDER BY 周订单金额 DESC LIMIT 1
-  expected:
-    columns:
-    - 周一
-    - 周订单金额
-    rows:
-    - - '2026-07-06'
-      - 3323580.0
+- id: q10
+  question: 2022 年 1 月至 6 月的累计销售额（含所有状态）是多少？
+  sql: SELECT ROUND(SUM(售价), 2) FROM 订单明细 WHERE 下单时间 >= '2022-01-01' AND 下单时间 < '2022-07-01'
   must_include:
-  - - '2026-07-06'
-    - 7月6日
-    - 07-06
-    - 7/6
-  - 3323580
-  qtype: 跨表关联
-  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template 的 saved query weekly_revenue（改为求最高的一周）
-- id: q16
-  question: 一共下了多少张订单（含已取消）？其中已取消多少张？
-  sql: SELECT COUNT(*) AS 全部订单, SUM(订单状态 = '已取消') AS 其中已取消 FROM 订单
+  - - 87596.34
+  source: 案例作者按本案例数据出题
   expected:
     columns:
-    - 全部订单
-    - 其中已取消
+    - ROUND(SUM(售价), 2)
     rows:
-    - - 217
-      - 16
-  qtype: 单表聚合
-  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template 的 saved query total_orders_full_aggregate
-- id: q17
-  question: 2026 年 9 月（不含已取消）的订单金额、订单数、下单客户数，较 8 月分别变化了多少（环比）？
-  sql: WITH m AS (SELECT substr(下单日期, 1, 7) AS 月份, SUM(订单金额) AS 金额, COUNT(*) AS 单数, COUNT(DISTINCT 客户编码) AS 客户数 FROM 订单 WHERE 订单状态 <> '已取消' GROUP BY 月份) SELECT ROUND(a.金额 / b.金额 - 1, 4) AS 金额环比, ROUND(1.0 * a.单数 / b.单数 - 1, 4) AS 订单数环比, ROUND(1.0 * a.客户数 / b.客户数 - 1, 4) AS 客户数环比 FROM m a JOIN m b ON a.月份 = '2026-09' AND b.月份 = '2026-08'
-  expected:
-    columns:
-    - 金额环比
-    - 订单数环比
-    - 客户数环比
-    rows:
-    - - -0.2936
-      - -0.4615
-      - -0.1
+    - - 87596.34
+  qtype: 时间筛选
+- id: q11
+  question: 首次下单（用户最早一条订单明细的下单时间）在 2021 年的用户有多少个？其中在首单后 90 天内又下了另一笔订单的用户占多少比例？
+  sql: WITH f AS (SELECT 用户编号, MIN(下单时间) AS t FROM 订单明细 GROUP BY 用户编号), c AS (SELECT f.用户编号, MAX(CASE WHEN o.下单时间 > f.t AND julianday(o.下单时间) <= julianday(f.t) + 90 AND o.订单编号 <> (SELECT 订单编号 FROM 订单明细 WHERE 用户编号 = f.用户编号 AND 下单时间 = f.t LIMIT 1) THEN 1 ELSE 0 END) AS rep FROM f JOIN 订单明细 o ON o.用户编号 = f.用户编号 WHERE f.t LIKE '2021-%' GROUP BY f.用户编号) SELECT COUNT(*), SUM(rep), ROUND(1.0 * SUM(rep) / COUNT(*), 4) FROM c
   must_include:
-  - - -0.2936
-    - 0.2936
-  - - -0.4615
-    - 0.4615
-  - - -0.1
-    - 0.1
-  qtype: 跨表关联
-  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template Evidence 首页的 monthly_stats（最近一个月与上月的收入、订单数、客户数对比；固定为 2026-09 对 2026-08）
-- id: q18
-  question: 累计消费（不含已取消订单）最高的客户是谁？累计多少张订单、平均每单多少？
-  sql: SELECT c.客户名称, COUNT(*) AS 累计订单数, ROUND(SUM(o.订单金额), 2) AS 累计消费, ROUND(SUM(o.订单金额) / COUNT(*), 2) AS 平均订单金额 FROM 订单 o JOIN 客户 c ON c.客户编码 = o.客户编码 WHERE o.订单状态 <> '已取消' GROUP BY c.客户名称 ORDER BY 累计消费 DESC LIMIT 1
+  - - 1369
+  - - 0.2725
+  source: 案例作者按本案例数据出题
   expected:
     columns:
-    - 客户名称
-    - 累计订单数
-    - 累计消费
-    - 平均订单金额
+    - COUNT(*)
+    - SUM(rep)
+    - ROUND(1.0 * SUM(rep) / COUNT(*), 4)
     rows:
-    - - 西部能源装备
-      - 24
-      - 5537111.5
-      - 230712.98
+    - - 1369
+      - 373
+      - 0.2725
   qtype: 跨表关联
-  source: dbt Labs 示例仓库 dbt-labs/jaffle-sl-template Evidence 客户页的 customers 查询（每个客户的累计订单数、累计消费、平均订单金额，按累计消费降序）
+- id: q12
+  question: 2022 年的毛利（售价合计减去对应库存件成本合计，含所有状态）是多少？
+  sql: SELECT ROUND(SUM(o.售价) - SUM(i.成本), 2) FROM 订单明细 o JOIN 库存件 i ON o.库存件编号 = i.库存件编号 WHERE o.下单时间 LIKE '2022-%'
+  must_include:
+  - - 85216.26
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - ROUND(SUM(o.售价) - SUM(i.成本), 2)
+    rows:
+    - - 85216.26
+  qtype: 跨表关联

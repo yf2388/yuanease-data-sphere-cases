@@ -126,16 +126,33 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 
 ## 6. 欧盟 Safety Gate 周报（CC BY 4.0）
 
-- 用于：`cases/06-auto-quality-analysis`
+- 用于：`cases/11-eu-vehicle-recalls`
 - 署名：© European Union, Safety Gate – the EU rapid alert system for dangerous non-food products, <https://ec.europa.eu/safety-gate-alerts/>，2025 年第 1–52 期周报
 - 许可：欧盟委员会网站法律声明（<https://commission.europa.eu/legal-notice_en>）规定其自有内容以 CC BY 4.0 授权，依据为 2011 年 12 月 12 日关于委员会文件再利用的委员会决定（2011/833/EU）。品牌名称、商标不在授权范围内，本仓库只把它们作为通报里的事实取值使用；周报里的产品图片未使用。
-- 改动：只取产品类别为 Motor vehicles 的 448 条通报；字段名译为中文；派生周报表与通报风险表。通报文字未改。逐份周报的下载地址与 sha256 见 `cases/06-auto-quality-analysis/prepare/sources.tsv`。
+- 改动：只取产品类别为 Motor vehicles 的 448 条通报；字段名译为中文；派生周报表与通报风险表。通报文字未改。逐份周报的下载地址与 sha256 见 `cases/11-eu-vehicle-recalls/prepare/sources.tsv`。
 
-## 7. 自建合成数据
+## 7. Google Malloy 官方样例（malloydata/malloy-samples，MIT）
 
-`cases/10-order-metric-types` 的数据由 `prepare/build_data.py` 以固定随机数种子生成，全部为虚构内容，不涉及任何真实企业或个人，按本仓库 LICENSE 第 2 类（CC BY 4.0）授权。`cases/04-cnc-machine-failure` 的设备台账、产线、班组、失效模式主数据与加工时间同样为自建。
+- 用于：`cases/06-auto-quality-analysis`（auto_recalls：美国 NHTSA 召回数据，Malloy README 注明取自 <https://catalog.data.gov/dataset/recalls-data>，底层为美国联邦政府作品、属公有领域）、`cases/10-order-metric-types`（thelook 虚构电商数据）
+- 来源：<https://github.com/malloydata/malloy-samples>（固定到提交 89eb0fda584e3b146bf04e2d31585d8f9b6ab7ec）
+- 改动：06 只取 2021 年起的召回、列名汉化、派生日历与两张中文译名对照表；10 只取 Florida 用户及其订单、库存件、商品，去掉用户姓名、邮箱、邮编、经纬度，列名汉化。取值未改。
+- 问答题：两案例 questions.yaml 里标注出处的题目，问题意图取自样例的语义模型 auto_recalls.malloy、ecommerce.malloy 的度量与视图（改写为中文问句，标准答案由本仓库数据独立算出）。
 
-## 8. 问答题的公开出处（只借问题意图，不含数据）
+```
+Copyright 2023 Google LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+## 8. 自建合成数据
+
+`cases/04-cnc-machine-failure` 的设备台账、产线、班组、失效模式主数据与加工时间由本仓库自建，按本仓库 LICENSE 第 2 类（CC BY 4.0）授权。
+
+## 9. 问答题的公开出处（只借问题意图，不含数据）
 
 下列案例 `questions.yaml` 里 `source` 标注了出处的题目（q11 起），问题意图或示例查询口径取自对应的公开文档；题干改写为中文、不依赖上下文的问句，原文与代码未复制，标准答案全部由本仓库 `data/` 上的 SQL 独立算出。
 
@@ -145,4 +162,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 | `cases/04-cnc-machine-failure` | Microsoft Learn「Fabric 数据科学：predictive maintenance」教程 Step 2、3、6 的数据说明与分析结论；UCI AI4I 2020 数据集页的失效模式说明 |
 | `cases/05-purchasing-metrics` | Databricks 文档「Metric views TPC-H example」Step 8 的按月与状态查询；Microsoft Learn PIVOT 文档的 Complex PIVOT example（AdventureWorks 采购单） |
 | `cases/08-supply-disruption` | Palantir 博客「Building with Palantir AIP」系列 Data Tools、Logic Tools 两篇的配送中心起火剧本（剧本步骤与提示词意图，改写为本案例数据上的仓库停运假设；博客数据与原文未使用） |
-| `cases/10-order-metric-types` | dbt Semantic Layer 快速入门（docs.getdbt.com/guides/sl-qs）的示例查询与练习；dbt Labs 示例仓库 dbt-labs/jaffle-sl-template 的 saved queries 与 Evidence 报表查询 |
+| `cases/06-auto-quality-analysis` | Google Malloy 官方样例 auto_recalls 的语义模型 auto_recalls.malloy 与 README 演示查询（MIT） |
+| `cases/10-order-metric-types` | Google Malloy 官方样例 ecommerce.malloy 的度量与看板视图（MIT）；五类指标的分法沿用 dbt Semantic Layer / MetricFlow 的指标类型 |

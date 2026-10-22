@@ -1,65 +1,62 @@
-"""直接从 Safety Gate 原始周报 XML 独立重算本案例全部问答题的标准答案，并与 questions.yaml 的 expected 比对。
+"""直接从 Malloy 样例里的原始 auto_recalls.csv 独立重算本案例全部问答题的标准答案，并与 questions.yaml 的 expected 比对。
 
-不经过 data/ 与 SQL：只读原始 XML 的元素名，用 Python 标准库计算，用来证明标准答案出自原始数据。
-另外按 prepare/sources.tsv 核对每份周报 XML 的 sha256，确认用的是登记过的原始文件。
+不经过 data/ 与 SQL：只用原始列名和 Python 标准库计算，用来证明标准答案出自原始数据。另外核对 data/召回.csv 与原始文件的对应行逐列相同。
 
-用法：python3 -I truth_from_raw.py <下载目录：含 list-en.xml 与 weekly/Report-2025-*.xml>
+用法：python3 -I truth_from_raw.py <auto_recalls.csv>
 """
 
 import csv
-import hashlib
 import sys
-import xml.etree.ElementTree as ET
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 import yaml
 
 CASE = Path(__file__).resolve().parent.parent
-CN = "People's Republic of China"
+
+
+def iso(mdy: str) -> str:
+    m, d, y = mdy.split("/")
+    return f"{y}-{m}-{d}"
 
 
 def main(src: str) -> int:
-    src = Path(src)
-    with open(CASE / "prepare" / "sources.tsv", encoding="utf-8", newline="") as fh:
-        for row in csv.DictReader(fh, delimiter="\t"):
-            if row["file"].startswith("weekly/"):
-                assert hashlib.sha256((src / row["file"]).read_bytes()).hexdigest() == row["sha256"], row["file"]
-    week_date = {}
-    for w in ET.parse(src / "list-en.xml").getroot().findall("weeklyReport"):
-        if w.findtext("year") == "2025":
-            d, m, y = w.findtext("publicationDate").split("/")
-            week_date[w.findtext("reference")] = f"{y}-{m}-{d}"
-    notes = []  # (周报编号, 通报元素的取值字典)
-    for ref in week_date:
-        for n in ET.parse(src / "weekly" / f"{ref}.xml").getroot().findall("notifications"):
-            if n.findtext("category") == "Motor vehicles":
-                notes.append((ref, {c.tag: c.text or "" for c in n}))
-    get = lambda k: [v[k] for _, v in notes]
-    product = lambda v: v["product"].strip()
-    risks = lambda v: v["riskType"].split(", ")
-    brands = Counter(get("brand"))
-    top3 = sorted(brands.items(), key=lambda x: (-x[1], x[0]))[:3]
-    fire = sum("Fire" in risks(v) for _, v in notes)
-    country = Counter(get("notifyingCountry")).most_common(1)[0]
-    cn = [v for _, v in notes if v["countryOfOrigin"] == CN]
-    cn_top = Counter(product(v) for v in cn).most_common(1)[0]
-    per_week = Counter(ref for ref, _ in notes)
-    top_week = max(per_week, key=per_week.get)
-    pro = [v for _, v in notes if v["type"] == "Professional"]
-    kia = [v for _, v in notes if v["brand"] == "Kia"]
-    other = sorted((v["caseNumber"], v["brand"]) for _, v in notes if v["level"] != "Serious risk")
+    with open(src, encoding="utf-8-sig", newline="") as fh:
+        raw = list(csv.reader(fh))
+    kept = [r for r in raw[1:] if iso(r[0]) >= "2021-01-01"]
+    with open(CASE / "data" / "召回.csv", encoding="utf-8-sig", newline="") as fh:
+        assert list(csv.reader(fh))[1:] == kept, "data/召回.csv 与原始文件不一致"
+    rows = [dict(zip(raw[0], r)) for r in kept]
+    for r in rows:
+        r["iso"], r["n"] = iso(r["Report Received Date"]), int(r["Potentially Affected"])
+    total = len(rows)
+    by_mfr, aff_mfr = Counter(r["Manufacturer"] for r in rows), defaultdict(int)
+    for r in rows:
+        aff_mfr[r["Manufacturer"]] += r["n"]
+    rank = lambda cnt: sorted(cnt.items(), key=lambda x: -x[1])
+    by_type = Counter(r["Recall Type"] for r in rows)
+    latest = max(r["iso"] for r in rows)
+    on_latest = [r for r in rows if r["iso"] == latest]
+    brake = [r for r in rows if "brake" in r["Recall Description"].lower()]
+    aff_comp = defaultdict(int)
+    for r in rows:
+        aff_comp[r["Component"]] += r["n"]
+    ford = [r for r in rows if r["Manufacturer"] == "Ford Motor Company"]
+    air = [r for r in rows if r["Component"] == "AIR BAGS"]
+    tire = [r for r in rows if r["Recall Type"] == "Tire"]
     truth = {
-        "q01": [[len(notes), sum(product(v) == "Passenger car" for _, v in notes)]],
-        "q02": [list(x) for x in top3],
-        "q03": [[fire, round(fire / len(notes), 4)]],
-        "q04": [list(country)],
-        "q05": [[len(cn), *cn_top]],
-        "q06": [[top_week, week_date[top_week], per_week[top_week]]],
-        "q07": [[sum("2025-07-01" <= week_date[ref] <= "2025-09-30" for ref, _ in notes)]],
-        "q08": [[len(pro), sum(product(v) == "Lorry" for v in pro)]],
-        "q09": [[len(kia), sum("Injuries" in risks(v) for v in kia)]],
-        "q10": [[len(other), *x] for x in other],
+        "q01": [[m, c, aff_mfr[m], round(100 * c / total, 2)] for m, c in rank(by_mfr)[:3]],
+        "q02": [[t, c, round(100 * c / total, 2)] for t, c in rank(by_type)],
+        "q03": [[int(y), c] for y, c in sorted(Counter(r["iso"][:4] for r in rows).items())],
+        "q04": [[latest, len(on_latest), on_latest[0]["Manufacturer"], on_latest[0]["NHTSA ID"]]],
+        "q05": [[r["Manufacturer"], r["NHTSA ID"], r["n"]] for r in sorted(rows, key=lambda r: -r["n"])[:3]],
+        "q06": [[len(brake), *rank(Counter(r["Manufacturer"] for r in brake))[0]]],
+        "q07": [list(x) for x in rank(Counter(r["Manufacturer"] for r in rows if r["iso"][:4] == "2021"))[:5]],
+        "q08": [[len(air), sum(r["n"] for r in air)]],
+        "q09": [[sum("2022-01-01" <= r["iso"] <= "2022-03-31" for r in rows)]],
+        "q10": [[len(ford), sum(r["n"] for r in ford), *rank(Counter(r["Component"] for r in ford))[0]]],
+        "q11": [[len(tire), sum(r["n"] for r in tire)]],
+        "q12": [list(rank(aff_comp)[0])],
     }
     doc = yaml.safe_load((CASE / "questions.yaml").read_text(encoding="utf-8"))
     bad = 0
