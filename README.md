@@ -4,26 +4,28 @@
 
 本仓库收录 10 个可以从零复现的行业案例。每个案例都包含：
 
-- `data/`：用 CSV 文件模拟一个业务数据库，体积在几 MB 以内；
+- `data/`：CSV 表格，体积在几 MB 以内；多数案例取自公开的真实数据或厂商样例库，由 `prepare/` 下的脚本从原始文件生成；
 - `README.md`：从新建资料库、上传表格、构筑实体模型、审核发布到问数的逐步教程，配 Yuanease 实拍截图；
 - `gold.yaml`：实体、唯一标识列、关系与指标的金标，有主外键的数据集直接从原始建表语句推导；
 - `questions.yaml`：10–16 道问答题，标准答案由题目里的 SQL 在 `data/` 上独立算出；每题的 `source` 写明出处：出自竞品或开源项目公开教程、示例查询的题（「原作者题」），或案例作者按数据补出的题（「自补题」）；
-- `prepare/`：从原始公开数据（或固定随机数种子）重新生成 `data/` 的脚本。
+- `prepare/`：从原始公开数据（或固定随机数种子）重新生成 `data/` 的脚本；真实数据案例另有直接从原始文件重算标准答案的脚本。
 
 ## 案例一览
 
-| 编号 | 案例 | 行业场景 | 数据来源 | 表数 |
-|---|---|---|---|---|
-| 01 | [多工厂供应链：库存、物料清单与订单](cases/01-supply-chain-network/) | 离散制造 · 供应链 | Snowflake 公开教程数据（MIT） | 11 |
-| 02 | [冷链门店本体：库存、冷柜遥测与货运](cases/02-cold-chain-ontology/) | 冷链 · 设备遥测 | Microsoft Fabric 本体教程数据（MIT） | 7 |
-| 03 | [自行车生产：物料清单、工单与工序](cases/03-bike-production-bom/) | 离散制造 · 生产执行 | Microsoft AdventureWorks（MIT） | 11 |
-| 04 | [数控设备故障分析](cases/04-cnc-machine-failure/) | 机加工 · 设备维修 | UCI AI4I 2020（CC BY 4.0）+ 自建台账 | 6 |
-| 05 | [采购与供应商指标](cases/05-purchasing-metrics/) | 采购 · 来料检验 | Microsoft AdventureWorks（MIT） | 9 |
-| 06 | [整车质量分析](cases/06-auto-quality-analysis/) | 汽车 · 售后质量 | 自建合成数据 | 8 |
-| 07 | [多工厂设备综合效率（OEE）](cases/07-multi-plant-oee/) | 注塑 / 冲压 / 装配 | 自建合成数据 | 7 |
-| 08 | [配送中心停运后的订单影响与调拨](cases/08-supply-disruption/) | 泵阀制造 · 供应中断 | 自建合成数据 | 8 |
-| 09 | [钢铁厂能耗分析](cases/09-steel-plant-energy/) | 钢铁 · 能源管理 | UCI 钢铁厂能耗数据（CC BY 4.0） | 4 |
-| 10 | [定制加工订单的五类指标](cases/10-order-metric-types/) | 机加工 · 订单交付 | 自建合成数据 | 5 |
+| 编号 | 案例 | 行业场景 | 数据档位 | 数据来源 | 表数 |
+|---|---|---|---|---|---|
+| 01 | [多工厂供应链：库存、物料清单与订单](cases/01-supply-chain-network/) | 离散制造 · 供应链 | 厂商样例 | Snowflake 公开教程数据（MIT） | 11 |
+| 02 | [冷链门店本体：库存、冷柜遥测与货运](cases/02-cold-chain-ontology/) | 冷链 · 设备遥测 | 厂商样例 | Microsoft Fabric 本体教程数据（MIT） | 7 |
+| 03 | [自行车生产：物料清单、工单与工序](cases/03-bike-production-bom/) | 离散制造 · 生产执行 | 厂商样例 | Microsoft AdventureWorks（MIT） | 11 |
+| 04 | [数控设备故障分析](cases/04-cnc-machine-failure/) | 机加工 · 设备维修 | ⚠️ 虚构 | UCI AI4I 2020 合成数据（CC BY 4.0）+ 自建台账 | 6 |
+| 05 | [采购与供应商指标](cases/05-purchasing-metrics/) | 采购 · 来料检验 | 厂商样例 | Microsoft AdventureWorks（MIT） | 9 |
+| 06 | [整车召回通报分析](cases/06-auto-quality-analysis/) | 汽车 · 售后质量 | 真实测量 | 欧盟 Safety Gate 2025 年机动车召回通报（CC BY 4.0） | 3 |
+| 07 | [服装厂班组生产效率](cases/07-garment-team-productivity/) | 服装 · 生产绩效 | 真实测量 | UCI 服装企业班组日报（CC BY 4.0） | 3 |
+| 08 | [仓库停运后的订单影响与替代仓库](cases/08-supply-disruption/) | 芯片 · 出库物流 | 真实测量 | Brunel 大学公开的芯片制造商出库物流数据（CC BY 4.0） | 7 |
+| 09 | [钢铁厂能耗分析](cases/09-steel-plant-energy/) | 钢铁 · 能源管理 | 真实测量 | UCI 钢铁厂实测用电数据（CC BY 4.0） | 4 |
+| 10 | [定制加工订单的五类指标](cases/10-order-metric-types/) | 机加工 · 订单交付 | ⚠️ 虚构 | 自建合成数据 | 5 |
+
+数据档位的含义：**真实测量**是企业、研究机构或监管机构公开的真实业务记录；**厂商样例**是软件厂商为教程公开发布的样例库（公司与数据虚构，但出自第三方、可从原始文件逐字节复现）；**虚构**是本仓库自建的数据。每个案例的原始文件地址、许可、sha256、改动与复现方法见 [PROVENANCE.md](PROVENANCE.md)。
 
 源自其他厂商公开教程的案例，只复现其业务场景与问题清单，并在案例 README 开头注明出处；教程文字与截图均为本仓库自行撰写与拍摄。
 

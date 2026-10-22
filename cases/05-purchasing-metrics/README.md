@@ -1,5 +1,7 @@
 # 案例 05 · 采购与供应商指标
 
+> **数据档位：厂商样例**。数据是 Microsoft AdventureWorks 示例数据库（虚构的自行车企业，但出自第三方、不是本仓库编的），本仓库译了列名与类目、状态名称，数值未改。出处、许可、原始文件 sha256 与复现方法见 [PROVENANCE.md](../../PROVENANCE.md)。
+
 > 场景参考自 Databricks 指标视图（Metric Views）公开教程（<https://docs.databricks.com/aws/en/business-semantics/metric-views/tpch-example>）的指标建模方法：多表关联、带筛选的指标、组合指标。
 > 原教程使用的 TPC-H 样例数据再分发条款未核实，本案例改用微软 AdventureWorks 的采购数据（MIT 许可）重做；教程文字、截图均为本仓库自行撰写与拍摄。
 > 问答题 q11 改写自上述 Databricks 教程的示例查询；q12 取自微软 PIVOT 文档里针对 AdventureWorks 采购单的示例查询（<https://learn.microsoft.com/en-us/sql/t-sql/queries/from-using-pivot-and-unpivot>）。

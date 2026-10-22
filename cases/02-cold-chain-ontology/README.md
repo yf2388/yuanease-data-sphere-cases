@@ -1,5 +1,7 @@
 # 案例 02 · 冷链门店本体：库存、冷柜遥测与货运
 
+> **数据档位：厂商样例**。数据是 Microsoft 为本体教程公开发布的样例（公司与数据为虚构，但出自第三方、不是本仓库编的），本仓库只译了表名列名、改写了布尔与时间格式，取值未改。出处、许可、原始文件 sha256 与复现方法见 [PROVENANCE.md](../../PROVENANCE.md)。
+
 > 场景参考自 Microsoft Fabric IQ 本体（Ontology）教程「Lakeshore Retail」（<https://learn.microsoft.com/en-us/fabric/iq/ontology/tutorial-0-introduction>）。
 > 本案例只复现其业务场景与问题；数据来自 microsoft/fabric-samples 仓库（MIT 许可），表名与列名已译为中文；教程文字、截图均为本仓库自行撰写与拍摄。
 
@@ -38,7 +40,7 @@
 - 「库存」是一次快照（同一快照时间），门店编号 + 产品编号唯一定位一行；「库存状态」0 表示有风险、1 表示健康。
 - 时间均为原数据的 UTC 时间。
 
-数据来源与改动：取自 microsoft/fabric-samples 仓库 `docs-samples/iq/ontology/new-experience` 下的 7 个 CSV；表名、列名译为中文；布尔值写成「是/否」；时间写成「YYYY-MM-DD HH:MM:SS」；不含 SalesReport.pbix（原教程用它建「销售」实体）。
+数据来源与改动：取自 microsoft/fabric-samples 仓库 `docs-samples/iq/ontology/new-experience` 下的 7 个 CSV；表名、列名译为中文；布尔值写成「是/否」；时间写成「YYYY-MM-DD HH:MM:SS」（原始带 Z，表示 UTC，本案例的时间仍是 UTC）；不含 SalesReport.pbix（原教程用它建「销售」实体）。
 
 ## 操作步骤
 

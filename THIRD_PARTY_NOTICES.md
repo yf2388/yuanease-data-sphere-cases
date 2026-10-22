@@ -108,18 +108,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 
 ## 4. UCI 机器学习库数据集（CC BY 4.0）
 
-以下数据集按知识共享 署名 4.0 国际许可协议（CC BY 4.0，<https://creativecommons.org/licenses/by/4.0/>）使用。改编内容见对应案例的 `prepare/build_data.py`。
+以下数据集按知识共享 署名 4.0 国际许可协议（CC BY 4.0，<https://creativecommons.org/licenses/by/4.0/>）使用。改编内容见对应案例的 `prepare/build_data.py` 与 [PROVENANCE.md](PROVENANCE.md)。
 
 | 用于 | 数据集 | 署名 | 来源 | 改动 |
 |---|---|---|---|---|
-| `cases/04-cnc-machine-failure` | AI4I 2020 Predictive Maintenance Dataset | AI4I 2020 Predictive Maintenance Dataset (2020). UCI Machine Learning Repository. https://doi.org/10.24432/C5HS5C ；论文 S. Matzka (2020) | <https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset> | 列名汉化；按行序分配到 10 台设备并生成加工时间与班组；由失效模式标志派生故障事件表；叠加自建的设备台账、产线、班组、失效模式主数据 |
+| `cases/04-cnc-machine-failure` | AI4I 2020 Predictive Maintenance Dataset（UCI 页面写明为合成数据） | AI4I 2020 Predictive Maintenance Dataset (2020). UCI Machine Learning Repository. https://doi.org/10.24432/C5HS5C ；论文 S. Matzka (2020) | <https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset> | 列名汉化；按行序分配到 10 台设备并生成加工时间与班组；由失效模式标志派生故障事件表；叠加自建的设备台账、产线、班组、失效模式主数据 |
+| `cases/07-garment-team-productivity` | Productivity Prediction of Garment Employees | Productivity Prediction of Garment Employees [Dataset]. (2020). UCI Machine Learning Repository. https://doi.org/10.24432/C51S6D ；论文 A. A. Imran, M. S. Rahim, T. Ahmed (2021), Mining the productivity data of the garment industry, International Journal of Business Intelligence and Data Mining 19(3) | <https://archive.ics.uci.edu/dataset/597/productivity+prediction+of+garment+employees> | 列名汉化，取值与行序不变；派生部门对照表与日历表 |
 | `cases/09-steel-plant-energy` | Steel Industry Energy Consumption | V E, S., Shin, C., & Cho, Y. (2021). Steel Industry Energy Consumption [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C52G8C | <https://archive.ics.uci.edu/dataset/851/steel+industry+energy+consumption> | 只取 2018 年 1–3 月；列名汉化；时间格式改写；拆出日历表，叠加自建的负荷类型与班次表 |
 
-## 5. 自建合成数据
+## 5. Brunel University London：Supply Chain Logistics Problem Dataset（CC BY 4.0）
 
-`cases/06-auto-quality-analysis`、`cases/07-multi-plant-oee`、`cases/08-supply-disruption`、`cases/10-order-metric-types` 的数据由各自 `prepare/build_data.py` 以固定随机数种子生成，全部为虚构内容，不涉及任何真实企业或个人，按本仓库 LICENSE 第 2 类（CC BY 4.0）授权。
+- 用于：`cases/08-supply-disruption`
+- 署名：Kalganova, T., & Dzalbs, I. (2019). Supply Chain Logistics Problem Dataset. Brunel University London. Dataset. https://doi.org/10.17633/rd.brunel.7558679.v2 ；论文 I. Dzalbs, T. Kalganova (2020), Accelerating supply chains with Ant Colony Optimization across a range of hardware solutions, Computers & Industrial Engineering 147:106610
+- 来源：<https://brunel.figshare.com/articles/dataset/Supply_Chain_Logistics_Problem_Dataset/7558679>
+- 许可：CC BY 4.0（<https://creativecommons.org/licenses/by/4.0/>）
+- 改动：7 个工作表各存成一个 CSV，表名、列名译为中文；订单日期写成 YYYY-MM-DD；去掉没有列名的空白列。取值未改。
 
-## 6. 问答题的公开出处（只借问题意图，不含数据）
+## 6. 欧盟 Safety Gate 周报（CC BY 4.0）
+
+- 用于：`cases/06-auto-quality-analysis`
+- 署名：© European Union, Safety Gate – the EU rapid alert system for dangerous non-food products, <https://ec.europa.eu/safety-gate-alerts/>，2025 年第 1–52 期周报
+- 许可：欧盟委员会网站法律声明（<https://commission.europa.eu/legal-notice_en>）规定其自有内容以 CC BY 4.0 授权，依据为 2011 年 12 月 12 日关于委员会文件再利用的委员会决定（2011/833/EU）。品牌名称、商标不在授权范围内，本仓库只把它们作为通报里的事实取值使用；周报里的产品图片未使用。
+- 改动：只取产品类别为 Motor vehicles 的 448 条通报；字段名译为中文；派生周报表与通报风险表。通报文字未改。逐份周报的下载地址与 sha256 见 `cases/06-auto-quality-analysis/prepare/sources.tsv`。
+
+## 7. 自建合成数据
+
+`cases/10-order-metric-types` 的数据由 `prepare/build_data.py` 以固定随机数种子生成，全部为虚构内容，不涉及任何真实企业或个人，按本仓库 LICENSE 第 2 类（CC BY 4.0）授权。`cases/04-cnc-machine-failure` 的设备台账、产线、班组、失效模式主数据与加工时间同样为自建。
+
+## 8. 问答题的公开出处（只借问题意图，不含数据）
 
 下列案例 `questions.yaml` 里 `source` 标注了出处的题目（q11 起），问题意图或示例查询口径取自对应的公开文档；题干改写为中文、不依赖上下文的问句，原文与代码未复制，标准答案全部由本仓库 `data/` 上的 SQL 独立算出。
 
@@ -128,6 +144,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 | `cases/03-bike-production-bom` | Microsoft Learn T-SQL 文档（WITH common_table_expression 示例 E、EXCEPT and INTERSECT 示例、FROM - Using PIVOT and UNPIVOT 的 Basic PIVOT example）；SQL Server 2005 文档 AdventureWorks Manufacturing Scenario 与 Product Scenario；AdventureWorks 安装脚本 instawdb.sql 的 ufnGetStock（MIT） |
 | `cases/04-cnc-machine-failure` | Microsoft Learn「Fabric 数据科学：predictive maintenance」教程 Step 2、3、6 的数据说明与分析结论；UCI AI4I 2020 数据集页的失效模式说明 |
 | `cases/05-purchasing-metrics` | Databricks 文档「Metric views TPC-H example」Step 8 的按月与状态查询；Microsoft Learn PIVOT 文档的 Complex PIVOT example（AdventureWorks 采购单） |
-| `cases/07-multi-plant-oee` | Databricks 解决方案加速器 databricks-industry-solutions/factory-optimization 的 notebook 场景问题与看板面板 |
-| `cases/08-supply-disruption` | Palantir 博客「Building with Palantir AIP」系列 Data Tools、Logic Tools 两篇的配送中心起火剧本（剧本步骤与提示词意图；博客数据与原文未使用） |
+| `cases/08-supply-disruption` | Palantir 博客「Building with Palantir AIP」系列 Data Tools、Logic Tools 两篇的配送中心起火剧本（剧本步骤与提示词意图，改写为本案例数据上的仓库停运假设；博客数据与原文未使用） |
 | `cases/10-order-metric-types` | dbt Semantic Layer 快速入门（docs.getdbt.com/guides/sl-qs）的示例查询与练习；dbt Labs 示例仓库 dbt-labs/jaffle-sl-template 的 saved queries 与 Evidence 报表查询 |
