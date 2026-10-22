@@ -45,7 +45,6 @@ def main(src: str) -> int:
     cn = [v for _, v in notes if v["countryOfOrigin"] == CN]
     cn_top = Counter(product(v) for v in cn).most_common(1)[0]
     per_week = Counter(ref for ref, _ in notes)
-    top_week = max(per_week, key=per_week.get)
     pro = [v for _, v in notes if v["type"] == "Professional"]
     kia = [v for _, v in notes if v["brand"] == "Kia"]
     other = sorted((v["caseNumber"], v["brand"]) for _, v in notes if v["level"] != "Serious risk")
@@ -55,7 +54,7 @@ def main(src: str) -> int:
         "q03": [[fire, round(fire / len(notes), 4)]],
         "q04": [list(country)],
         "q05": [[len(cn), *cn_top]],
-        "q06": [[top_week, week_date[top_week], per_week[top_week]]],
+        "q06": [[w, week_date[w], per_week[w]] for w in sorted(per_week) if per_week[w] == max(per_week.values())],
         "q07": [[sum("2025-07-01" <= week_date[ref] <= "2025-09-30" for ref, _ in notes)]],
         "q08": [[len(pro), sum(product(v) == "Lorry" for v in pro)]],
         "q09": [[len(kia), sum("Injuries" in risks(v) for v in kia)]],

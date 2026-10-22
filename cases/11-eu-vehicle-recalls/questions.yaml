@@ -1,5 +1,5 @@
 case: 11-eu-vehicle-recalls
-note: 产品类型有几处首尾多了空格（例如「 Passenger car」），按去掉首尾空格后的写法统计。标准答案由 sql 在 data/ 上算出（tools/casekit.py answers），并由 prepare/truth_from_raw.py 直接从 Safety Gate 原始周报 XML 独立重算核对。品牌、国家等按通报里的原始写法统计，不合并大小写或别名。
+note: q06 实跑后修订（2026-10-22 22:40，独立判分发现第 2 周与第 33 周并列 22 条）：题干补「如有并列，全部列出」，答出任一并列周即算对，修订前的回答（第 33 周）判定不变。产品类型有几处首尾多了空格（例如「 Passenger car」），按去掉首尾空格后的写法统计。标准答案由 sql 在 data/ 上算出（tools/casekit.py answers），并由 prepare/truth_from_raw.py 直接从 Safety Gate 原始周报 XML 独立重算核对。品牌、国家等按通报里的原始写法统计，不合并大小写或别名。
 questions:
 - id: q01
   question: 2025 年 Safety Gate 一共发布了多少条机动车召回通报？其中乘用车（Passenger car）多少条？
@@ -93,16 +93,16 @@ questions:
       - 6
   qtype: 排名
 - id: q06
-  question: 哪一份周报里的机动车召回通报最多？是哪天发布的？有多少条？
-  sql: SELECT w.周报编号, w.标准日期, COUNT(*) AS c FROM 召回通报 n JOIN 周报 w ON n.周报编号 = w.周报编号 GROUP BY w.周报编号 ORDER BY c DESC LIMIT 1
+  question: 哪一份周报里的机动车召回通报最多？是哪天发布的？有多少条？（如有并列，全部列出）
+  sql: WITH t AS (SELECT w.周报编号, w.标准日期, COUNT(*) AS c FROM 召回通报 n JOIN 周报 w ON n.周报编号 = w.周报编号 GROUP BY w.周报编号) SELECT * FROM t WHERE c = (SELECT MAX(c) FROM t) ORDER BY 周报编号
   must_include:
   - - Report-2025-33
     - 2025-33
     - 第33周
     - 第 33 周
-  - - '2025-08-15'
-    - 8月15日
-    - 15/08/2025
+    - Report-2025-2
+    - 第2周
+    - 第 2 周
   - - 22
   source: 案例作者按本案例数据出题
   expected:
@@ -111,6 +111,9 @@ questions:
     - 标准日期
     - c
     rows:
+    - - Report-2025-2
+      - '2025-01-10'
+      - 22
     - - Report-2025-33
       - '2025-08-15'
       - 22

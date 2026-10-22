@@ -14,4 +14,4 @@
 | 08-supply-disruption | 13 | `91d444b9e5409623e0bdc7448ba2a8174a15bbc6cb24db688fc815626c82e729` |
 | 09-steel-plant-energy | 10 | `168d41d2f6a062c109c0b3ce7cab7b118c5f8d51d5219518517eefcfce0f91e5` |
 | 10-order-metric-types | 12 | `d37f730321003cb820b48a4345fee967d362efa77c77abd642b5b3ff2c3a945e` |
-| 11-eu-vehicle-recalls | 10 | `2c130023591d93c6ec97da10caac6c87238c49cb814e11ba181e7ae43907af53` |
+| 11-eu-vehicle-recalls | 10 | `931110ddbb1f0b326acc3afb6bc2aeb57bdf20800c0345fe734cd9b6f7bbad52` |
