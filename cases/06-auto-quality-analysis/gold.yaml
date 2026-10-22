@@ -1,53 +1,26 @@
-gold_version: case06-auto-quality-v1
+gold_version: case06-safetygate-v1
 status: frozen
 protocol: entity-model-score-v1
 weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
 weights_rationale: 沿用协议默认权重。
 derivation: >-
-  本案例为自建合成数据，表结构、主键与外键由 prepare/build_data.py 的生成规则决定，金标按生成规则写出并用 tools/casekit.py gold 核验。
-  指标按公开的汽车行业质量评价口径：维修次数、维修费用、每百辆问题数（PP100 = 报告问题数合计 / 样本车辆数合计，产品里的比率不含 ×100）、
-  客户满意度（满意度评分平均值）、投诉率（投诉回访数 / 回访数）。每千辆维修频次与单车维修成本跨表或需要去重计数，列在 format_gaps。
+  召回通报一条通报一行，通报编号（Safety Gate 的 caseNumber）在 448 条里唯一；周报编号是周报索引的 reference，52 份周报各一行；
+  通报风险由通报的风险类型按「, 」拆出，一条通报的同一风险只出现一次，通报编号 + 风险类型唯一。关系就是派生时用的两列。
+  已用 tools/casekit.py gold 核验。指标取召回统计常看的量：通报条数、涉及品牌数，以及按风险计的通报条数。
 entities:
-  - {table: 车型, kind: object, label: 车型, identifier: [[车型代码], [车型名称]]}
-  - {table: 生产基地, kind: object, label: 生产基地, identifier: [[基地代码]]}
-  - {table: 服务站, kind: object, label: 服务站, identifier: [[服务站代码]]}
-  - {table: 故障代码, kind: object, label: 故障代码, identifier: [[故障代码]]}
-  - {table: 车辆, kind: object, label: 车辆, identifier: [[VIN码]]}
-  - {table: 维修记录, kind: event, label: 维修记录, identifier: [[维修单号]]}
-  - {table: 客户回访, kind: event, label: 客户回访, identifier: [[回访编号]]}
-  - {table: 市场调查, kind: event, label: 市场调查, identifier: [[调查编号], [调查批次, 车型代码]]}
+  - {table: 召回通报, kind: event, label: 召回通报, identifier: [[通报编号]]}
+  - {table: 周报, kind: object, label: 周报, identifier: [[周报编号], [标准日期], [发布日期], [周次]]}
+  - {table: 通报风险, kind: object, label: 通报风险, identifier: [[通报编号, 风险类型]]}
 relations:
-  - {from: 车辆, to: 车型, on: [[车型代码, 车型代码]], relationship: many_to_one}
-  - {from: 车辆, to: 生产基地, on: [[基地代码, 基地代码]], relationship: many_to_one}
-  - {from: 维修记录, to: 车辆, on: [[VIN码, VIN码]], relationship: many_to_one}
-  - {from: 维修记录, to: 故障代码, on: [[故障代码, 故障代码]], relationship: many_to_one}
-  - {from: 维修记录, to: 服务站, on: [[服务站代码, 服务站代码]], relationship: many_to_one}
-  - {from: 客户回访, to: 车辆, on: [[VIN码, VIN码]], relationship: many_to_one}
-  - {from: 市场调查, to: 车型, on: [[车型代码, 车型代码]], relationship: many_to_one}
+  - {from: 召回通报, to: 周报, on: [[周报编号, 周报编号]], relationship: many_to_one}
+  - {from: 通报风险, to: 召回通报, on: [[通报编号, 通报编号]], relationship: many_to_one}
 metrics:
-  - {table: 维修记录, label: 维修次数, aggregate: count, column: null, filters: []}
-  - {table: 维修记录, label: 维修费用, aggregate: sum, column: 维修费用合计, filters: []}
-  - {table: 客户回访, label: 客户满意度, aggregate: avg, column: 满意度评分, filters: []}
-  - table: 客户回访
-    label: 投诉率
-    aggregate: ratio
-    numerator: {aggregate: count, filters: [{column: 是否投诉, op: eq, value: 是}]}
-    denominator: {aggregate: count, filters: []}
-  - table: 市场调查
-    label: 每百辆问题数
-    aggregate: ratio
-    numerator: {aggregate: sum, column: 报告问题数, filters: []}
-    denominator: {aggregate: sum, column: 样本车辆数, filters: []}
-  - {table: 车辆, label: 车辆数, aggregate: count, column: null, filters: []}
-  - {table: 维修记录, label: 保修维修次数, aggregate: count, column: null, filters: [{column: 维修类型, op: eq, value: 保修}], required: false}
-  - {table: 维修记录, label: 工时费, aggregate: sum, column: 工时费, filters: [], required: false}
-  - {table: 维修记录, label: 配件费, aggregate: sum, column: 配件费, filters: [], required: false}
-  - {table: 维修记录, label: 平均维修费用, aggregate: avg, column: 维修费用合计, filters: [], required: false}
-  - {table: 维修记录, label: 维修车辆数, aggregate: count_distinct, column: VIN码, filters: [], required: false}
-  - {table: 客户回访, label: 回访数, aggregate: count, column: null, filters: [], required: false}
-  - {table: 客户回访, label: 投诉数, aggregate: count, column: null, filters: [{column: 是否投诉, op: eq, value: 是}], required: false}
-  - {table: 市场调查, label: 样本车辆数, aggregate: sum, column: 样本车辆数, filters: [], required: false}
-  - {table: 市场调查, label: 报告问题数, aggregate: sum, column: 报告问题数, filters: [], required: false}
+  - {table: 召回通报, label: 通报数, aggregate: count, column: null, filters: []}
+  - {table: 召回通报, label: 品牌数, aggregate: count_distinct, column: 品牌, filters: []}
+  - {table: 通报风险, label: 涉及风险的通报数, aggregate: count_distinct, column: 通报编号, filters: []}
+  - {table: 召回通报, label: 严重风险通报数, aggregate: count, column: null, filters: [{column: 风险等级, op: eq, value: Serious risk}], required: false}
+  - {table: 召回通报, label: 通报国数, aggregate: count_distinct, column: 通报国, filters: [], required: false}
+  - {table: 周报, label: 周报数, aggregate: count, column: null, filters: [], required: false}
 format_gaps:
-  - {area: metric, description: 每千辆维修频次 = 维修次数 / 车辆数 × 1000，分子分母在两张表, tables: [维修记录, 车辆]}
-  - {area: metric, description: 单车维修成本 = 维修费用合计 / 维修过的车辆数（去重计数），比率里不能用去重计数, tables: [维修记录]}
+  - {area: metric, description: 按产品类型（如乘用车）统计需要先去掉首尾空格合并写法（原始数据有「 Passenger car」等 8 处首尾空格），单表指标只能按原始取值筛选, tables: [召回通报]}
+  - {area: metric, description: 按季度统计需要关联周报取发布日期，单表指标不能跨表筛选, tables: [召回通报, 周报]}

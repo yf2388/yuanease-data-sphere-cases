@@ -1,0 +1,204 @@
+case: 07-garment-team-productivity
+note: 标准答案由 sql 在 data/ 上算出（tools/casekit.py answers），并由 prepare/truth_from_raw.py 直接从 UCI 原始文件独立重算核对。后整部门在原始数据里有「finishing」与「finishing 」（带尾随空格）两种写法，按部门名称统计时两种写法合并。
+questions:
+- id: q01
+  question: 一共有多少条班组日报？覆盖多少个生产日，从哪天到哪天？
+  sql: SELECT COUNT(*), COUNT(DISTINCT r.日期), MIN(c.标准日期), MAX(c.标准日期) FROM 班组日报 r JOIN 日历 c ON r.日期 = c.日期
+  must_include:
+  - - 1197
+  - - 59
+  - - '2015-01-01'
+    - 2015年1月1日
+    - 1月1日
+    - 1/1/2015
+  - - '2015-03-11'
+    - 2015年3月11日
+    - 3月11日
+    - 3/11/2015
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    - COUNT(DISTINCT r.日期)
+    - MIN(c.标准日期)
+    - MAX(c.标准日期)
+    rows:
+    - - 1197
+      - 59
+      - '2015-01-01'
+      - '2015-03-11'
+  qtype: 跨表关联
+- id: q02
+  question: 缝制部门和后整部门各有多少条日报？平均实际效率分别是多少？
+  sql: SELECT d.部门名称, COUNT(*), ROUND(AVG(r.实际效率), 4) FROM 班组日报 r JOIN 部门 d ON r.部门 = d.部门 GROUP BY d.部门名称 ORDER BY d.部门名称
+  must_include:
+  - - 506
+  - - 0.753
+  - - 691
+  - - 0.722
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 部门名称
+    - COUNT(*)
+    - ROUND(AVG(r.实际效率), 4)
+    rows:
+    - - 后整
+      - 506
+      - 0.753
+    - - 缝制
+      - 691
+      - 0.722
+  qtype: 跨表关联
+- id: q03
+  question: 实际效率达到或超过目标效率的日报，占全部日报的比例是多少？
+  sql: SELECT SUM(实际效率 >= 目标效率), COUNT(*), ROUND(1.0 * SUM(实际效率 >= 目标效率) / COUNT(*), 4) FROM 班组日报
+  must_include:
+  - - 0.731
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - SUM(实际效率 >= 目标效率)
+    - COUNT(*)
+    - ROUND(1.0 * SUM(实际效率 >= 目标效率) / COUNT(*), 4)
+    rows:
+    - - 875
+      - 1197
+      - 0.731
+  qtype: 比率
+- id: q04
+  question: 按「部门 + 班组」统计平均实际效率，最低的是哪个组合？是多少？
+  sql: SELECT d.部门名称, '第' || r.班组 || '组', ROUND(AVG(r.实际效率), 4) AS v FROM 班组日报 r JOIN 部门 d ON r.部门 = d.部门 GROUP BY d.部门名称, r.班组 ORDER BY v LIMIT 1
+  must_include:
+  - - 后整
+  - - 6组
+    - 第6
+    - 班组6
+    - 组6
+    - 6号
+  - - 0.6279
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 部门名称
+    - '''第'' || r.班组 || ''组'''
+    - v
+    rows:
+    - - 后整
+      - 第6组
+      - 0.6279
+  qtype: 跨表关联
+- id: q05
+  question: 闲置时间合计是多少？最长的一次闲置发生在哪一天、哪个部门的哪个班组？
+  sql: SELECT (SELECT SUM(闲置时间) FROM 班组日报), c.标准日期, d.部门名称, '第' || r.班组 || '组', r.闲置时间 FROM 班组日报 r JOIN 日历 c ON r.日期 = c.日期 JOIN 部门 d ON r.部门 = d.部门 ORDER BY r.闲置时间 DESC LIMIT 1
+  must_include:
+  - - 874
+  - - '2015-02-07'
+    - 2月7日
+    - 2/7/2015
+  - - 缝制
+  - - 8组
+    - 第8
+    - 班组8
+    - 组8
+    - 8号
+  - - 300
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - (SELECT SUM(闲置时间) FROM 班组日报)
+    - 标准日期
+    - 部门名称
+    - '''第'' || r.班组 || ''组'''
+    - 闲置时间
+    rows:
+    - - 874.0
+      - '2015-02-07'
+      - 缝制
+      - 第8组
+      - 300.0
+  qtype: 多表综合
+- id: q06
+  question: 有款式变更（款式变更次数大于 0）的日报有多少条？这些日报的平均实际效率是多少？
+  sql: SELECT COUNT(*), ROUND(AVG(实际效率), 4) FROM 班组日报 WHERE 款式变更次数 > 0
+  must_include:
+  - - 147
+  - - 0.6256
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - COUNT(*)
+    - ROUND(AVG(实际效率), 4)
+    rows:
+    - - 147
+      - 0.6256
+  qtype: 单表聚合
+- id: q07
+  question: 2015 年 2 月，缝制部门的加班时间合计多少分钟？
+  sql: SELECT SUM(r.加班时间_分钟) FROM 班组日报 r JOIN 日历 c ON r.日期 = c.日期 JOIN 部门 d ON r.部门 = d.部门 WHERE c.月份 = '2015-02' AND d.部门名称 = '缝制'
+  must_include:
+  - - 1338920
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - SUM(r.加班时间_分钟)
+    rows:
+    - - 1338920
+  qtype: 多表综合
+- id: q08
+  question: 按天统计全部班组的平均实际效率，最低的是哪一天？是多少？
+  sql: SELECT c.标准日期, ROUND(AVG(r.实际效率), 4) AS v FROM 班组日报 r JOIN 日历 c ON r.日期 = c.日期 GROUP BY c.标准日期 ORDER BY v LIMIT 1
+  must_include:
+  - - '2015-02-26'
+    - 2月26日
+    - 2/26/2015
+  - - 0.6341
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 标准日期
+    - v
+    rows:
+    - - '2015-02-26'
+      - 0.6341
+  qtype: 跨表关联
+- id: q09
+  question: 2015 年 1 月 15 日，缝制部门第 8 组的实际效率和目标效率各是多少？
+  sql: SELECT r.实际效率, r.目标效率 FROM 班组日报 r JOIN 日历 c ON r.日期 = c.日期 JOIN 部门 d ON r.部门 = d.部门 WHERE c.标准日期 = '2015-01-15' AND d.部门名称 = '缝制' AND r.班组 = 8
+  must_include:
+  - - 0.8504
+  - - 0.8
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - 实际效率
+    - 目标效率
+    rows:
+    - - 0.8504
+      - 0.8
+  qtype: 多表综合
+- id: q10
+  question: 激励金额合计多少塔卡？按「部门 + 班组」看，激励金额合计最多的是哪个组合、多少塔卡？
+  sql: SELECT (SELECT SUM(激励金额_塔卡) FROM 班组日报), d.部门名称, '第' || r.班组 || '组', SUM(r.激励金额_塔卡) AS v FROM 班组日报 r JOIN 部门 d ON r.部门 = d.部门 GROUP BY d.部门名称, r.班组 ORDER BY v DESC LIMIT 1
+  must_include:
+  - - 45738
+  - - 缝制
+  - - 1组
+    - 第1
+    - 班组1
+    - 组1
+    - 1号
+  - - 3933
+  source: 案例作者按本案例数据出题
+  expected:
+    columns:
+    - (SELECT SUM(激励金额_塔卡) FROM 班组日报)
+    - 部门名称
+    - '''第'' || r.班组 || ''组'''
+    - v
+    rows:
+    - - 45738
+      - 缝制
+      - 第1组
+      - 3933
+  qtype: 跨表关联

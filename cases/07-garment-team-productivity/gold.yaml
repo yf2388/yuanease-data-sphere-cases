@@ -1,0 +1,29 @@
+gold_version: case07-garment-v1
+status: frozen
+protocol: entity-model-score-v1
+weights: {entities: 0.3, identifiers: 0.2, relations: 0.3, metrics: 0.2}
+weights_rationale: 沿用协议默认权重。
+derivation: >-
+  班组日报是 UCI 原始文件原样（只换列名）；原始文件没有主键，日期 + 部门 + 班组三列组合在 1,197 行里唯一（部门按原始取值区分，
+  finishing 与「finishing 」两种写法各自成值；按去掉空格后的部门名称组合也唯一），已用 tools/casekit.py gold 核验。
+  部门、日历两张表由 prepare/build_data.py 从班组日报的取值派生，关系就是派生它们的那一列。
+  指标取原始数据集文档列出的生产绩效变量：实际效率、目标效率的平均，加班时间、闲置时间、激励金额的合计，以及日报条数。
+entities:
+  - {table: 班组日报, kind: event, label: 班组日报, identifier: [[日期, 部门, 班组]]}
+  - {table: 部门, kind: object, label: 部门, identifier: [[部门]]}
+  - {table: 日历, kind: object, label: 日历, identifier: [[日期], [标准日期]]}
+relations:
+  - {from: 班组日报, to: 部门, on: [[部门, 部门]], relationship: many_to_one}
+  - {from: 班组日报, to: 日历, on: [[日期, 日期]], relationship: many_to_one}
+metrics:
+  - {table: 班组日报, label: 日报数, aggregate: count, column: null, filters: []}
+  - {table: 班组日报, label: 平均实际效率, aggregate: avg, column: 实际效率, filters: []}
+  - {table: 班组日报, label: 加班时间, aggregate: sum, column: 加班时间_分钟, filters: []}
+  - {table: 班组日报, label: 闲置时间, aggregate: sum, column: 闲置时间, filters: []}
+  - {table: 班组日报, label: 激励金额, aggregate: sum, column: 激励金额_塔卡, filters: []}
+  - {table: 班组日报, label: 平均目标效率, aggregate: avg, column: 目标效率, filters: [], required: false}
+  - {table: 班组日报, label: 款式变更次数, aggregate: sum, column: 款式变更次数, filters: [], required: false}
+  - {table: 班组日报, label: 闲置人数, aggregate: sum, column: 闲置人数, filters: [], required: false}
+format_gaps:
+  - {area: metric, description: 目标达成率（实际效率不低于目标效率的日报占比）需要列与列比较，单表指标的筛选只能和常量比, tables: [班组日报]}
+  - {area: metric, description: 按部门名称（缝制 / 后整）统计需要先关联部门表合并两种 finishing 写法，单表指标只能按原始部门取值筛选, tables: [班组日报, 部门]}
